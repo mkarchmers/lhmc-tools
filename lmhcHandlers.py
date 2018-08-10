@@ -23,6 +23,19 @@ def user_key(uid):
     """
     return ndb.Key('User',uid)
 
+class ModelEncoder(json.JSONEncoder):
+    def default(self, obj): 
+
+        if isinstance(obj, db.Model): 
+            properties = obj.properties().items() 
+            output = {} 
+            for field, value in properties: 
+                output[field] = getattr(obj, field) 
+            return output 
+
+        return json.JSONEncoder.default(self, obj) 
+
+
 # for testing
 class Test(ndb.Model):
 
@@ -63,12 +76,12 @@ class GetHandler(webapp2.RequestHandler):
 
 class Patient(db.Model):
 
-    fname = db.StringProperty()
+    fname = db.StringProperty(indexed=False)
     lname = db.StringProperty()
-    dob = db.StringProperty()
+    dob = db.StringProperty(indexed=False)
     pid = db.StringProperty()
     insurance = db.StringProperty()
-    session_number = db.IntegerProperty()
+    session_number = db.IntegerProperty(indexed=False)
     user_id = db.StringProperty()
 
     def increment(self, amount=1):
@@ -130,7 +143,6 @@ class Session(db.Model):
     notes = db.StringProperty(multiline=True)
 
 
-
 class Insurance(db.Model):
 
     name = db.StringProperty()
@@ -165,6 +177,7 @@ class EmailHandler(webapp2.RequestHandler):
         email = "not logged in" if (user is None) else user.email()
         self.response.write(email)
 
+
 class Insurance_init(webapp2.RequestHandler):
 
     def get(self):
@@ -185,8 +198,6 @@ class Insurance_init(webapp2.RequestHandler):
         i.modality_of_session = "FamilyWPatient"
         i.put()
         self.response.write("done!")
-
-
 
 
 class InsuranceHandler(webapp2.RequestHandler):
@@ -215,15 +226,6 @@ class InsuranceHandler(webapp2.RequestHandler):
 
         self.response.write(json.dumps(obj))
 
-
-class NP(webapp2.RequestHandler):
-
-    def post(self):
-        parms = {}
-        for (k,v) in self.request.POST.items():
-            parms[k] = v
-        url = "/patients?" + urllib.urlencode(parms)
-        self.redirect(url)
         
 class NS(webapp2.RequestHandler):
 
@@ -238,43 +240,37 @@ class NS(webapp2.RequestHandler):
         #self.redirect(url)
 
 class PatientHandler(webapp2.RequestHandler):
-    def get(self):
 
-        self.response.headers['Content-Type'] = 'application/json'
+    def post(self):
+        user = users.get_current_user()
+
+        parms = {}
+        for (k,v) in self.request.POST.items():
+            parms[k] = v
+        parms['session_number'] = 0
+        parms['user_id'] = user.user_id()
+        parms['pid'] = str(r.randint(0, 10000000000))
+        p = Patient(**parms)
+        p.put()
+
+        self.redirect('/')
+
+    def get(self):
 
         user = users.get_current_user()
         uid = user.user_id()
 
-        if self.request.get('lname') is not '':
-            pid = str(r.randint(0, 10000000000))
-            new_patient = {'id': pid, 'fname': self.request.get('fname'),
-                           'lname': self.request.get('lname'),'dob': self.request.get('dob'),
-                           'insurance': self.request.get('insurance'), 'session_number': 0}
-            p = Patient(fname=new_patient['fname'], lname=new_patient['lname'], dob=new_patient['dob'], pid=new_patient['id']
-                        , insurance=new_patient['insurance'], session_number=new_patient['session_number'], user_id=uid)
-            p.put()
-
-        else:
-            new_patient = None
-
-        pid = self.request.get('id')
         query = db.Query(Patient)
-
         query.filter('user_id =', uid)
 
-        if pid != '':
-            query.filter('pid =', pid)
+        #s = [{'fname': x.fname, 'lname': x.lname, 'dob': x.dob, 'pid': x.pid,
+        #      'insurance': x.insurance, 'session_number': x.session_number} for x in query.run()]
+        s = list(query.run())
+        obj = {'patient_list': s}
 
-            s = [{'fname': x.fname, 'lname': x.lname, 'dob': x.dob, 'id': x.pid,
-                  'insurance': x.insurance, 'session_number': x.session_number} for x in query.run(limit=100)]
-            obj = {'patient': s[0]}
-        else:
-            s = [{'fname': x.fname, 'lname': x.lname, 'dob': x.dob, 'id': x.pid,
-                  'insurance': x.insurance, 'session_number': x.session_number} for x in query.run(limit=100)]
-            obj = {'patient_list': s, 'latest': new_patient}
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.write(json.dumps(obj, cls=ModelEncoder))
 
-
-        self.response.write(json.dumps(obj))
 
 
 class BillingHandler(webapp2.RequestHandler):

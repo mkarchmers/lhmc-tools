@@ -631,7 +631,7 @@
               </div>
 
               <div class="patient_form">
-                <form id="new_patient_form" action="/np" method="post">
+                <form id="new_patient_form" action="/patient" method="post">
                 <!--<form id="new_patient_form" action="javascript:postNewPatient(this);" method="post">-->
                   <div class="form-group">
                     <input name="fname" type="text" class="form-control" id="fnameInput" placeholder="first name">
@@ -746,11 +746,10 @@
 
       function submit_patient(){
 
-        alert('submitting');
         document.getElementById("new_patient_form").submit();
 
-        enable('.patient_display')
-        load_patients();
+        //enable('.patient_display')
+        //load_patients();
       }
 
       function new_patient(){
@@ -792,7 +791,7 @@
             lazyFetching: true,
             defaultView: 'listMonth',
             events: {
-              url: '/sessions?pid='+patient.id,
+              url: '/sessions?pid='+patient.pid,
               type: 'GET',
               success: processNotesData,
             },
@@ -804,7 +803,7 @@
         var row = function(item){return item.lname + ', ' + item.fname};
         var sessionNo = function(item){return item.session_number};
 
-        $.getJSON('/patients', function(data){
+        $.getJSON('/patient', function(data){
           var table = d3.select('#patientTable');
           var tbody = table.select('tbody');
           var selection = tbody.selectAll('a')
@@ -1007,7 +1006,7 @@
         $('#notes').val('')
 
 
-        $.getJSON('/sessions?pid=' + patient.id, function (data) {
+        $.getJSON('/sessions?pid=' + patient.pid, function (data) {
             $('#seshdate').datepicker('destroy');
 
 
@@ -1045,7 +1044,7 @@
         document.getElementById('lname').value = patient.lname;
         document.getElementById('dob').value = patient.dob;
         document.getElementById('insurance').value = patient.insurance;
-        document.getElementById('patient_id').value = patient.id;
+        document.getElementById('patient_id').value = patient.pid;
         // incrememnt session number
         document.getElementById('seshNo').value = patient.session_number + 1;
 
