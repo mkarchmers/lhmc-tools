@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>LHMC-tool</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">  
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/fullcalendar.min.css" />
+
+    <style type="text/css">
+      body {
+        padding-top: 40px;
+        padding-bottom: 40px;
+        background-color: #f5f5f5;
+      }
+
+      .visible {
+        visibility: visible;
+      }
+      .invisible {
+        visibility: hidden;
+      }
+
+      .glyphicon-align-justify{
+        padding-right: 10px;
+      }
+
+      #calendar {
+        max-width: 900px;
+        margin: 40px auto;
+      }
+      .fc-center h2{
+        font-size: 20px;
+      }
+
+      a:hover,a:focus{
+          text-decoration: none;
+          outline: none;
+      }
+      #aaccordion{
+          border: 2px solid #3485ef;
+          border-radius: 20px;
+          overflow: hidden;
+      }
+      #aaccordion .panel{
+          border: none;
+          border-bottom: 2px solid #3485ef;
+          box-shadow: none;
+          border-radius: 0;
+          margin: 0;
+      }
+      #aaccordion .panel:last-child{
+          border-bottom: none;
+      }
+      #aaccordion .panel-heading{
+          padding: 0;
+          border: none;
+      }
+      #aaccordion .panel-title a{
+          display: block;
+          padding: 10px;
+          font-size: 14px;
+          font-weight: 600;
+          color: #fff;
+          text-transform: uppercase;
+          background: #3485ef;
+          text-align: left;
+          border: none;
+          border-radius: 0;
+          position: relative;
+          transition: all 0.3s ease 0s;
+      }
+      #aaccordion .panel-title a.collapsed{
+          background: #fff;
+          color: #3485ef;
+      }
+      #aaccordion .panel-title a.collapsed:hover{
+          background: #3485ef;
+          color: #fff;
+      }
+      #aaccordion .panel-title a.collapsed:hover:after{
+          color: #fff;
+      }
+      #aaccordion .panel-body{
+          padding: 10px;
+          border: none;
+          font-size: 14px;
+          color: #888;
+          line-height: 25px;
+      }
+
+      .SI-group{
+          max-height: 300px;
+          margin-bottom: 10px;
+          overflow:scroll;
+          -webkit-overflow-scrolling: touch;
+      }
+      .SI-group .list-group-item{
+        padding: 5px;
+      }
+      .SI-group .list-group-item input{
+        font-weight: bold;
+      }
+
+      .badge-pill { float:right }
+
+    </style>
+  </head>
+
+  <body>
+
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="true" aria-controls="navbar">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">LHMC tools</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Home</a></li>
+            <li><a onclick="billing()">Billing</a></li>
+            <li><a onclick="patients()">Patients</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <!--
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Calendar <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a onclick="prev()">Prev</a></li>
+                <li><a onclick="next()">Next</a></li>
+                <li><a onclick="gotoday()"">Today</a></li>
+                <li role="separator" class="divider"></li>
+                <li class="dropdown-header">view</li>
+                <li><a onclick="viewMonth()">Month</a></li>
+                <li><a onclick="viewList()">List</a></li>
+              </ul>
+            </li>
+          -->
+            <li class="active"><a href="{{ url|safe }}">{{ url_linktext }}</a></li>
+            <li><a disabled>
+              {% if user %}
+                {{user.email()}}
+              {% endif %}
+            </a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+    
+    <div id="calendar"> </div>
+
+    <!-- session modal -->
+    <div class="modal fade bs-example-modal-lg" id="session_info" tabindex="-1" role="dialog" aria-labelledby="sessionInfoLabel">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="sessionInfoLabel">Session</h4>
+          </div>
+          <div class="modal-body">
+
+                  
+            <form id="new_session_form" action="/ns" method='post'>
+              <div class="panel-group" id="aaccordion" role="tablist" aria-multiselectable="true">
+
+                <!-- PI -->
+                <div class="panel panel-default">
+                  <div class="panel-heading" role="tab" id="headingPI">
+                    <h4 class="panel-title">
+                      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#aaccordion" href="#collapsePI" aria-expanded="true" aria-controls="collapsePI">
+                        Patient info
+                      </a>
+                    </h4>
+                  </div>
+                  <div id="collapsePI" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingPI">
+                    <div class="panel-body">
+                      <ul class="SI-group list-group">
+                        <li class="list-group-item">
+                        First name: <input type="textarea" id="fname" name="fname" class="data-ro" >
+                        </li>
+                        <li class="list-group-item">
+                        Last name: <input type="textarea" id="lname" name="lname" class="data-ro" >
+                        </li>
+                        <li class="list-group-item">
+                          <div class="form-row">
+                            DOB: <input id="dob" name="dob" class="data-ro" >
+                            <input id="insurance" name="insurance" class="data-ro"  hidden>
+                            <input id="patient_id" name="patient_id" class="data-ro"  hidden>
+                          </div>
+                        </li>
+                        <li class="list-group-item">
+                        Diagnosis: <input type="textarea" id="diag" name="diag" >
+                        </li>                        
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- SI -->
+                <div class="panel panel-default">
+                  <div class="panel-heading" role="tab" id="headingSI">
+                    <h4 class="panel-title">
+                      <a role="button" data-toggle="collapse" data-parent="#aaccordion" href="#collapseSI" aria-expanded="false" aria-controls="collapseSI">
+                        Session info
+                      </a>
+                    </h4>
+                  </div>
+                  <div id="collapseSI" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingSI">
+                    <div class="panel-body">
+                      <ul class="SI-group list-group">
+                        <li class="list-group-item">
+                        Date: <input id="seshdate" name="date" >
+                        </li>
+                        <li class="list-group-item">
+                        Session #: <input type="textarea" id="seshNo" class="data-ro" >
+                        </li>
+                        <li class="list-group-item">
+                          Modality:
+                          <select id="modality" name="modality" >
+                            <option id="ind" value="Individual">Individual</option>
+                            <option id="fam" value="Family with patient">Family with patient</option>
+                            <option id="grp" value="Family without patient">Family without patient</option>
+                          </select>
+                        </li>
+                        <li class="list-group-item">
+                        New issue: <input type="textarea" id="newIssue">
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- RA -->
+                <div class="panel panel-default">
+                  <div class="panel-heading" role="tab" id="headingRA">
+                    <h4 class="panel-title">
+                      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#aaccordion" href="#collapseRA" aria-expanded="false" aria-controls="collapseRA">
+                        Risk assessment
+                      </a>
+                    </h4>
+                  </div>
+                  <div id="collapseRA" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingRA">
+                    <div class="panel-body">
+                      <table class="table table-responsive">
+                          <thead>
+                            <tr>
+                              <th>Self</th>
+                              <th>Others</th>
+                              <th>Property</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td><input type="checkbox" name="RA_self_idea"> Ideation</td>
+                              <td><input type="checkbox" name="RA_others_idea"> Ideation</td>
+                              <td><input type="checkbox" name="RA_prop_idea"> Ideation</td>
+                            </tr>
+                            <tr>
+                              <td><input type="checkbox" name="RA_self_plan"> Plan</td>
+                              <td><input type="checkbox" name="RA_others_plan"> Plan</td>
+                              <td><input type="checkbox" name="RA_prop_plan"> Plan</td>
+                            </tr>
+                            <tr>
+                              <td><input type="checkbox" name="RA_self_attempt"> Attempted</td>
+                              <td><input type="checkbox" name="RA_others_att"> Attempted</td>
+                              <td><input type="checkbox" name="RA_prop_att"> Attempted</td>
+                            </tr>
+                          </tbody>
+                        </table>                      
+                    </div>
+                  </div>
+                </div>
+
+                <!-- TI -->
+                <div class="panel panel-default">
+                  <div class="panel-heading" role="tab" id="headingTI">
+                    <h4 class="panel-title">
+                      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#aaccordion" href="#collapseTI" aria-expanded="false" aria-controls="collapseTI">
+                        Therapeutic Interventions
+                      </a>
+                    </h4>
+                  </div>
+                  <div id="collapseTI" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTI">
+                    <div class="panel-body">
+                      <ul class="SI-group list-group">
+                        <li class="list-group-item">
+                        <input type="checkbox" name="TI_refl_listen"> Reflective Listening
+                        </li>
+                        <li class="list-group-item">
+                        <input type="checkbox" name="TI_encour"> Encouragement
+                        </li>
+                        <li class="list-group-item">
+                        <input type="checkbox" name="TI_decis_balnc"> Decisional Balancing
+                        </li>
+                        <li class="list-group-item">
+                        <input type="checkbox" name="TI_prob_solv"> Problem Solving
+                        </li>
+                        <li class="list-group-item">
+                        <input type="checkbox" name="TI_pos_reinforce"> Positive Reinforcemnt
+                        </li>
+                        <li class="list-group-item">
+                        <input type="checkbox" name="TI_explore"> Exploring
+                        </li>
+                        <li class="list-group-item">
+                        <input type="checkbox" name="TI_play_therapy"> Play Therapy
+                        </li>
+                        <li class="list-group-item">
+                        <input type="checkbox" name="TI_valid"> Validation
+                        </li>
+                        <li class="list-group-item">
+                        <input type="checkbox" name="TI_conf_behav"> Confronting of Behaviors
+                        </li>
+                        <li class="list-group-item">
+                        <input type="checkbox" name="TI_real_test"> Reality Testing
+                        </li>
+                        <li class="list-group-item">
+                        <input type="checkbox" name="TI_PSCR"> Provide Safe Consistent Relationship
+                        </li>
+                        <li class="list-group-item">
+                        <input type="checkbox" name="TI_CSB"> Communication Skill Building
+                        </li>
+                        <li class="list-group-item">
+                        <input type="checkbox" name="TI_PSB"> Parenting Skill Building
+                        </li>
+                        <li class="list-group-item">
+                        <input type="checkbox" name="TI_emot_supp"> Emotional Supportiveness
+                        </li>
+                        <!--
+                        <li class="list-group-item">
+                          <div class="input-group">
+                            <div class="input-group-prepend">
+                                <input type="checkbox" name="TI_other">
+                                <span class="input-group-text">Other</span>
+                            </div>
+                            <input type="text" id="TI_other_txt" name="TI_other_txt" class="form-control">
+                          </div>
+                        </li>
+                      -->
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- GO -->
+                <div class="panel panel-default">
+                  <div class="panel-heading" role="tab" id="headingGO">
+                    <h4 class="panel-title">
+                      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#aaccordion" href="#collapseGO" aria-expanded="false" aria-controls="collapseGO">
+                        Goals
+                      </a>
+                    </h4>
+                  </div>
+                  <div id="collapseGO" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingGO">
+                    <div class="panel-body">
+                      <ul class="SI-group list-group">
+                        <li class="list-group-item">
+                          <table class="table table-responsive">
+                            <thead>
+                              <tr>
+                                <th>Improve</th>
+                                <th>Decrease</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td>
+                                  <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <input type="checkbox" name="G_1_impr" >
+                                        <span class="input-group-text">Improve</span>
+                                    </div>
+                                    <input type="text" name="G_1_impr_txt" class="form-control" >
+                                  </div>
+                                </td>
+                                <td>
+                                  <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <input type="checkbox" name="G_1_decr" >
+                                        <span class="input-group-text">Decrease</span>
+                                    </div>
+                                    <input type="text" name="G_1_decr_txt" class="form-control" >
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <input type="checkbox" name="G_2_impr" >
+                                        <span class="input-group-text">Improve</span>
+                                    </div>
+                                    <input type="text" name="G_2_impr_txt" class="form-control" >
+                                  </div>
+                                </td>
+                                <td>
+                                  <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <input type="checkbox" name="G_2_decr" >
+                                        <span class="input-group-text">Decrease</span>
+                                    </div>
+                                    <input type="text" name="G_2_decr_txt" class="form-control" >
+                                  </div>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </li>
+                        
+                        <li class="list-group-item">
+                          <input type="checkbox" name="G_cop_skills" > Develop coping skills
+                        </li>
+                        <li class="list-group-item">
+                          <input type="checkbox" name="G_sc_skills" > Develop self-care skills
+                        </li>
+                        <li class="list-group-item">
+                          <input type="checkbox" name="G_id_res" > identify resistance & roadblocks
+                        </li>
+                        <li class="list-group-item">
+                          <input type="checkbox" name="G_expr" > Increase capacity to verbalize thoughts and feelings and express self
+                        </li>
+                        <li class="list-group-item">
+                          <input type="checkbox" name="G_verb" > Verbalize thoguhts and feelings in place of acting
+                        </li>
+                        <!--
+                        <li class="list-group-item">
+                          <div class="input-group">
+                            <div class="input-group-prepend">
+                                <input type="checkbox" name="G_other">
+                                <span class="input-group-text">Other</span>
+                            </div>
+                            <input type="text" name="G_other_txt" class="form-control">
+                          </div>
+                        </li>
+                      -->
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- SPA -->
+                <div class="panel panel-default">
+                  <div class="panel-heading" role="tab" id="headingSPA">
+                    <h4 class="panel-title">
+                      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#aaccordion" href="#collapseSPA" aria-expanded="false" aria-controls="collapseSPA">
+                        Symptoms / Problem Areas
+                      </a>
+                    </h4>
+                  </div>
+                  <div id="collapseSPA" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSPA">
+                    <div class="panel-body">
+                      <ul class="SI-group list-group">
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- notes -->
+                <div class="panel panel-default">
+                  <div class="panel-heading" role="tab" id="headingNO">
+                    <h4 class="panel-title">
+                      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#aaccordion" href="#collapseNO" aria-expanded="false" aria-controls="collapseNO">
+                        Notes
+                      </a>
+                    </h4>
+                  </div>
+                  <div id="collapseNO" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingNO">
+                    <div class="panel-body">
+                      <div class="form-group">
+                        <textarea class="form-control" rows="5" id="notes" name="notes"></textarea>
+                        <!--<input type="textarea" class="form-control" rows="5" id="notes" name="notes">-->
+                      </div>                      
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ASS -->
+                <div class="panel panel-default">
+                  <div class="panel-heading" role="tab" id="headingASS">
+                    <h4 class="panel-title">
+                      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#aaccordion" href="#collapseASS" aria-expanded="false" aria-controls="collapseASS">
+                        Assesment
+                      </a>
+                    </h4>
+                  </div>
+                  <div id="collapseASS" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingASS">
+                    <div class="panel-body">
+                      <ul class="SI-group list-group">
+                        <li class="list-group-item">
+                          <select id="ASS_CONST" name="ASS_CONST" >
+                            <option value="Did">Did</option>
+                            <option value="DidNot">Did not</option>
+                          </select>
+                          use session constructively to address problem areas.
+                        </li>
+                        <li class="list-group-item">
+                          <select id="ASS_INSIG" name="ASS_INSIG" >
+                            <option value="Did">Did</option>
+                            <option value="DidNot">Did not</option>
+                          </select>
+                          show insightfulness.
+                        </li>
+                        <li class="list-group-item">
+                          <select id="ASS_EFFRT" name="ASS_EFFRT" >
+                            <option value="Did">Did</option>
+                            <option value="DidNot">Did not</option>
+                          </select>
+                          show effort in addressing problem areas.
+                        </li>
+                        <li class="list-group-item">
+                          <select id="ASS_OR" name="ASS_OR" >
+                            <option value="Was">Was</option>
+                            <option value="WasNot">Was not</option>
+                          </select>
+                          oriented.
+                        </li>
+
+                        <li class="list-group-item">
+                          <div class="input-group">
+                            <div class="input-group-prepend">
+                                <select id="ASS_present" name="ASS_present" >
+                                  <option value="Did">Did</option>
+                                  <option value="DidNot">Did not</option>
+                                </select>
+                                <span class="input-group-text">present with</span>
+                            </div>
+                            <input type="textarea" id="ASS_present_txt" name="ASS_present_txt" class="form-control">
+                            <span class="input-group-text">symptoms in session</span>
+
+                          </div>
+                        </li>
+
+                        <li class="list-group-item">
+                          <select id="ASS_ABLE" name="ASS_ABLE" >
+                            <option value="Was">Was</option>
+                            <option value="WasNot">Was not</option>
+                          </select>
+                          able to talk about stress factors and how to better manage them.
+                        </li>
+                        <li class="list-group-item">
+                          <select id="ASS_COOP" name="ASS_COOP" >
+                            <option value="Was">Was</option>
+                            <option value="WasNot">Was not</option>
+                          </select>
+                          cooperative with therapist's efforts to assist him/her with problem areas.
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              
+                <!-- PLN -->
+                <div class="panel panel-default">
+                  <div class="panel-heading" role="tab" id="headingPLN">
+                    <h4 class="panel-title">
+                      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#aaccordion" href="#collapsePLN" aria-expanded="false" aria-controls="collapsePLN">
+                        Plan
+                      </a>
+                    </h4>
+                  </div>
+                  <div id="collapsePLN" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingPLN">
+                    <div class="panel-body">
+                      <ul class="SI-group list-group">
+                        <li class="list-group-item">
+                          Continue
+                          <select id="PLN_CONT" name="PLN_CONT" >
+                            <option value="Individual">individual</option>
+                            <option value="Other">other</option>
+                          </select>
+                          on a 
+                          <select id="PLN_FREQ" name="PLN_FREQ" >
+                            <option value="Weekly">weekly</option>
+                            <option value="Bi-weekly">bi-weekly</option>
+                            <option value="Monthly">monthly</option>
+                          </select>
+                          basis to work through and develop coping skills to address problem areas.
+                        </li>
+                        <li class="list-group-item">
+                          <input type="checkbox" id="PLN_PSY" name="PLN_PSY"> Continue psychiatric meditations as directed by doctor.
+                        </li>
+                        <li class="list-group-item">
+                          Next session date: 
+                          <input type="text" id="PLN_NXT" name="PLN_NXT"> 
+                        </li>
+
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <div class="modal-footer">
+            <button id="sessionSubmit" type="button" class="btn" onclick="submit_session()">Submit</button>
+          </div>
+
+        </div>
+      </div>
+    </div>   
+
+    <!-- Patients modal -->
+    <div class="modal fade bs-example-modal-lg" id="patientList" tabindex="-1" role="dialog" >
+      <div class="modal-dialog modal_lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="patient_display modal-title" id="patientDisplayLabel">Patients</h4>
+            <h4 class="patient_form modal-title" id="patientFormLabel">New patient</h4>
+          </div>
+          <div class="modal-body">
+  
+              <div class="patient_display">
+                <input class="form-control" id="patientSearchInput" type="text" placeholder="Search..">
+                <br>
+                <table id="patientTable" class="table table-bordered table-striped">
+                  <tbody></tbody>
+                </table>
+              </div>
+
+              <div class="patient_form">
+                <form id="new_patient_form" action="/np" method="post">
+                <!--<form id="new_patient_form" action="javascript:postNewPatient(this);" method="post">-->
+                  <div class="form-group">
+                    <input name="fname" type="text" class="form-control" id="fnameInput" placeholder="first name">
+                  </div>
+                  <div class="form-group">
+                    <input name="lname" type="text" class="form-control" id="lnameInput" placeholder="last name">
+                  </div>
+                  <div class="form-group date">
+                    <input name="dob" id="dob-date" type="text" class="form-control" name="dob" placeholder="dob">
+                  </div>
+                  <div class="form-group">
+                    <select name="insurance" class="form-control" id="insurance" placeholder="insurance">
+                      <option>BlueCrossBlueShield</option>
+                      <option>other</option>
+                    </select>
+                  </div>
+                </form>
+              </div>
+
+              
+
+          </div>
+          <div class="modal-footer">
+            <button id="submit-patient" type="button" class="patient_form btn btn-default" onclick="submit_patient()">Submit</button>
+            <button type="button" class="patient_display btn btn-default" onclick="new_patient()">New</button>
+            <!--<button type="button" class="new_session_iframe btn btn-default" onclick="patients()">Back</button>-->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- notes modal -->
+    <div class="modal fade bs-example-modal-lg" id="notesList" tabindex="-1" role="dialog" >
+      <div class="modal-dialog modal_lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="notes_display modal-title" id="notesListLabel">Notes</h4>
+          </div>
+          <div class="modal-body"> 
+            <div id="notesCalendar"> </div>
+          </div>     
+        </div>
+      </div>
+    </div>
+    
+
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.min.js"
+      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+      crossorigin="anonymous"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.min.js' type='text/javascript'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/fullcalendar.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.1.1/d3.min.js"></script>
+
+    <script src="js/form.js"></script>
+
+    <script>
+
+      function postNewPatient(form){
+        console.log(form);
+        console.log(document.getElementById("fnameInput").value)
+        //return true;
+      }
+
+      // utility functions to handle different forms
+      function enable(what){
+        ['.patient_display', '.new_session_iframe','.patient_form'].forEach(function(cls){
+          d3.selectAll(cls).style('display',(what==cls?'block':'none'))
+        })
+      }
+
+      function setFormDisabled(id, value){
+        d3.select(id)
+          .selectAll('input')
+          .attr('disabled',value);
+        d3.select(id)
+          .selectAll('select')
+          .attr('disabled',value);
+        d3.select(id)
+          .selectAll('textarea')
+          .attr('disabled',value);
+      }
+
+      function capitalize(string) {
+          return string.charAt(0).toUpperCase() + string.slice(1);
+      }
+
+
+
+      function display_patient_info(item){
+        enable('.patient_form')
+
+        var form = d3.select('#new_patient_form');
+        form.selectAll('.form-control')
+          .attr('disabled',true);
+        d3.select('#submit-patient')
+          .attr('disabled',true);
+        d3.select('#patientFormLabel').text('Patient info');
+
+        form.select('#fnameInput').property('value',item['fname']);
+        form.select('#lnameInput').property('value',item['lname']);
+        form.select('#dob-date').property('value',item['dob']);
+        form.select('#insurance').property('value',item['insurance']);
+
+      }
+
+      function submit_patient(){
+
+        alert('submitting');
+        document.getElementById("new_patient_form").submit();
+
+        enable('.patient_display')
+        load_patients();
+      }
+
+      function new_patient(){
+        enable('.patient_form')
+        d3.select('#new_patient_form')
+          .selectAll('.form-control')
+          .attr('disabled',null)
+        d3.select('#submit-patient')
+          .attr('disabled',null)
+        $("#new_patient_form")[0].reset();
+        $('#dob-date').datepicker({
+              autoclose: true,
+              startView: 2
+          });
+        d3.select('#patientFormLabel').text('New patient');
+      }
+
+      function processNotesData(data){
+        return data.relevant_list.map(function(d){
+          return {title: d.data.notes,
+                  date: d.data.date,
+                  data: d.data}
+          })
+      }
+
+      function display_notes(patient){
+        d3.select('#notesListLabel')
+          .text('Notes for ' + capitalize(patient.fname) + " " + capitalize(patient.lname));
+        $('#notesList').modal('show');
+
+        $('#notesCalendar').fullCalendar('destroy');
+        $('#notesCalendar').fullCalendar({
+             header: {
+                left: 'prev,next',
+                center: 'title',
+                right: ''
+              },
+
+            lazyFetching: true,
+            defaultView: 'listMonth',
+            events: {
+              url: '/sessions?pid='+patient.id,
+              type: 'GET',
+              success: processNotesData,
+            },
+          });
+
+      }
+
+      function load_patients(){
+        var row = function(item){return item.lname + ', ' + item.fname};
+        var sessionNo = function(item){return item.session_number};
+
+        $.getJSON('/patients', function(data){
+          var table = d3.select('#patientTable');
+          var tbody = table.select('tbody');
+          var selection = tbody.selectAll('a')
+            .data(data.patient_list);
+            
+          selection.text(row)
+
+          selection.enter()
+            .append('tr')
+            .append('td')
+            .append('a')
+            .text(row)
+            .on('click',function(item){
+              display_patient_info(item);
+            })
+
+          selection.exit().remove();
+
+          tbody.selectAll('a')
+            .data(data.patient_list)
+            .append('span')
+            .classed('badge',true)
+            .classed('badge-primary',true)
+            .classed('badge-pill',true)
+            .text(sessionNo)
+            .on('click',function(item){
+              new_session(item);
+              d3.event.stopPropagation();
+            });
+          tbody.selectAll('a')
+            .data(data.patient_list)
+            .append('span')
+            .classed('glyphicon',true)
+            .classed('glyphicon-align-justify',true)
+            .classed('badge-pill',true)
+            .on('click',function(item){
+              display_notes(item);
+              d3.event.stopPropagation();
+            });
+
+            /*
+          tbody.selectAll('a')
+            .data(data.patient_list)
+            .append('p')
+            .text('w')
+            */
+
+        })
+      }
+
+      function write_checbox(name, write) {
+        document.getElementsByName(name)[0].checked = (write == "on");
+      }
+
+      function write_dropdown(name, write) {
+        document.getElementById(name).value = write
+      }
+
+      function populateSessionData(data){
+
+        document.getElementById('diag').value = data['diag'];
+
+        $("#modality").val(data['modality']);
+        document.getElementById('newIssue').value = data['newIssue'];
+
+        // risk assessment
+        //write_checbox('RA_none', data['RA_none']);
+        write_checbox('RA_self_idea', data['RA_self_idea']);
+        write_checbox('RA_self_plan', data['RA_self_plan']);
+        write_checbox('RA_self_attempt', data['RA_self_attempt']);
+        write_checbox('RA_others_idea', data['RA_others_idea']);
+        write_checbox('RA_others_plan', data['RA_others_plan']);
+        write_checbox('RA_others_att', data['RA_others_att']);
+        write_checbox('RA_prop_idea', data['RA_prop_idea']);
+        write_checbox('RA_prop_plan', data['RA_prop_plan']);
+        write_checbox('RA_prop_att', data['RA_prop_att']);
+
+        // interventions
+        write_checbox('TI_refl_listen', data['TI_refl_listen']);
+        write_checbox('TI_encour', data['TI_encour']);
+        write_checbox('TI_decis_balnc', data['TI_decis_balnc']);
+        write_checbox('TI_prob_solv', data['TI_prob_solv']);
+        write_checbox('TI_pos_reinforce', data['TI_pos_reinforce']);
+        write_checbox('TI_explore', data['TI_explore']);
+        write_checbox('TI_play_therapy', data['TI_play_therapy']);
+        write_checbox('TI_valid', data['TI_valid']);
+        write_checbox('TI_conf_behav', data['TI_conf_behav']);
+        write_checbox('TI_real_test', data['TI_real_test']);
+        write_checbox('TI_PSCR', data['TI_PSCR']);
+        write_checbox('TI_CSB', data['TI_CSB']);
+        write_checbox('TI_PSB', data['TI_PSB']);
+        write_checbox('TI_emot_supp', data['TI_emot_supp']);
+        //write_checbox('TI_other', data['TI_other']);
+        
+        document.getElementById('TI_other_txt').value = data['TI_other_txt'];
+
+        // goals
+
+
+
+        // SPA
+        Object.keys(symptomsProblemAreas).forEach(function(k){
+          write_checbox(k, data[k]);
+        })
+        document.getElementById('SPA_other_txt').value = data['SPA_other_txt'];
+
+        // Assesment
+
+      }
+
+      function populateSession(data){
+
+        //d3.select('#new_session_form')
+         // .attr('disabled',true);
+        setFormDisabled('#new_session_form', true);
+
+        //console.log(data);
+        
+        ['fname', 'lname', 'dob'].forEach(function(s){
+          document.getElementById(s).value = data[s];
+        });
+
+        document.getElementById('seshdate').value = data['date'];
+        document.getElementById('seshNo').value = data['session_number'];
+
+        document.getElementById('notes').value = data['notes'];
+
+        populateSessionData(data);
+
+        d3.select('#sessionInfoLabel').text('Session');
+      }
+
+      function prev(){
+        $('#calendar').fullCalendar('prev')
+      }
+
+      function next(){
+        $('#calendar').fullCalendar('next')
+      }
+
+      function gotoday(){
+        $('#calendar').fullCalendar('today')
+      }
+
+      function viewMonth(){
+        $('#calendar').fullCalendar('changeView', 'month')
+      }
+
+      function viewList(){
+        $('#calendar').fullCalendar('changeView', 'listMonth')
+      }
+
+      function patients(){
+        enable('.patient_display')
+  
+        load_patients();
+        $('#patientList').modal('show');
+      }
+
+      function billing(){
+        //alert('billing')
+        generate_bill();
+      }
+
+      function submit_session(){
+
+        var date = $('#seshdate').val();
+        if (date == ""){
+          alert('date cannot be empty');
+          return
+        }
+
+        var notes = $('#notes').val();
+        if (notes == ""){
+          alert('notes cannot be empty');
+          return
+        }
+
+        document.getElementById("new_session_form").submit();
+
+        $('#session_info').modal('hide');
+        $('#patientList').modal('show');
+        load_patients();
+      }
+
+      function new_session(patient){
+
+        setFormDisabled('#session_info', null);
+        d3.selectAll('.data-ro')
+          .attr('readonly',true);
+        d3.select('#sessionSubmit')
+          .classed('visible',true)
+          .classed('invisible',null)
+
+
+        $('#patientList').modal('hide');
+
+        $('#session_info').modal('show');
+        $("#new_session_form")[0].reset();
+        $('#notes').val('')
+
+
+        $.getJSON('/sessions?pid=' + patient.id, function (data) {
+            $('#seshdate').datepicker('destroy');
+
+
+            //console.log(data);
+            if (data.relevant_list.length == 0){
+              $('#seshdate').datepicker({
+                  autoclose: true,
+                  todayBtn: "linked",
+                });
+              return;
+            }
+
+            var latest_data = data.relevant_list[0]['data'];
+            //console.log(latest_data);
+
+            var latest = moment(latest_data.date);
+            //console.log(latest.format("YYYY/MM/DD"));
+
+            // restrict datepicker
+            $('#seshdate').datepicker({
+                autoclose: true,
+                todayBtn: "linked",
+                startDate: latest.add(1,'day').toDate(),
+            });
+
+            populateSessionData(latest_data);
+        });
+
+        d3.select('#sessionInfoLabel').text('New session');
+
+        // populate current values
+        // patient
+        //console.log(patient);
+        document.getElementById('fname').value = patient.fname;
+        document.getElementById('lname').value = patient.lname;
+        document.getElementById('dob').value = patient.dob;
+        document.getElementById('insurance').value = patient.insurance;
+        document.getElementById('patient_id').value = patient.id;
+        // incrememnt session number
+        document.getElementById('seshNo').value = patient.session_number + 1;
+
+        // last session
+      }
+
+      function processPatientData(data){
+        return data.patient_list.map(function(d){
+          return {title: d.fname + ' ' + d.lname,
+                  date: d.data.date,
+                  color: (d.data.is_billed? 'red':'green'),
+                  data: d.data}
+          })
+      }
+
+      function generate_bill() {
+
+        $.getJSON('/billing', function (data) {
+            var bills = data.Bill;
+            var csv = 'Name,Session Date,Procedure Code,DSM 5,Insurance\n';
+            bills.forEach(function (row) {
+                csv += capitalize(row.first) + " " + capitalize(row.last) + ',';
+                csv += row.session_date + ',';
+                csv += row.bill_code + ',';
+                csv += row.diag_code + ",";
+                csv += row.insurance + ',';
+                csv += "\n";
+            });
+
+            var hiddenElement = document.createElement('a');
+            hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+            hiddenElement.target = '_blank';
+            hiddenElement.download = 'billing.csv';
+            hiddenElement.click();
+        });
+
+      }      
+
+
+      $( document ).ready(function() {
+
+        addOtherToList(d3.select('#collapseTI').select('ul'),"TI_other_txt")
+        addOtherToList(d3.select('#collapseGO').select('ul'),"G_other_txt")
+        createFormSection('#collapseSPA', symptomsProblemAreas);
+        addOtherToList(d3.select('#collapseSPA').select('ul'),"SPA_other_txt")
+        addOtherToList(d3.select('#collapseASS').select('ul'),"ASS_other_txt")
+        addOtherToList(d3.select('#collapsePLN').select('ul'),"PLN_other_txt")
+
+        $("#patientSearchInput").on("keyup", function() {
+          var value = $(this).val().toLowerCase();
+          $("#patientList tr").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+          });
+        });
+
+
+        $('#calendar').fullCalendar({
+             header: {
+                left: 'prev,next today',
+                //left: '',
+                center: 'title',
+                //right: '',
+                right: 'month,listMonth'
+              },
+
+            lazyFetching: true,
+            eventLimit: true, // allow "more" link when too many events
+   
+            defaultView: 'listMonth',
+            events: {
+              id: 'all',
+              url: '/sessions?pid=',
+              type: 'GET',
+              success: processPatientData,
+            },
+            eventClick: function(calEvent, jsEvent, view) {
+              $("#new_session_form")[0].reset();
+              populateSession(calEvent.data);
+              d3.select('#sessionSubmit')
+                .classed('visible',null)
+                .classed('invisible',true)
+
+              $('#session_info').modal('show');
+            }
+          });
+
+
+        $(document).on('click','.navbar-collapse.in',function(e) {
+          if( $(e.target).is('a') ) {
+              $(this).collapse('hide');
+          }
+        });
+
+
+      });
+    </script>
+
+  </body>
+</html>
