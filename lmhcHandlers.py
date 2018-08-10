@@ -247,7 +247,7 @@ class PatientHandler(webapp2.RequestHandler):
         parms = {}
         for (k,v) in self.request.POST.items():
             parms[k] = v
-        parms['session_number'] = 0
+        parms['session_number'] = int(parms['session_number'])
         parms['user_id'] = user.user_id()
         parms['pid'] = str(r.randint(0, 10000000000))
         p = Patient(**parms)
@@ -277,14 +277,18 @@ class BillingHandler(webapp2.RequestHandler):
 
     def get(self):
 
-        query = db.Query(Session)
+        query = db.Query(Session, projection=('date','fname'))
         query.filter('is_billed =', False)
+        #query.projection()
 
         res = [{'session_date': x.date, 'first': x.fname, 'last': x.lname, 'bill_code': x.mod_code,
                 'diag_code': x.diag_code,
                'insurance': x.insurance} for x in query.run()]
+        res = list(query.run())
 
-        self.response.write(json.dumps({'Bill': res}))
+
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.write(json.dumps({'Bill': res},cls=ModelEncoder))
 
         # if self.request.get('bill') is not '':
         #     bill_time = dt.now()

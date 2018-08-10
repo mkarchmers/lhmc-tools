@@ -648,6 +648,9 @@
                       <option>other</option>
                     </select>
                   </div>
+                  <div class="form-group">
+                    <input name="session_number" type="text" class="form-control" id="session_number" placeholder="session number">
+                  </div>
                 </form>
               </div>
 
@@ -741,6 +744,7 @@
         form.select('#lnameInput').property('value',item['lname']);
         form.select('#dob-date').property('value',item['dob']);
         form.select('#insurance').property('value',item['insurance']);
+        form.select('#session_number').property('value',item['session_number']);
 
       }
 
