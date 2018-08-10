@@ -189,10 +189,10 @@
                     <div class="panel-body">
                       <ul class="SI-group list-group">
                         <li class="list-group-item">
-                        First name: <input type="textarea" id="fname" name="fname" class="data-ro" >
-                        </li>
-                        <li class="list-group-item">
-                        Last name: <input type="textarea" id="lname" name="lname" class="data-ro" >
+                          <div class="input-group">
+                            First: <input type="textarea" id="fname" name="fname" class="data-ro">
+                            Last: <input type="textarea" id="lname" name="lname" class="data-ro">
+                          </div>
                         </li>
                         <li class="list-group-item">
                           <div class="form-row">
@@ -202,7 +202,10 @@
                           </div>
                         </li>
                         <li class="list-group-item">
-                        Diagnosis: <input type="textarea" id="diag" name="diag" >
+                          <div class="input-group">
+                            Diagnosis: <input type="textarea" id="diag" name="diag" >
+                            Diagnosis code: <input type="textarea" id="diag_code" name="diag_code" >
+                          </div>
                         </li>                        
                       </ul>
                     </div>
@@ -225,7 +228,7 @@
                         Date: <input id="seshdate" name="date" >
                         </li>
                         <li class="list-group-item">
-                        Session #: <input type="textarea" id="seshNo" class="data-ro" >
+                        Session #: <input type="textarea" id="seshNo" name="seshNo" class="data-ro" >
                         </li>
                         <li class="list-group-item">
                           Modality:
@@ -274,7 +277,7 @@
                               <td><input type="checkbox" name="RA_prop_plan"> Plan</td>
                             </tr>
                             <tr>
-                              <td><input type="checkbox" name="RA_self_attempt"> Attempted</td>
+                              <td><input type="checkbox" name="RA_self_att"> Attempted</td>
                               <td><input type="checkbox" name="RA_others_att"> Attempted</td>
                               <td><input type="checkbox" name="RA_prop_att"> Attempted</td>
                             </tr>
@@ -296,59 +299,6 @@
                   <div id="collapseTI" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTI">
                     <div class="panel-body">
                       <ul class="SI-group list-group">
-                        <li class="list-group-item">
-                        <input type="checkbox" name="TI_refl_listen"> Reflective Listening
-                        </li>
-                        <li class="list-group-item">
-                        <input type="checkbox" name="TI_encour"> Encouragement
-                        </li>
-                        <li class="list-group-item">
-                        <input type="checkbox" name="TI_decis_balnc"> Decisional Balancing
-                        </li>
-                        <li class="list-group-item">
-                        <input type="checkbox" name="TI_prob_solv"> Problem Solving
-                        </li>
-                        <li class="list-group-item">
-                        <input type="checkbox" name="TI_pos_reinforce"> Positive Reinforcemnt
-                        </li>
-                        <li class="list-group-item">
-                        <input type="checkbox" name="TI_explore"> Exploring
-                        </li>
-                        <li class="list-group-item">
-                        <input type="checkbox" name="TI_play_therapy"> Play Therapy
-                        </li>
-                        <li class="list-group-item">
-                        <input type="checkbox" name="TI_valid"> Validation
-                        </li>
-                        <li class="list-group-item">
-                        <input type="checkbox" name="TI_conf_behav"> Confronting of Behaviors
-                        </li>
-                        <li class="list-group-item">
-                        <input type="checkbox" name="TI_real_test"> Reality Testing
-                        </li>
-                        <li class="list-group-item">
-                        <input type="checkbox" name="TI_PSCR"> Provide Safe Consistent Relationship
-                        </li>
-                        <li class="list-group-item">
-                        <input type="checkbox" name="TI_CSB"> Communication Skill Building
-                        </li>
-                        <li class="list-group-item">
-                        <input type="checkbox" name="TI_PSB"> Parenting Skill Building
-                        </li>
-                        <li class="list-group-item">
-                        <input type="checkbox" name="TI_emot_supp"> Emotional Supportiveness
-                        </li>
-                        <!--
-                        <li class="list-group-item">
-                          <div class="input-group">
-                            <div class="input-group-prepend">
-                                <input type="checkbox" name="TI_other">
-                                <span class="input-group-text">Other</span>
-                            </div>
-                            <input type="text" id="TI_other_txt" name="TI_other_txt" class="form-control">
-                          </div>
-                        </li>
-                      -->
                       </ul>
                     </div>
                   </div>
@@ -379,19 +329,19 @@
                                 <td>
                                   <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <input type="checkbox" name="G_1_impr" >
+                                        <input type="checkbox" name="G_1_impr" id="G_1_impr">
                                         <span class="input-group-text">Improve</span>
                                     </div>
-                                    <input type="text" name="G_1_impr_txt" class="form-control" >
+                                    <input type="text" name="G_1_impr_txt" id="G_1_impr_txt" class="form-control" >
                                   </div>
                                 </td>
                                 <td>
                                   <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <input type="checkbox" name="G_1_decr" >
+                                        <input type="checkbox" name="G_1_decr" id="G_1_decr">
                                         <span class="input-group-text">Decrease</span>
                                     </div>
-                                    <input type="text" name="G_1_decr_txt" class="form-control" >
+                                    <input type="text" name="G_1_decr_txt" id="G_1_decr_txt" class="form-control" >
                                   </div>
                                 </td>
                               </tr>
@@ -399,19 +349,19 @@
                                 <td>
                                   <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <input type="checkbox" name="G_2_impr" >
+                                        <input type="checkbox" name="G_2_impr" id="G_2_impr">
                                         <span class="input-group-text">Improve</span>
                                     </div>
-                                    <input type="text" name="G_2_impr_txt" class="form-control" >
+                                    <input type="text" name="G_2_impr_txt" id="G_2_impr_txt" class="form-control" >
                                   </div>
                                 </td>
                                 <td>
                                   <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <input type="checkbox" name="G_2_decr" >
+                                        <input type="checkbox" name="G_2_decr" id="G_2_decr">
                                         <span class="input-group-text">Decrease</span>
                                     </div>
-                                    <input type="text" name="G_2_decr_txt" class="form-control" >
+                                    <input type="text" name="G_2_decr_txt" id="G_2_decr_txt" class="form-control" >
                                   </div>
                                 </td>
                               </tr>
@@ -420,31 +370,20 @@
                         </li>
                         
                         <li class="list-group-item">
-                          <input type="checkbox" name="G_cop_skills" > Develop coping skills
+                          <input type="checkbox" name="G_cop_skills" id="G_cop_skills"> Develop coping skills
                         </li>
                         <li class="list-group-item">
-                          <input type="checkbox" name="G_sc_skills" > Develop self-care skills
+                          <input type="checkbox" name="G_sc_skills" id="G_sc_skills"> Develop self-care skills
                         </li>
                         <li class="list-group-item">
-                          <input type="checkbox" name="G_id_res" > identify resistance & roadblocks
+                          <input type="checkbox" name="G_id_res" id="G_id_res"> identify resistance & roadblocks
                         </li>
                         <li class="list-group-item">
-                          <input type="checkbox" name="G_expr" > Increase capacity to verbalize thoughts and feelings and express self
+                          <input type="checkbox" name="G_expr" id="G_expr"> Increase capacity to verbalize thoughts and feelings and express self
                         </li>
                         <li class="list-group-item">
-                          <input type="checkbox" name="G_verb" > Verbalize thoguhts and feelings in place of acting
+                          <input type="checkbox" name="G_verb" id="G_verb"> Verbalize thoguhts and feelings in place of acting
                         </li>
-                        <!--
-                        <li class="list-group-item">
-                          <div class="input-group">
-                            <div class="input-group-prepend">
-                                <input type="checkbox" name="G_other">
-                                <span class="input-group-text">Other</span>
-                            </div>
-                            <input type="text" name="G_other_txt" class="form-control">
-                          </div>
-                        </li>
-                      -->
                       </ul>
                     </div>
                   </div>
@@ -491,7 +430,7 @@
                   <div class="panel-heading" role="tab" id="headingASS">
                     <h4 class="panel-title">
                       <a class="collapsed" role="button" data-toggle="collapse" data-parent="#aaccordion" href="#collapseASS" aria-expanded="false" aria-controls="collapseASS">
-                        Assesment
+                        Assessment
                       </a>
                     </h4>
                   </div>
@@ -876,34 +815,14 @@
         document.getElementById('newIssue').value = data['newIssue'];
 
         // risk assessment
-        //write_checbox('RA_none', data['RA_none']);
-        write_checbox('RA_self_idea', data['RA_self_idea']);
-        write_checbox('RA_self_plan', data['RA_self_plan']);
-        write_checbox('RA_self_attempt', data['RA_self_attempt']);
-        write_checbox('RA_others_idea', data['RA_others_idea']);
-        write_checbox('RA_others_plan', data['RA_others_plan']);
-        write_checbox('RA_others_att', data['RA_others_att']);
-        write_checbox('RA_prop_idea', data['RA_prop_idea']);
-        write_checbox('RA_prop_plan', data['RA_prop_plan']);
-        write_checbox('RA_prop_att', data['RA_prop_att']);
+        riskAssessmentCheckboxes.forEach(function(k){
+          write_checbox(k, data[k]);
+        })
 
         // interventions
-        write_checbox('TI_refl_listen', data['TI_refl_listen']);
-        write_checbox('TI_encour', data['TI_encour']);
-        write_checbox('TI_decis_balnc', data['TI_decis_balnc']);
-        write_checbox('TI_prob_solv', data['TI_prob_solv']);
-        write_checbox('TI_pos_reinforce', data['TI_pos_reinforce']);
-        write_checbox('TI_explore', data['TI_explore']);
-        write_checbox('TI_play_therapy', data['TI_play_therapy']);
-        write_checbox('TI_valid', data['TI_valid']);
-        write_checbox('TI_conf_behav', data['TI_conf_behav']);
-        write_checbox('TI_real_test', data['TI_real_test']);
-        write_checbox('TI_PSCR', data['TI_PSCR']);
-        write_checbox('TI_CSB', data['TI_CSB']);
-        write_checbox('TI_PSB', data['TI_PSB']);
-        write_checbox('TI_emot_supp', data['TI_emot_supp']);
-        //write_checbox('TI_other', data['TI_other']);
-        
+        Object.keys(therapeuticInterventionsCheckboxes).forEach(function(k){
+          write_checbox(k, data[k]);
+        })
         document.getElementById('TI_other_txt').value = data['TI_other_txt'];
 
         // goals
@@ -911,12 +830,12 @@
 
 
         // SPA
-        Object.keys(symptomsProblemAreas).forEach(function(k){
+        Object.keys(symptomsProblemAreasCheckboxes).forEach(function(k){
           write_checbox(k, data[k]);
         })
         document.getElementById('SPA_other_txt').value = data['SPA_other_txt'];
 
-        // Assesment
+        // Assessment
 
       }
 
@@ -1092,9 +1011,10 @@
 
       $( document ).ready(function() {
 
+        createFormSection('#collapseTI', therapeuticInterventionsCheckboxes);
         addOtherToList(d3.select('#collapseTI').select('ul'),"TI_other_txt")
         addOtherToList(d3.select('#collapseGO').select('ul'),"G_other_txt")
-        createFormSection('#collapseSPA', symptomsProblemAreas);
+        createFormSection('#collapseSPA', symptomsProblemAreasCheckboxes);
         addOtherToList(d3.select('#collapseSPA').select('ul'),"SPA_other_txt")
         addOtherToList(d3.select('#collapseASS').select('ul'),"ASS_other_txt")
         addOtherToList(d3.select('#collapsePLN').select('ul'),"PLN_other_txt")

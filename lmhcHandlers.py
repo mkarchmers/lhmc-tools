@@ -299,6 +299,7 @@ class BillingHandler(webapp2.RequestHandler):
 
 
 class SessionsHandler(webapp2.RequestHandler):
+    
     def get(self):
         self.response.headers['Content-Type'] = 'application/json'
 

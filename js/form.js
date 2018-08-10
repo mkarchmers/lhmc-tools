@@ -1,6 +1,66 @@
 //
 
-var symptomsProblemAreas = {
+var patientInfoText = [
+	"name",
+	"dob",
+	"insurance",
+	"patient_id",
+	"diag",
+	"diag_code",
+];
+
+var sessionInfoText = [
+	"seshdate",
+	"seshNo",
+	"modality",
+	"newIssue",
+];
+
+var riskAssessmentCheckboxes = [
+	"RA_self_idea",
+	"RA_self_plan",
+	"RA_self_att",
+
+	"RA_others_idea",
+	"RA_others_plan",
+	"RA_others_att",
+
+	"RA_prop_idea",
+	"RA_prop_plan",
+	"RA_prop_att",
+];
+
+var therapeuticInterventionsCheckboxes = {
+
+	TI_refl_listen: "Reflective Listening",
+	TI_encour: "Encouragement",
+	TI_decis_balnc: "Decisional Balancing",
+	TI_prob_solv: "Problem Solving",
+	TI_pos_reinforce: "Positive Reinforcemnt",
+	TI_explore: "Exploring",
+	TI_play_therapy: "Play Therapy",
+	TI_valid: "Validation",
+	TI_conf_behav: "Confronting of Behaviors",
+	TI_real_test: "Reality Testing",
+	TI_PSCR: "Provide Safe Consistent Relationship",
+	TI_CSB: "Communication Skill Building",
+	TI_PSB: "Parenting Skill Building",
+	TI_emot_supp: "Emotional Supportiveness",
+};
+
+var therapeuticInterventionsText = [
+	"TI_other_txt",
+];
+
+var goalsCheckboxes = [
+	"G_1_impr",
+	"G_1_decr",
+	"G_2_impr",
+	"G_2_decr",
+];
+
+var symptomsProblemAreasCheckboxes = {
+
 	SPA_AX: "Anxiousness",
 	SPA_EW: "Excessive worry",
 	SPA_HV: "Hyper Vigilance",
@@ -73,6 +133,10 @@ var symptomsProblemAreas = {
 	SPA_MEDDIF: "Medical problems",
 	SPA_MEDNC: "Medication non-compliance",
 }
+
+var symptomsProblemAreasText = [
+	"SPA_other_txt",
+];
 
 function addOtherToList(selection, name){
 	selection.append('li')
