@@ -97,28 +97,6 @@ class EmailHandler(webapp2.RequestHandler):
         email = "not logged in" if (user is None) else user.email()
         self.response.write(email)
 
-
-class LoginPageHandler(webapp2.RequestHandler):
-
-    def get(self):
-        user = users.get_current_user()
-        if user:
-            url = users.create_logout_url(self.request.uri)
-            url_text = 'logout'
-        else:
-            url = users.create_login_url(self.request.uri)
-            url_text = 'login'
-
-        jinja_temp = {
-            'user': user,
-            'url': url,
-            'text': url_text
-        }
-
-        template = JINJA_ENVIRONMENT.get_template('LoginPage.html')
-        self.response.write(template.render(jinja_temp))
-
-
 class Insurance(db.Model):
 
     name = db.StringProperty()
@@ -227,51 +205,6 @@ class InsuranceHandler(webapp2.RequestHandler):
 
         self.response.write(json.dumps(obj))
 
-
-class PsychHandler(webapp2.RequestHandler):
-
-    def get(self):
-
-        user = users.get_current_user()
-
-        params = {'user': user}
-        template = JINJA_ENVIRONMENT.get_template('Patients.html')
-        self.response.write(template.render(params))
-
-
-class PatientPageHandler(webapp2.RequestHandler):
-
-    def get(self):
-
-        pid = self.request.get('id')
-
-        params = {'id': pid}
-
-        template = JINJA_ENVIRONMENT.get_template('PatientPage.html')
-        self.response.write(template.render(params))
-
-
-class AddPatientHandler(webapp2.RequestHandler):
-
-    def get(self):
-        stars_page = JINJA_ENVIRONMENT.get_template('addPatient.html')
-        self.response.write(stars_page.render())
-
-
-class SessionListHandler(webapp2.RequestHandler):
-
-    def get(self):
-
-        sid = self.request.get('id')
-        user = users.get_current_user()
-
-        query = db.Query(Session)
-        res = list(query.fetch(10))
-
-        params = {'id': sid, 'sessions': res, 'user': user}
-
-        stars_page = JINJA_ENVIRONMENT.get_template('SessionListPatient.html')
-        self.response.write(stars_page.render(params))
 
 class NP(webapp2.RequestHandler):
 
@@ -421,34 +354,3 @@ class SessionsHandler(webapp2.RequestHandler):
                    'latest_relevant': (lambda x: relevant[0] if len(relevant) > 0 else '')(0)}
 
         self.response.write(json.dumps(obj, default=str))
-
-
-class SessionFinderHandler(webapp2.RequestHandler):
-    def get(self):
-
-        sid = self.request.get('sid')
-        # pid = self.request.get('pid')
-
-        query = db.Query(Session)
-        query.filter('session_id =', sid)
-        # query.filter('patient_id =', pid)
-        res = list(query.run())
-        res = res[0]
-
-        self.response.write(json.dumps(vars(res)['_entity'], default=str))
-
-
-class SessionHandler(webapp2.RequestHandler):
-    def get(self):
-
-        sid = self.request.get('sid')
-        user = users.get_current_user()
-
-        query = db.Query(Session)
-        query.filter('session_id =', sid)
-        res = list(query.run())
-        res = res[0]
-
-        params = {'data': vars(res)['_entity'], 'sid': sid, 'user': user}
-        stars_page = JINJA_ENVIRONMENT.get_template('SessionSummary.html')
-        self.response.write(stars_page.render(params))
