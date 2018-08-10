@@ -699,12 +699,6 @@
 
     <script>
 
-      function postNewPatient(form){
-        console.log(form);
-        console.log(document.getElementById("fnameInput").value)
-        //return true;
-      }
-
       // utility functions to handle different forms
       function enable(what){
         ['.patient_display', '.new_session_iframe','.patient_form'].forEach(function(cls){
@@ -729,7 +723,6 @@
       }
 
 
-
       function display_patient_info(item){
         enable('.patient_form')
 
@@ -749,6 +742,15 @@
       }
 
       function submit_patient(){
+
+        if ($('#dob-date').val() == ""){
+          alert('dob cannot be empty');
+          return
+        }
+        if (($('#fnameInput').val() == "") || ($('#lnameInput').val() == "")){
+          alert('names cannot be empty');
+          return
+        }
 
         document.getElementById("new_patient_form").submit();
 

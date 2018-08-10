@@ -247,7 +247,7 @@ class PatientHandler(webapp2.RequestHandler):
         parms = {}
         for (k,v) in self.request.POST.items():
             parms[k] = v
-        parms['session_number'] = int(parms['session_number'])
+        parms['session_number'] = int(parms['session_number'] or "0")
         parms['user_id'] = user.user_id()
         parms['pid'] = str(r.randint(0, 10000000000))
         p = Patient(**parms)
