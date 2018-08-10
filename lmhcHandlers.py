@@ -54,7 +54,7 @@ class Patient(db.Model):
     session_number = db.IntegerProperty()
     user_id = db.StringProperty()
 
-    def increment(self, amount):
+    def increment(self, amount=1):
         self.session_number += amount
         self.put()
 
