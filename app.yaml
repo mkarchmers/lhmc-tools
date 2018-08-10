@@ -13,7 +13,7 @@ handlers:
 
 - url: /.*
   script: lmhcMain.app
-  #login: required
+  login: required
 # [END handlers]
 
 # [START libraries]
