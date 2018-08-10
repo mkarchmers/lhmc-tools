@@ -23,54 +23,24 @@ def user_key(uid):
     """
     return ndb.Key('User',uid)
 
-
-class MainPage(webapp2.RequestHandler):
-
-    def get(self):
-        user = users.get_current_user()
-        if user:
-            url = users.create_logout_url(self.request.uri)
-            url_linktext = 'logout'
-        else:
-            url = users.create_login_url(self.request.uri)
-            url_linktext = 'login'
-
-        template_values = {
-            'user': user,
-            'url': url,
-            'url_linktext': url_linktext,
-        }
-
-        template = JINJA_ENVIRONMENT.get_template('index2.html')
-        self.response.write(template.render(template_values))
-
-class Patient(db.Model):
-
-    fname = db.StringProperty()
-    lname = db.StringProperty()
-    dob = db.StringProperty()
-    pid = db.StringProperty()
-    insurance = db.StringProperty()
-    session_number = db.IntegerProperty()
-    user_id = db.StringProperty()
-
-    def increment(self, amount=1):
-        self.session_number += amount
-        self.put()
-
+# for testing
 class Test(ndb.Model):
 
     a = ndb.StringProperty(indexed=True)
-    #b = db.StringProperty()
+    b = ndb.StringProperty(default='x', choices=['x','y'], indexed=False)
+    c = ndb.StringProperty()
+    d = ndb.DateProperty()
 
 class TestHandler(webapp2.RequestHandler):
 
     def get(self):
+        import datetime
         user = users.get_current_user()
 
         t = Test(parent=user_key(user.user_id()))
-        t.a = "six"
-        #t.b = "two.b"
+        t.a = self.request.get('a')
+        t.d = datetime.datetime(2018,8,31)
+        t.c = "first\nsecond"
         t.put()
         self.response.write("success")
 
@@ -86,43 +56,24 @@ class GetHandler(webapp2.RequestHandler):
 
         q = Test.query(ancestor=user_key(user.user_id()))
         q = q.filter(Test.a==unicode(self.request.get('a')))
-        greetings = q.iter()
+        greetings = q.iter(limit=10)
         self.response.write(list(greetings))
-    
+# done testing    
 
 
-class EmailHandler(webapp2.RequestHandler):
-    def get(self):
-        user = users.get_current_user()
-        email = "not logged in" if (user is None) else user.email()
-        self.response.write(email)
+class Patient(db.Model):
 
-class Insurance(db.Model):
+    fname = db.StringProperty()
+    lname = db.StringProperty()
+    dob = db.StringProperty()
+    pid = db.StringProperty()
+    insurance = db.StringProperty()
+    session_number = db.IntegerProperty()
+    user_id = db.StringProperty()
 
-    name = db.StringProperty()
-    mod_code = db.StringProperty()
-    modality_of_session = db.StringProperty()
-
-class Insurance_init(webapp2.RequestHandler):
-
-    def get(self):
-
-        i = Insurance()
-        i.name = "BlueCrossBlueShield"
-        i.mod_code = "90846"
-        i.modality_of_session = "FamilyWOPatient"
-        i.put()
-        i = Insurance()
-        i.name = "BlueCrossBlueShield"
-        i.mod_code = "90834"
-        i.modality_of_session = "Individual"
-        i.put()
-        i = Insurance()
-        i.name = "BlueCrossBlueShield"
-        i.mod_code = "90847"
-        i.modality_of_session = "FamilyWPatient"
-        i.put()
-        self.response.write("done!")
+    def increment(self, amount=1):
+        self.session_number += amount
+        self.put()
 
 
 class Session(db.Model):
@@ -177,6 +128,65 @@ class Session(db.Model):
     Other = db.StringProperty()
 
     notes = db.StringProperty(multiline=True)
+
+
+
+class Insurance(db.Model):
+
+    name = db.StringProperty()
+    mod_code = db.StringProperty()
+    modality_of_session = db.StringProperty()
+
+
+class MainPage(webapp2.RequestHandler):
+
+    def get(self):
+        user = users.get_current_user()
+        if user:
+            url = users.create_logout_url(self.request.uri)
+            url_linktext = 'logout'
+        else:
+            url = users.create_login_url(self.request.uri)
+            url_linktext = 'login'
+
+        template_values = {
+            'user': user,
+            'url': url,
+            'url_linktext': url_linktext,
+        }
+
+        template = JINJA_ENVIRONMENT.get_template('index2.html')
+        self.response.write(template.render(template_values))
+
+
+class EmailHandler(webapp2.RequestHandler):
+    def get(self):
+        user = users.get_current_user()
+        email = "not logged in" if (user is None) else user.email()
+        self.response.write(email)
+
+class Insurance_init(webapp2.RequestHandler):
+
+    def get(self):
+
+        i = Insurance()
+        i.name = "BlueCrossBlueShield"
+        i.mod_code = "90846"
+        i.modality_of_session = "FamilyWOPatient"
+        i.put()
+        i = Insurance()
+        i.name = "BlueCrossBlueShield"
+        i.mod_code = "90834"
+        i.modality_of_session = "Individual"
+        i.put()
+        i = Insurance()
+        i.name = "BlueCrossBlueShield"
+        i.mod_code = "90847"
+        i.modality_of_session = "FamilyWPatient"
+        i.put()
+        self.response.write("done!")
+
+
 
 
 class InsuranceHandler(webapp2.RequestHandler):
