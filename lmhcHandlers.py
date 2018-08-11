@@ -188,7 +188,7 @@ class Insurance_init(webapp2.RequestHandler):
         i = Insurance()
         i.name = "BlueCrossBlueShield"
         i.mod_code = "90846"
-        i.modality_of_session = "FamilyWOPatient"
+        i.modality_of_session = "Family without patient"
         i.put()
         i = Insurance()
         i.name = "BlueCrossBlueShield"
@@ -198,7 +198,7 @@ class Insurance_init(webapp2.RequestHandler):
         i = Insurance()
         i.name = "BlueCrossBlueShield"
         i.mod_code = "90847"
-        i.modality_of_session = "FamilyWPatient"
+        i.modality_of_session = "Family with patient"
         i.put()
         self.response.write("done!")
 
