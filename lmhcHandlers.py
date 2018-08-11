@@ -142,6 +142,8 @@ class Session(db.Model):
 
     notes = db.StringProperty(multiline=True)
 
+    G_1_impr = db.StringProperty(indexed=False)
+
 
 class Insurance(db.Model):
 
@@ -277,18 +279,18 @@ class BillingHandler(webapp2.RequestHandler):
 
     def get(self):
 
-        query = db.Query(Session, projection=('date','fname'))
+        query = db.Query(Session)
         query.filter('is_billed =', False)
         #query.projection()
 
         res = [{'session_date': x.date, 'first': x.fname, 'last': x.lname, 'bill_code': x.mod_code,
                 'diag_code': x.diag_code,
                'insurance': x.insurance} for x in query.run()]
-        res = list(query.run())
+        #res = list(query.run())
 
 
         self.response.headers['Content-Type'] = 'application/json'
-        self.response.write(json.dumps({'Bill': res},cls=ModelEncoder))
+        self.response.write(json.dumps({'Bill': res}))
 
         # if self.request.get('bill') is not '':
         #     bill_time = dt.now()
@@ -299,7 +301,7 @@ class BillingHandler(webapp2.RequestHandler):
 
 
 class SessionsHandler(webapp2.RequestHandler):
-    
+
     def get(self):
         self.response.headers['Content-Type'] = 'application/json'
 
@@ -312,7 +314,7 @@ class SessionsHandler(webapp2.RequestHandler):
                   'RA_prop_plan', 'RA_prop_att', 'TI_refl_listen',
                   'TI_encour', 'TI_decis_balnc', 'TI_prob_solv', 'TI_pos_reinforce', 'TI_explore', 'TI_play_therapy',
                   'TI_valid', 'TI_conf_behav', 'TI_real_test', 'TI_PSCR', 'TI_CSB', 'TI_PSB', 'TI_emot_supp', 'Other',
-                  'user_id', 'notes']
+                  'user_id', 'notes', 'G_1_impr']
 
         new_sess = {}
         for att in attrbs:

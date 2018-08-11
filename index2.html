@@ -661,6 +661,20 @@
           return string.charAt(0).toUpperCase() + string.slice(1);
       }
 
+      function calendarEventClick(calEvent, jsEvent, view) {
+        $("#new_session_form")[0].reset();
+        populateSession(calEvent.data);
+        d3.select('#sessionSubmit')
+          .classed('visible',null)
+          .classed('invisible',true)
+
+        $('#patientList').modal('hide');
+        $('#notesList').modal('hide');
+
+        $('#session_info').modal('show');
+      }
+
+
 
       function display_patient_info(item){
         enable('.patient_form')
@@ -740,6 +754,7 @@
               type: 'GET',
               success: processNotesData,
             },
+            eventClick: calendarEventClick,
           });
 
       }
@@ -815,25 +830,33 @@
         document.getElementById('newIssue').value = data['newIssue'];
 
         // risk assessment
-        riskAssessmentCheckboxes.forEach(function(k){
+        RACheckArray.forEach(function(k){
           write_checbox(k, data[k]);
         })
 
         // interventions
-        Object.keys(therapeuticInterventionsCheckboxes).forEach(function(k){
+        Object.keys(TICheckDict).forEach(function(k){
           write_checbox(k, data[k]);
         })
-        document.getElementById('TI_other_txt').value = data['TI_other_txt'];
+        TITextArray.forEach(function(k){
+          document.getElementById(k).value = data[k];
+        })
 
         // goals
-
-
-
-        // SPA
-        Object.keys(symptomsProblemAreasCheckboxes).forEach(function(k){
+        GCheckArray.forEach(function(k){
           write_checbox(k, data[k]);
         })
-        document.getElementById('SPA_other_txt').value = data['SPA_other_txt'];
+        GTextArray.forEach(function(k){
+          document.getElementById(k).value = data[k];
+        })
+
+        // SPA
+        Object.keys(SPACheckDict).forEach(function(k){
+          write_checbox(k, data[k]);
+        })
+        SPATextArray.forEach(function(k){
+          document.getElementById(k).value = data[k];
+        })
 
         // Assessment
 
@@ -991,7 +1014,8 @@
             var bills = data.Bill;
             var csv = 'Name,Session Date,Procedure Code,DSM 5,Insurance\n';
             bills.forEach(function (row) {
-                csv += capitalize(row.first) + " " + capitalize(row.last) + ',';
+                //csv += capitalize(row.first) + " " + capitalize(row.last) + ',';
+                csv += row.first + " " + row.last + ',';
                 csv += row.session_date + ',';
                 csv += row.bill_code + ',';
                 csv += row.diag_code + ",";
@@ -1011,10 +1035,10 @@
 
       $( document ).ready(function() {
 
-        createFormSection('#collapseTI', therapeuticInterventionsCheckboxes);
+        createFormSection('#collapseTI', TICheckDict);
         addOtherToList(d3.select('#collapseTI').select('ul'),"TI_other_txt")
         addOtherToList(d3.select('#collapseGO').select('ul'),"G_other_txt")
-        createFormSection('#collapseSPA', symptomsProblemAreasCheckboxes);
+        createFormSection('#collapseSPA', SPACheckDict);
         addOtherToList(d3.select('#collapseSPA').select('ul'),"SPA_other_txt")
         addOtherToList(d3.select('#collapseASS').select('ul'),"ASS_other_txt")
         addOtherToList(d3.select('#collapsePLN').select('ul'),"PLN_other_txt")
@@ -1046,15 +1070,7 @@
               type: 'GET',
               success: processPatientData,
             },
-            eventClick: function(calEvent, jsEvent, view) {
-              $("#new_session_form")[0].reset();
-              populateSession(calEvent.data);
-              d3.select('#sessionSubmit')
-                .classed('visible',null)
-                .classed('invisible',true)
-
-              $('#session_info').modal('show');
-            }
+            eventClick: calendarEventClick,
           });
 
 

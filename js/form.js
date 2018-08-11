@@ -1,6 +1,6 @@
 //
 
-var patientInfoText = [
+var PITextArray = [
 	"name",
 	"dob",
 	"insurance",
@@ -9,14 +9,14 @@ var patientInfoText = [
 	"diag_code",
 ];
 
-var sessionInfoText = [
+var SITextArray = [
 	"seshdate",
 	"seshNo",
 	"modality",
 	"newIssue",
 ];
 
-var riskAssessmentCheckboxes = [
+var RACheckArray = [
 	"RA_self_idea",
 	"RA_self_plan",
 	"RA_self_att",
@@ -30,7 +30,8 @@ var riskAssessmentCheckboxes = [
 	"RA_prop_att",
 ];
 
-var therapeuticInterventionsCheckboxes = {
+
+var TICheckDict = {
 
 	TI_refl_listen: "Reflective Listening",
 	TI_encour: "Encouragement",
@@ -48,18 +49,28 @@ var therapeuticInterventionsCheckboxes = {
 	TI_emot_supp: "Emotional Supportiveness",
 };
 
-var therapeuticInterventionsText = [
+
+var TITextArray = [
 	"TI_other_txt",
 ];
 
-var goalsCheckboxes = [
+var GCheckArray = [
 	"G_1_impr",
 	"G_1_decr",
 	"G_2_impr",
 	"G_2_decr",
+	"G_cop_skills",
+	"G_sc_skills",
+	"G_id_res",
+	"G_expr",
+	"G_verb",
 ];
 
-var symptomsProblemAreasCheckboxes = {
+var GTextArray = [
+	"G_other_txt",
+];
+
+var SPACheckDict = {
 
 	SPA_AX: "Anxiousness",
 	SPA_EW: "Excessive worry",
@@ -108,7 +119,7 @@ var symptomsProblemAreasCheckboxes = {
 	SPA_SIDI: "Sibling discord",
 	SPA_PACH: "Parental challenges",
 
-	SPA_INTP: "Intimacy problems",
+	SPA_INTI: "Intimacy problems",
 	SPA_PSEC: "Poor self esteem / confidence",
 	SPA_HSC: "Harsh self criticism",
 
@@ -134,9 +145,13 @@ var symptomsProblemAreasCheckboxes = {
 	SPA_MEDNC: "Medication non-compliance",
 }
 
-var symptomsProblemAreasText = [
+var SPATextArray = [
 	"SPA_other_txt",
 ];
+
+
+
+// utility functions to build the form
 
 function addOtherToList(selection, name){
 	selection.append('li')
