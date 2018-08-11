@@ -1,3 +1,6 @@
 indexes:
-- kind: Test
-  ancestor: yes
+- kind: Session
+  properties:
+  - name: is_billed
+  - name: user_id
+  - name: date_object
