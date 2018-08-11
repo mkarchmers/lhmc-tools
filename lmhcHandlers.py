@@ -279,15 +279,17 @@ class BillingHandler(webapp2.RequestHandler):
 
     def get(self):
 
+    	user = users.get_current_user()
+        uid = user.user_id()
+
         query = db.Query(Session)
         query.order('date_object')
         query.filter('is_billed =', False)
+        query.filter('user_id = ', uid)
         #query.projection()
 
         res = [{'session_date': x.date, 'first': x.fname, 'last': x.lname, 'bill_code': x.mod_code,
-                'diag_code': x.diag_code,
-               'insurance': x.insurance} for x in query.run()]
-        #res = list(query.run())
+                'diag_code': x.diag_code, 'insurance': x.insurance} for x in query.run()]
 
 
         self.response.headers['Content-Type'] = 'application/json'
