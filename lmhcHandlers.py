@@ -114,7 +114,7 @@ class Session(db.Model):
     modality = db.StringProperty()
     new_issue = db.StringProperty()
 
-    RAnone = db.StringProperty()
+    RA_none = db.StringProperty()
     RA_self_idea = db.StringProperty()
     RA_self_plan = db.StringProperty()
     RA_self_att = db.StringProperty()
@@ -280,6 +280,7 @@ class BillingHandler(webapp2.RequestHandler):
     def get(self):
 
         query = db.Query(Session)
+        query.order('date_object')
         query.filter('is_billed =', False)
         #query.projection()
 
@@ -309,7 +310,7 @@ class SessionsHandler(webapp2.RequestHandler):
         uid = user.user_id()
 
         attrbs = ['patient_id', 'date', 'fname', 'lname', 'dob', 'insurance','diag', 'diag_code','modality',
-                  'new_issue', 'RAnone', 'RA_self_idea', 'RA_self_plan', 'RA_self_att', 'RA_others_idea',
+                  'new_issue', 'RA_none', 'RA_self_idea', 'RA_self_plan', 'RA_self_att', 'RA_others_idea',
                   'RA_others_plan', 'RA_others_att', 'RA_prop_idea',
                   'RA_prop_plan', 'RA_prop_att', 'TI_refl_listen',
                   'TI_encour', 'TI_decis_balnc', 'TI_prob_solv', 'TI_pos_reinforce', 'TI_explore', 'TI_play_therapy',

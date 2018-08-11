@@ -17,6 +17,8 @@ var SITextArray = [
 ];
 
 var RACheckArray = [
+	"RA_none",
+	
 	"RA_self_idea",
 	"RA_self_plan",
 	"RA_self_att",
