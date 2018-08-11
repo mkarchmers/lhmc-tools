@@ -18,7 +18,7 @@ var SITextArray = [
 
 var RACheckArray = [
 	"RA_none",
-	
+
 	"RA_self_idea",
 	"RA_self_plan",
 	"RA_self_att",
@@ -154,6 +154,13 @@ var SPATextArray = [
 
 
 // utility functions to build the form
+
+function associateCheckText(chk, txt){
+	$('input[name='+chk+']').change(function(){
+		$('input[name='+txt+']').toggle(this.checked);
+	})
+
+}
 
 function addOtherToList(selection, name){
 	selection.append('li')

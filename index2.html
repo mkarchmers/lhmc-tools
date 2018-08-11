@@ -239,8 +239,21 @@
                           </select>
                         </li>
                         <li class="list-group-item">
-                        New issue: <input type="textarea" id="newIssue">
+                        New issue: <input type="textarea" id="newIssue" name="newIssue">
                         </li>
+                        <!--
+                        <li class="list-group-item">
+                          <p class="help-block">New issue</p>
+                          <div class="input-group">
+                            <div class="input-group-prepend">
+                                <input type="checkbox" name="newIssue" id="newIssue">
+                                <span class="input-group-text">None reported</span>
+                            </div>
+                            <input type="text" name="newIssue_txt" id="newIssue_txt" class="form-control">
+                          </div>
+                        </li>
+                      -->
+
                       </ul>
                     </div>
                   </div>
@@ -339,7 +352,7 @@
                                         <input type="checkbox" name="G_1_impr" id="G_1_impr">
                                         <span class="input-group-text">Improve</span>
                                     </div>
-                                    <input type="text" name="G_1_impr_txt" id="G_1_impr_txt" class="form-control" >
+                                    <input type="text" name="G_1_impr_txt" id="G_1_impr_txt" class="form-control">
                                   </div>
                                 </td>
                                 <td>
@@ -348,7 +361,7 @@
                                         <input type="checkbox" name="G_1_decr" id="G_1_decr">
                                         <span class="input-group-text">Decrease</span>
                                     </div>
-                                    <input type="text" name="G_1_decr_txt" id="G_1_decr_txt" class="form-control" >
+                                    <input type="text" name="G_1_decr_txt" id="G_1_decr_txt" class="form-control">
                                   </div>
                                 </td>
                               </tr>
@@ -851,6 +864,7 @@
 
         // goals
         GCheckArray.forEach(function(k){
+          //console.log('populating ' + k);
           write_checbox(k, data[k]);
         })
         GTextArray.forEach(function(k){
@@ -1049,6 +1063,11 @@
         addOtherToList(d3.select('#collapseSPA').select('ul'),"SPA_other_txt")
         addOtherToList(d3.select('#collapseASS').select('ul'),"ASS_other_txt")
         addOtherToList(d3.select('#collapsePLN').select('ul'),"PLN_other_txt")
+
+        
+        //associateCheckText('G_1_impr', 'G_1_impr_txt');
+        //associateCheckText('G_1_decr', 'G_1_decr_txt');
+        
 
         $("#patientSearchInput").on("keyup", function() {
           var value = $(this).val().toLowerCase();
