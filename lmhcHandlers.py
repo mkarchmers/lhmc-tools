@@ -257,7 +257,7 @@ class PatientHandler(webapp2.RequestHandler):
             parms[k] = v
         parms['session_number'] = int(parms['session_number'] or "0")
         parms['user_id'] = user.user_id()
-        parms['pid'] = str(hs.md5(parms['lname']))
+        parms['pid'] = str(hs.md5(parms['lname']).hexdigest())
         p = Patient(**parms)
         p.put()
 
