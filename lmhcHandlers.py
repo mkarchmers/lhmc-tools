@@ -9,6 +9,7 @@ from google.appengine.ext import db
 from datetime import datetime as dt
 from datetime import date as d
 import random as r
+import hashlib as hs
 from google.appengine.api import users
 from google.appengine.ext import ndb
 
@@ -251,7 +252,7 @@ class PatientHandler(webapp2.RequestHandler):
             parms[k] = v
         parms['session_number'] = int(parms['session_number'] or "0")
         parms['user_id'] = user.user_id()
-        parms['pid'] = str(r.randint(0, 10000000000))
+        parms['pid'] = str(hs.md5(parms['lname']))
         p = Patient(**parms)
         p.put()
 
@@ -327,6 +328,8 @@ class SessionsHandler(webapp2.RequestHandler):
         # get mode code
         if new_sess['date'] is not '':
             query = db.Query(Insurance)
+        	# print new_sess['insurance']
+        	# print new_sess['modality_of_session']
             query.filter('name =', new_sess['insurance'])
             query.filter('modality_of_session =', new_sess['modality'])
             res = [{'mod_code': x.mod_code} for x in
