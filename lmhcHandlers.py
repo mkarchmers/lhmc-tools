@@ -295,12 +295,12 @@ class BillingHandler(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'application/json'
         self.response.write(json.dumps({'Bill': res}))
 
-        # if self.request.get('bill') is not '':
-        #     bill_time = dt.now()
-        #     for s in query.run():
-        #         s.is_billed = True
-        #         s.billing_time = bill_time
-        #         s.put()
+        if self.request.get('bill') is not '':
+            bill_time = dt.now()
+            for s in query.run():
+                s.is_billed = True
+                s.billing_time = bill_time
+                s.put()
 
 
 class SessionsHandler(webapp2.RequestHandler):
