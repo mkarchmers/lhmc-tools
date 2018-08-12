@@ -1067,6 +1067,11 @@
         
         //associateCheckText('G_1_impr', 'G_1_impr_txt');
         //associateCheckText('G_1_decr', 'G_1_decr_txt');
+        $('input[name=date]').change(function(){
+          nxt = moment($('input[name=date]').val()).add(7,'day').format('MM/DD/YYYY');
+          console.log('nxt = ', nxt);
+          $('input[name=PLN_NXT]').val(nxt);
+        })
         
 
         $("#patientSearchInput").on("keyup", function() {

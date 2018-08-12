@@ -1,20 +1,21 @@
 //
 
 var PITextArray = [
-	"name",
-	"dob",
-	"insurance",
-	"patient_id",
+	"fname", //ro
+	"lname", //ro
+	"dob", //ro
+	"insurance", //ro
+	"patient_id", //ro
 	"diag",
 	"diag_code",
-];
+]; // 7
 
 var SITextArray = [
 	"seshdate",
-	"seshNo",
+	"seshNo", //ro
 	"modality",
 	"newIssue",
-];
+]; // 4
 
 var RACheckArray = [
 	"RA_none",
@@ -30,7 +31,7 @@ var RACheckArray = [
 	"RA_prop_idea",
 	"RA_prop_plan",
 	"RA_prop_att",
-];
+]; // 10
 
 
 var TICheckDict = {
@@ -49,12 +50,12 @@ var TICheckDict = {
 	TI_CSB: "Communication Skill Building",
 	TI_PSB: "Parenting Skill Building",
 	TI_emot_supp: "Emotional Supportiveness",
-};
+}; // 14
 
 
 var TITextArray = [
 	"TI_other_txt",
-];
+]; // 1
 
 var GCheckArray = [
 	"G_1_impr",
@@ -66,11 +67,15 @@ var GCheckArray = [
 	"G_id_res",
 	"G_expr",
 	"G_verb",
-];
+]; // 9
 
 var GTextArray = [
+	"G_1_impr_txt",
+	"G_1_decr_txt",
+	"G_2_impr_txt",
+	"G_2_decr_txt",
 	"G_other_txt",
-];
+]; // 5
 
 var SPACheckDict = {
 
@@ -145,11 +150,35 @@ var SPACheckDict = {
 	SPA_FINDIF: "Financial Difficulties",
 	SPA_MEDDIF: "Medical problems",
 	SPA_MEDNC: "Medication non-compliance",
-}
+} // 59
 
 var SPATextArray = [
 	"SPA_other_txt",
-];
+]; // 1
+
+var notesArray = [
+	"notes",
+]; // 1
+
+var ASSTextArray = [
+	"ASS_CONST",
+	"ASS_INSIG",
+	"ASS_EFFRT",
+	"ASS_OR",
+	"ASS_present",
+	"ASS_present_txt",
+	"ASS_ABLE",
+	"ASS_COOP",
+	"ASS_other_txt",
+]; // 9
+
+var PLNTextArray = [
+	"PLN_CONT",
+	"PLN_FREQ",
+	"PLN_PSY",
+	"PLN_NXT",
+	"PLN_other_txt",
+]; // 5
 
 
 
