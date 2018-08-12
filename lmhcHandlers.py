@@ -92,30 +92,30 @@ class Patient(db.Model):
 
 class Session(db.Model):
 
-    user_id = db.StringProperty()
+	user_id = db.StringProperty()
 
-    patient_id = db.StringProperty()
-    session_id = db.StringProperty()
-    is_billed = db.BooleanProperty()
-    billing_time = db.DateTimeProperty()
-    insurance = db.StringProperty()
-    mod_code = db.StringProperty()
+	patient_id = db.StringProperty()
+	session_id = db.StringProperty()
+	is_billed = db.BooleanProperty()
+	billing_time = db.DateTimeProperty()
+	insurance = db.StringProperty()
+	mod_code = db.StringProperty()
 
-    session_number = db.IntegerProperty()
+	session_number = db.IntegerProperty()
 
-    date = db.StringProperty()
-    date_object = db.DateProperty()
-    timestamp = db.DateTimeProperty()
+	date = db.StringProperty()
+	date_object = db.DateProperty()
+	timestamp = db.DateTimeProperty()
 
-    fname = db.StringProperty()
-    lname = db.StringProperty()
-    dob = db.StringProperty()
-    diag = db.StringProperty()
-    diag_code = db.StringProperty()
-    modality = db.StringProperty()
-    new_issue = db.StringProperty()
+	fname = db.StringProperty()
+	lname = db.StringProperty()
+	dob = db.StringProperty()
+	diag = db.StringProperty()
+	diag_code = db.StringProperty()
+	modality = db.StringProperty()
+	new_issue = db.StringProperty()
 
-    ASS_ABLE= db.StringProperty()
+	ASS_ABLE= db.StringProperty()
 	ASS_CONST= db.StringProperty()
 	ASS_COOP= db.StringProperty()
 	ASS_EFFRT= db.StringProperty()
@@ -229,9 +229,9 @@ class Session(db.Model):
 	TI_refl_listen= db.StringProperty()
 	TI_valid= db.StringProperty()
 
-    notes = db.StringProperty(multiline=True)
+	notes = db.StringProperty(multiline=True)
 
-    G_1_impr = db.StringProperty(indexed=False)
+	G_1_impr = db.StringProperty(indexed=False)
 
 
 class Insurance(db.Model):
