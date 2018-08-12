@@ -311,59 +311,56 @@ class BillingHandler(webapp2.RequestHandler):
 
 class SessionsHandler(webapp2.RequestHandler):
 
+    def post(self):
+        user = users.get_current_user()
+        uid = user.user_id()
+
+        parms = {}
+        for (k,v) in self.request.POST.items():
+            parms[k] = v
+            query = db.Query(Insurance)
+
+        # get insurance code
+        query.filter('name =', parms['insurance'])
+        query.filter('modality_of_session =', parms['modality'])
+        res = list(query.run(limit=1))
+        parms['mod_code'] = res[0].mod_code
+        parms['is_billed'] = False
+
+        user_date_lst = parms['date'].split('/')
+        parms['date_object'] = d(int(user_date_lst[2]), int(user_date_lst[0]), int(user_date_lst[1]))
+        parms['timestamp'] = dt.now()
+        parms['session_id'] = str(r.randint(0, 10000000000))
+
+        # increment session number for patient
+        query = db.Query(Patient)
+        query.filter('user_id = ', uid)        
+        query.filter('pid =', parms['patient_id'])
+        patient = list(query.run(limit=1))[0]
+        db.run_in_transaction(patient.increment, 1)
+        parms['session_number'] = patient.session_number
+
+        parms['user_id'] = uid
+        
+        session = Session(**parms)
+        session.put()
+
+        self.redirect('/')
+
     def get(self):
         self.response.headers['Content-Type'] = 'application/json'
 
         user = users.get_current_user()
         uid = user.user_id()
 
-        attrbs = ['patient_id', 'date', 'fname', 'lname', 'dob', 'insurance','diag', 'diag_code','modality',
-                  'new_issue', 'RA_none', 'RA_self_idea', 'RA_self_plan', 'RA_self_att', 'RA_others_idea',
-                  'RA_others_plan', 'RA_others_att', 'RA_prop_idea',
-                  'RA_prop_plan', 'RA_prop_att', 'TI_refl_listen',
-                  'TI_encour', 'TI_decis_balnc', 'TI_prob_solv', 'TI_pos_reinforce', 'TI_explore', 'TI_play_therapy',
-                  'TI_valid', 'TI_conf_behav', 'TI_real_test', 'TI_PSCR', 'TI_CSB', 'TI_PSB', 'TI_emot_supp', 'Other',
-                  'user_id', 'notes', 'G_1_impr']
-
-        new_sess = {}
-        for att in attrbs:
-            val = self.request.get(att)
-            new_sess[att] = val
-
-        # get mode code
-        if new_sess['date'] is not '':
-            query = db.Query(Insurance)
-        	# print new_sess['insurance']
-        	# print new_sess['modality_of_session']
-            query.filter('name =', new_sess['insurance'])
-            query.filter('modality_of_session =', new_sess['modality'])
-            res = [{'mod_code': x.mod_code} for x in
-                   query.run(limit=1)][0]
-            new_sess['mod_code'] = res['mod_code']
-            new_sess['is_billed'] = False
-
-            user_date_lst = new_sess['date'].split('/')
-            new_sess['date_object'] = d(int(user_date_lst[2]), int(user_date_lst[0]), int(user_date_lst[1]))
-            new_sess['timestamp'] = dt.now()
-            new_sess['session_id'] = str(r.randint(0, 10000000000))
-
-            query = db.Query(Patient)
-            query.filter('pid =', new_sess['patient_id'])
-            patient = [x for x in query.run(limit=1)][0]
-            db.run_in_transaction(patient.increment, 1)
-            new_sess['session_number'] = patient.session_number
-
-            new_sess['user_id'] = uid
-
-            session = Session(**new_sess)
-            session.put()
-
         query = db.Query(Session)
         query.order('-date_object')
-
-        # %m%d%y
+        query.filter('user_id = ', uid)
 
         pid = self.request.get('pid')
+
+        if pid !=  "" or pid:
+            query.filter('patient_id = ', pid)
 
 
         s = [{'fname': x.fname, 'lname': x.lname, 'session_date': x.date_object, 'session_id': x.session_id,
