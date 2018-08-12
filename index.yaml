@@ -4,3 +4,16 @@ indexes:
   - name: is_billed
   - name: user_id
   - name: date_object
+
+- kind: Session
+  properties:
+  - name: user_id
+  - name: date_object
+    direction: desc
+
+- kind: Session
+  properties:
+  - name: patient_id
+  - name: user_id
+  - name: date_object
+    direction: desc  
