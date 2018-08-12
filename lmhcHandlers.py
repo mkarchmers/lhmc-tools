@@ -99,21 +99,21 @@ class Session(db.Model):
 	is_billed = db.BooleanProperty()
 	billing_time = db.DateTimeProperty()
 	insurance = db.StringProperty()
-	mod_code = db.StringProperty()
+	mod_code = db.StringProperty(indexed=False)
 
-	session_number = db.IntegerProperty()
+	session_number = db.IntegerProperty(indexed=False)
 
-	date = db.StringProperty()
+	date = db.StringProperty(indexed=False)
 	date_object = db.DateProperty()
 	timestamp = db.DateTimeProperty()
 
-	fname = db.StringProperty()
+	fname = db.StringProperty(indexed=False)
 	lname = db.StringProperty()
-	dob = db.StringProperty()
-	diag = db.StringProperty()
+	dob = db.StringProperty(indexed=False)
+	diag = db.StringProperty(indexed=False)
 	diag_code = db.StringProperty()
 	modality = db.StringProperty()
-	new_issue = db.StringProperty()
+	new_issue = db.StringProperty(indexed=False)
 
 	ASS_ABLE= db.StringProperty(indexed=False)
 	ASS_CONST= db.StringProperty(indexed=False)
@@ -230,8 +230,6 @@ class Session(db.Model):
 	TI_valid= db.StringProperty(indexed=False)
 
 	notes = db.StringProperty(multiline=True)
-
-	G_1_impr = db.StringProperty(indexed=False)
 
 
 class Insurance(db.Model):
