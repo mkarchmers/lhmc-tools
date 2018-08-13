@@ -131,7 +131,13 @@
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
             <li class="active"><a href="#">Home</a></li>
-            <li><a onclick="billing()">Billing</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Billing<span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a onclick="billing(0)">tentative</a></li>
+                <li><a onclick="billing(1)">final</a></li>
+              </ul>
+            </li>
             <li><a onclick="patients()">Patients</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
@@ -920,9 +926,9 @@
         $('#patientList').modal('show');
       }
 
-      function billing(){
-        //alert('billing')
-        generate_bill();
+      function billing(final){
+        route = "/billing?bill=" + (final? "Y" : "");
+        generate_bill(route);
       }
 
       function validate_session(){
@@ -1033,9 +1039,9 @@
           })
       }
 
-      function generate_bill() {
+      function generate_bill(route) {
 
-        $.getJSON('/billing', function (data) {
+        $.getJSON(route, function (data) {
             var bills = data.Bill;
             var csv = 'Name,Session Date,Procedure Code,DSM 5,Insurance\n';
             bills.forEach(function (row) {
