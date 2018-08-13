@@ -220,7 +220,7 @@
                 <div class="panel panel-default">
                   <div class="panel-heading" role="tab" id="headingSI">
                     <h4 class="panel-title">
-                      <a role="button" data-toggle="collapse" data-parent="#aaccordion" href="#collapseSI" aria-expanded="false" aria-controls="collapseSI">
+                      <a id="a-SI" role="button" data-toggle="collapse" data-parent="#aaccordion" href="#collapseSI" aria-expanded="false" aria-controls="collapseSI">
                         Session info
                       </a>
                     </h4>
@@ -929,26 +929,45 @@
 
       function validate_session(){
         
-        var f = $('#date').val();
+        var f = $('#seshdate').val();
         if (f == ""){
           alert("date cannot be empty");
-          return
+          return false;
         }
         var f = $('#notes').val();
         if (f == ""){
           alert("notes cannot be empty");
-          return
+          return false;
         }
         var f = $('#diag_code').val();
         if (f == ""){
           alert("diagnosis code cannot be empty");
-          return
-        }        
+          return false;
+        } 
+
+        var new_issue_filled =  $('#new_issue').val() != "";
+        if (!document.getElementById('no_new_issue').checked){
+          if (!new_issue_filled){
+            alert("new issue cannot be empty when 'None Reported' checkbox is unchecked");
+            return false;
+          }
+        } 
+        else {
+          if (new_issue_filled){
+            alert("new issue cannot be filled when 'None Reported' checkbox is checked");
+            return false;
+          }
+        }
+   
+        return true;
       }
 
       function submit_session(){
 
-        validate_session();
+        if (!validate_session()){
+          //alert("submition failed");
+          return;
+        };
 
         document.getElementById("new_session_form").submit();
 
@@ -1008,6 +1027,10 @@
             });
 
             populateSessionData(latest_data);
+
+            // clear new_issue
+            $('#new_issue').val("")
+            write_checbox('no_new_issue', "on")
         });
 
         d3.select('#sessionInfoLabel').text('New session');
@@ -1021,9 +1044,10 @@
         document.getElementById('insurance').value = patient.insurance;
         document.getElementById('patient_id').value = patient.pid;
         // incrememnt session number
-        document.getElementById('seshNo').value = patient.session_number + 1;
+        document.getElementById('seshNo').value = patient.session_number + 1
 
-        // last session
+
+        $('#a-SI.collapsed').click();
       }
 
       function processPatientData(data){
