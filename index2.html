@@ -243,21 +243,16 @@
                           </select>
                         </li>
                         <li class="list-group-item">
-                        New issue: <input type="text" id="new_issue" name="new_issue">
-                        </li>
-                        <!--
-                        <li class="list-group-item">
                           <p class="help-block">New issue</p>
                           <div class="input-group">
                             <div class="input-group-prepend">
-                                <input type="checkbox" name="new_issue" id="new_issue">
+                                <input type="checkbox" name="no_new_issue" id="no_new_issue">
                                 <span class="input-group-text">None reported</span>
                             </div>
-                            <input type="text" name="new_issue_txt" id="new_issue_txt" class="form-control">
+                            New:
+                            <input type="text" name="new_issue" id="new_issue" class="form-control">
                           </div>
                         </li>
-                      -->
-
                       </ul>
                     </div>
                   </div>
@@ -850,6 +845,7 @@
         ['diag', 'diag_code', 'modality', 'new_issue'].forEach(function(w){
           document.getElementById(w).value = data[w];
         })
+        write_checbox('no_new_issue', data['no_new_issue']);
 
         // risk assessment
         RACheckArray.forEach(function(k){
@@ -1075,7 +1071,6 @@
         addOtherToList(d3.select('#collapseASS').select('ul'),"ASS_other_txt")
         addOtherToList(d3.select('#collapsePLN').select('ul'),"PLN_other_txt")
 
-        
         //associateCheckText('G_1_impr', 'G_1_impr_txt');
         //associateCheckText('G_1_decr', 'G_1_decr_txt');
         $('input[name=date]').change(function(){

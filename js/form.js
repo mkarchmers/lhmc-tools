@@ -10,6 +10,10 @@ var PITextArray = [
 	"diag_code",
 ]; // 7
 
+var SICheckArray = [
+	"no_new_issue",
+]; // 1
+
 var SITextArray = [
 	"date",
 	"seshNo", //ro
