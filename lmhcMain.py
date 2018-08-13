@@ -11,7 +11,5 @@ app = webapp2.WSGIApplication([
     ('/billing', hh.BillingHandler),
     ('/email', hh.EmailHandler),
     ('/insurance_init', hh.Insurance_init),
-    ('/test',hh.TestHandler),
-    ('/get',hh.GetHandler),
 
 ], debug=True)
