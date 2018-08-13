@@ -387,7 +387,7 @@ class BillingHandler(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'application/json'
         self.response.write(json.dumps({'Bill': res}))
 
-        if self.request.get('bill') is not '':
+        if self.request.get('bill') == "Y":
             bill_time = dt.now()
             for s in query.run():
                 s.is_billed = True
