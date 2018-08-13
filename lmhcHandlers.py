@@ -358,6 +358,7 @@ class SessionsHandler(webapp2.RequestHandler):
             query = db.Query(Insurance)
 
         # get insurance code
+        print parms
         query.filter('name =', parms['insurance'])
         query.filter('modality_of_session =', parms['modality'])
         res = list(query.run(limit=1))
