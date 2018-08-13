@@ -170,9 +170,7 @@
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             <h4 class="modal-title" id="sessionInfoLabel">Session</h4>
           </div>
-          <div class="modal-body">
-
-                  
+          <div class="modal-body">   
             <form id="new_session_form" action="/sessions" method='post'>
               <div class="panel-group" id="aaccordion" role="tablist" aria-multiselectable="true">
 
@@ -239,17 +237,17 @@
                           </select>
                         </li>
                         <li class="list-group-item">
-                        New issue: <input type="text" id="newIssue" name="newIssue">
+                        New issue: <input type="text" id="new_issue" name="new_issue">
                         </li>
                         <!--
                         <li class="list-group-item">
                           <p class="help-block">New issue</p>
                           <div class="input-group">
                             <div class="input-group-prepend">
-                                <input type="checkbox" name="newIssue" id="newIssue">
+                                <input type="checkbox" name="new_issue" id="new_issue">
                                 <span class="input-group-text">None reported</span>
                             </div>
-                            <input type="text" name="newIssue_txt" id="newIssue_txt" class="form-control">
+                            <input type="text" name="new_issue_txt" id="new_issue_txt" class="form-control">
                           </div>
                         </li>
                       -->
@@ -564,7 +562,8 @@
           </div>
 
           <div class="modal-footer">
-            <button id="sessionSubmit" type="button" class="btn" onclick="submit_session()">Submit</button>
+            <button id="sessionSubmit" type="button" class="btn btn-default" onclick="submit_session()">Submit</button>
+            <button id="sessionEdit" type="button" class="btn btn-default" onclick="edit_session()">Edit</button>
           </div>
 
         </div>
@@ -612,15 +611,12 @@
                     <input name="session_number" type="text" class="form-control" id="session_number" placeholder="session number">
                   </div>
                 </form>
-              </div>
-
-              
+              </div>            
 
           </div>
           <div class="modal-footer">
             <button id="submit-patient" type="button" class="patient_form btn btn-default" onclick="submit_patient()">Submit</button>
-            <button type="button" class="patient_display btn btn-default" onclick="new_patient()">New</button>
-            <!--<button type="button" class="new_session_iframe btn btn-default" onclick="patients()">Back</button>-->
+            <button id="new-patient" type="button" class="patient_display btn btn-default" onclick="new_patient()">New</button>
           </div>
         </div>
       </div>
@@ -660,8 +656,8 @@
     <script>
 
       // utility functions to handle different forms
-      function enable(what){
-        ['.patient_display', '.new_session_iframe','.patient_form'].forEach(function(cls){
+      function enablePatientDisplay(what){
+        ['.patient_display', '.patient_form'].forEach(function(cls){
           d3.selectAll(cls).style('display',(what==cls?'block':'none'))
         })
       }
@@ -688,6 +684,9 @@
         d3.select('#sessionSubmit')
           .classed('visible',null)
           .classed('invisible',true)
+        d3.select('#sessionEdit')
+          .classed('visible',true)
+          .classed('invisible',null)
 
         $('#patientList').modal('hide');
         $('#notesList').modal('hide');
@@ -698,7 +697,7 @@
 
 
       function display_patient_info(item){
-        enable('.patient_form')
+        enablePatientDisplay('.patient_form')
 
         var form = d3.select('#new_patient_form');
         form.selectAll('.form-control')
@@ -727,13 +726,10 @@
         }
 
         document.getElementById("new_patient_form").submit();
-
-        //enable('.patient_display')
-        //load_patients();
       }
 
       function new_patient(){
-        enable('.patient_form')
+        enablePatientDisplay('.patient_form')
         d3.select('#new_patient_form')
           .selectAll('.form-control')
           .attr('disabled',null)
@@ -845,10 +841,9 @@
 
       function populateSessionData(data){
 
-        document.getElementById('diag').value = data['diag'];
-
-        $("#modality").val(data['modality']);
-        document.getElementById('newIssue').value = data['newIssue'];
+        ['diag', 'diag_code', 'modality', 'new_issue'].forEach(function(w){
+          document.getElementById(w).value = data[w];
+        })
 
         // risk assessment
         RACheckArray.forEach(function(k){
@@ -881,41 +876,33 @@
         })
 
         // Assessment
+        ASSTextArray.forEach(function(k){
+          document.getElementById(k).value = data[k];
+        })
 
+        // Plan
+        PLNCheckArray.forEach(function(k){
+          write_checbox(k, data[k]);
+        })
+        PLNTextArray.forEach(function(k){
+          document.getElementById(k).value = data[k];
+        })
       }
 
       function populateSession(data){
 
-        //d3.select('#new_session_form')
-         // .attr('disabled',true);
         setFormDisabled('#new_session_form', true);
 
-        //console.log(data);
-        
-        ['fname', 'lname', 'dob'].forEach(function(s){
+        ['fname', 'lname', 'dob', 'notes'].forEach(function(s){
           document.getElementById(s).value = data[s];
         });
 
         document.getElementById('seshdate').value = data['date'];
         document.getElementById('seshNo').value = data['session_number'];
 
-        document.getElementById('notes').value = data['notes'];
-
         populateSessionData(data);
 
         d3.select('#sessionInfoLabel').text('Session');
-      }
-
-      function prev(){
-        $('#calendar').fullCalendar('prev')
-      }
-
-      function next(){
-        $('#calendar').fullCalendar('next')
-      }
-
-      function gotoday(){
-        $('#calendar').fullCalendar('today')
       }
 
       function viewMonth(){
@@ -927,7 +914,7 @@
       }
 
       function patients(){
-        enable('.patient_display')
+        enablePatientDisplay('.patient_display')
   
         load_patients();
         $('#patientList').modal('show');
@@ -938,25 +925,38 @@
         generate_bill();
       }
 
+      function validate_session(){
+        
+        var f = $('#date').val();
+        if (f == ""){
+          alert("date cannot be empty");
+          return
+        }
+        var f = $('#notes').val();
+        if (f == ""){
+          alert("notes cannot be empty");
+          return
+        }
+        var f = $('#diag_code').val();
+        if (f == ""){
+          alert("diagnosis code cannot be empty");
+          return
+        }        
+      }
+
       function submit_session(){
 
-        var date = $('#seshdate').val();
-        if (date == ""){
-          alert('date cannot be empty');
-          return
-        }
-
-        var notes = $('#notes').val();
-        if (notes == ""){
-          alert('notes cannot be empty');
-          return
-        }
+        validate_session();
 
         document.getElementById("new_session_form").submit();
 
         $('#session_info').modal('hide');
         $('#patientList').modal('show');
         load_patients();
+      }
+
+      function edit_session(){
+        alert('edit')
       }
 
       function new_session(patient){
@@ -967,6 +967,9 @@
         d3.select('#sessionSubmit')
           .classed('visible',true)
           .classed('invisible',null)
+        d3.select('#sessionEdit')
+          .classed('visible',null)
+          .classed('invisible',true)
 
 
         $('#patientList').modal('hide');

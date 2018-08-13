@@ -11,7 +11,7 @@ var PITextArray = [
 ]; // 7
 
 var SITextArray = [
-	"seshdate",
+	"date",
 	"seshNo", //ro
 	"modality",
 	"newIssue",
@@ -172,13 +172,16 @@ var ASSTextArray = [
 	"ASS_other_txt",
 ]; // 9
 
+var PLNCheckArray = [
+	"PLN_PSY",
+]; //1
+
 var PLNTextArray = [
 	"PLN_CONT",
 	"PLN_FREQ",
-	"PLN_PSY",
 	"PLN_NXT",
 	"PLN_other_txt",
-]; // 5
+]; // 4
 
 
 
