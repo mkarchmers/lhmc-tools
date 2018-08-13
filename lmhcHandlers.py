@@ -37,44 +37,6 @@ class ModelEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj) 
 
 
-# for testing
-class Test(ndb.Model):
-
-    a = ndb.StringProperty(indexed=True)
-    b = ndb.StringProperty(default='x', choices=['x','y'], indexed=False)
-    c = ndb.StringProperty()
-    d = ndb.DateProperty()
-
-class TestHandler(webapp2.RequestHandler):
-
-    def get(self):
-        import datetime
-        user = users.get_current_user()
-
-        t = Test(parent=user_key(user.user_id()))
-        t.a = self.request.get('a')
-        t.d = datetime.datetime(2018,8,31)
-        t.c = "first\nsecond"
-        t.put()
-        self.response.write("success")
-
-
-class GetHandler(webapp2.RequestHandler):
-
-    def get(self):
-        user = users.get_current_user()
-
-        greetings_query = Test.query(
-            ancestor=user_key(user.user_id()))
-        greetings = greetings_query.fetch(10)
-
-        q = Test.query(ancestor=user_key(user.user_id()))
-        q = q.filter(Test.a==unicode(self.request.get('a')))
-        greetings = q.iter(limit=10)
-        self.response.write(list(greetings))
-# done testing    
-
-
 class Patient(db.Model):
 
     fname = db.StringProperty(indexed=False)
@@ -321,18 +283,6 @@ class InsuranceHandler(webapp2.RequestHandler):
         self.response.write(json.dumps(obj))
 
         
-class NS(webapp2.RequestHandler):
-
-    def post(self):
-        parms = {}
-        for (k,v) in self.request.POST.items():
-            parms[k] = v
-
-        #self.response.write(parms)
-        url = "/sessions?" + urllib.urlencode(parms)
-        self.redirect(url)
-        #self.redirect(url)
-
 class PatientHandler(webapp2.RequestHandler):
 
     def post(self):
