@@ -20,7 +20,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 def user_key(uid):
     """Constructs a Datastore key for a User entity.
     """
-    return ndb.Key('User',uid)
+    return db.Key.from_path('User', uid)
 
 class ModelEncoder(json.JSONEncoder):
     def default(self, obj): 
@@ -47,7 +47,6 @@ class Patient(db.Model):
     dob = db.StringProperty(indexed=False)
     insurance = db.StringProperty()
     session_number = db.IntegerProperty(indexed=False)
-    user_id = db.StringProperty()
 
     def increment(self, amount=1):
         self.session_number += amount
@@ -56,7 +55,6 @@ class Patient(db.Model):
 
 class Session(db.Model):
 
-    user_id = db.StringProperty()
     patient_id = db.StringProperty()
 
     is_billed = db.BooleanProperty()
@@ -295,7 +293,7 @@ class PatientHandler(webapp2.RequestHandler):
         for (k,v) in self.request.POST.items():
             parms[k] = v
         parms['session_number'] = int(parms['session_number'] or "0")
-        parms['user_id'] = user.user_id()
+        parms['parent'] = user_key(user.user_id())
         p = Patient(**parms)
         p.put()
 
@@ -307,7 +305,7 @@ class PatientHandler(webapp2.RequestHandler):
         uid = user.user_id()
 
         query = db.Query(Patient)
-        query.filter('user_id =', uid)
+        query.ancestor(user_key(uid))
 
         s = list(query.run())
         obj = {'patient_list': s}
@@ -325,9 +323,10 @@ class BillingHandler(webapp2.RequestHandler):
         uid = user.user_id()
 
         query = db.Query(Session)
+        query.ancestor(user_key(uid))
+
         query.order('date_object')
         query.filter('is_billed =', False)
-        query.filter('user_id = ', uid)
 
         res = [{'session_date': x.date, 'first': x.fname, 'last': x.lname, 'bill_code': x.mod_code,
                 'diag_code': x.diag_code, 'insurance': x.insurance} for x in query.run()]
@@ -371,7 +370,7 @@ class SessionsHandler(webapp2.RequestHandler):
         db.run_in_transaction(patient.increment, 1)
         parms['session_number'] = patient.session_number
 
-        parms['user_id'] = uid
+        parms['parent'] = user_key(user.user_id())
         
         session = Session(**parms)
         session.put()
@@ -385,8 +384,9 @@ class SessionsHandler(webapp2.RequestHandler):
         uid = user.user_id()
 
         query = db.Query(Session)
+        query.ancestor(user_key(uid))
+
         query.order('-date_object')
-        query.filter('user_id = ', uid)
 
         pid = self.request.get('pid')
 
