@@ -5,7 +5,6 @@ import os
 import urllib
 import urllib2
 import logging
-from google.appengine.ext import db
 import datetime
 import random as r
 from google.appengine.api import users
@@ -17,18 +16,17 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     extensions=['jinja2.ext.autoescape'],
     autoescape=True)
 
-def user_key(uid):
+def ndb_user_key(uid):
     """Constructs a Datastore key for a User entity.
     """
-    return db.Key.from_path('User', uid)
+    return ndb.Key('User', uid)
 
 class ModelEncoder(json.JSONEncoder):
     def default(self, obj): 
 
-        if isinstance(obj, db.Model): 
-            properties = obj.properties().items() 
-            output = {'id': str(obj.key())} 
-            print output
+        if isinstance(obj, ndb.Model): 
+            properties = obj._properties.items() 
+            output = {'id': obj.key.urlsafe()} 
             for field, value in properties: 
                 output[field] = getattr(obj, field)
             return output
@@ -40,164 +38,164 @@ class ModelEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj) 
 
 
-class Patient(db.Model):
+class Patient(ndb.Model):
 
-    name = db.StringProperty()
-    dob = db.StringProperty(indexed=False)
-    insurance = db.StringProperty()
-    session_number = db.IntegerProperty(indexed=False)
+    name = ndb.StringProperty()
+    dob = ndb.StringProperty(indexed=False)
+    insurance = ndb.StringProperty()
+    session_number = ndb.IntegerProperty(indexed=False)
 
     def increment(self, amount=1):
         self.session_number += amount
         self.put()
 
 
-class Session(db.Model):
+class Session(ndb.Model):
 
-    patient_id = db.StringProperty()
+    patient_id = ndb.StringProperty()
 
-    is_billed = db.BooleanProperty()
-    billing_time = db.DateTimeProperty()
-    insurance = db.StringProperty()
-    mod_code = db.StringProperty(indexed=False)
+    is_billed = ndb.BooleanProperty()
+    billing_time = ndb.DateTimeProperty()
+    insurance = ndb.StringProperty()
+    mod_code = ndb.StringProperty(indexed=False)
 
-    session_number = db.IntegerProperty(indexed=False)
+    session_number = ndb.IntegerProperty(indexed=False)
 
-    date = db.StringProperty(indexed=False)
-    date_object = db.DateProperty()
-    timestamp = db.DateTimeProperty()
+    date = ndb.StringProperty(indexed=False)
+    date_object = ndb.DateProperty()
+    timestamp = ndb.DateTimeProperty()
 
-    name = db.StringProperty()
+    name = ndb.StringProperty()
 
-    dob = db.StringProperty(indexed=False)
-    diag = db.StringProperty(indexed=False)
-    diag_code = db.StringProperty()
-    modality = db.StringProperty()
-    new_issue = db.StringProperty(indexed=False)
-    no_new_issue = db.StringProperty(indexed=False)
+    dob = ndb.StringProperty(indexed=False)
+    diag = ndb.StringProperty(indexed=False)
+    diag_code = ndb.StringProperty()
+    modality = ndb.StringProperty()
+    new_issue = ndb.StringProperty(indexed=False)
+    no_new_issue = ndb.StringProperty(indexed=False)
 
-    ASS_ABLE= db.StringProperty(indexed=False)
-    ASS_CONST= db.StringProperty(indexed=False)
-    ASS_COOP= db.StringProperty(indexed=False)
-    ASS_EFFRT= db.StringProperty(indexed=False)
-    ASS_INSIG= db.StringProperty(indexed=False)
-    ASS_OR= db.StringProperty(indexed=False)
-    ASS_other_txt= db.StringProperty(indexed=False)
-    ASS_present= db.StringProperty(indexed=False)
-    ASS_present_txt= db.StringProperty(indexed=False)
-    G_1_decr= db.StringProperty(indexed=False)
-    G_1_decr_txt= db.StringProperty(indexed=False)
-    G_1_impr= db.StringProperty(indexed=False)
-    G_1_impr_txt= db.StringProperty(indexed=False)
-    G_2_decr= db.StringProperty(indexed=False)
-    G_2_decr_txt= db.StringProperty(indexed=False)
-    G_2_impr= db.StringProperty(indexed=False)
-    G_2_impr_txt= db.StringProperty(indexed=False)
-    G_cop_skills= db.StringProperty(indexed=False)
-    G_expr= db.StringProperty(indexed=False)
-    G_id_res= db.StringProperty(indexed=False)
-    G_other_txt= db.StringProperty(indexed=False)
-    G_sc_skills= db.StringProperty(indexed=False)
-    G_verb= db.StringProperty(indexed=False)
-    PLN_CONT= db.StringProperty(indexed=False)
-    PLN_FREQ= db.StringProperty(indexed=False)
-    PLN_NXT= db.StringProperty(indexed=False)
-    PLN_PSY= db.StringProperty(indexed=False)
-    PLN_other_txt= db.StringProperty(indexed=False)
-    RA_none= db.StringProperty(indexed=False)
-    RA_others_att= db.StringProperty(indexed=False)
-    RA_others_idea= db.StringProperty(indexed=False)
-    RA_others_plan= db.StringProperty(indexed=False)
-    RA_prop_att= db.StringProperty(indexed=False)
-    RA_prop_idea= db.StringProperty(indexed=False)
-    RA_prop_plan= db.StringProperty(indexed=False)
-    RA_self_att= db.StringProperty(indexed=False)
-    RA_self_idea= db.StringProperty(indexed=False)
-    RA_self_plan= db.StringProperty(indexed=False)
-    SPA_ACTOUT= db.StringProperty(indexed=False)
-    SPA_AGI= db.StringProperty(indexed=False)
-    SPA_AHA= db.StringProperty(indexed=False)
-    SPA_ALCHUSE= db.StringProperty(indexed=False)
-    SPA_ANG= db.StringProperty(indexed=False)
-    SPA_ARG= db.StringProperty(indexed=False)
-    SPA_AX= db.StringProperty(indexed=False)
-    SPA_DIFTRAN= db.StringProperty(indexed=False)
-    SPA_DIT= db.StringProperty(indexed=False)
-    SPA_DM= db.StringProperty(indexed=False)
-    SPA_DRGUSE= db.StringProperty(indexed=False)
-    SPA_DRT= db.StringProperty(indexed=False)
-    SPA_DWF= db.StringProperty(indexed=False)
-    SPA_EABOR= db.StringProperty(indexed=False)
-    SPA_EW= db.StringProperty(indexed=False)
-    SPA_FA= db.StringProperty(indexed=False)
-    SPA_FDP= db.StringProperty(indexed=False)
-    SPA_FINDIF= db.StringProperty(indexed=False)
-    SPA_FRU= db.StringProperty(indexed=False)
-    SPA_GF= db.StringProperty(indexed=False)
-    SPA_HSC= db.StringProperty(indexed=False)
-    SPA_HV= db.StringProperty(indexed=False)
-    SPA_I= db.StringProperty(indexed=False)
-    SPA_IMPU= db.StringProperty(indexed=False)
-    SPA_INT= db.StringProperty(indexed=False)
-    SPA_INTI= db.StringProperty(indexed=False)
-    SPA_INTP= db.StringProperty(indexed=False)
-    SPA_IRR= db.StringProperty(indexed=False)
-    SPA_LE= db.StringProperty(indexed=False)
-    SPA_LF= db.StringProperty(indexed=False)
-    SPA_LI= db.StringProperty(indexed=False)
-    SPA_LM= db.StringProperty(indexed=False)
-    SPA_MARC= db.StringProperty(indexed=False)
-    SPA_MEDDIF= db.StringProperty(indexed=False)
-    SPA_MEDNC= db.StringProperty(indexed=False)
-    SPA_ML= db.StringProperty(indexed=False)
-    SPA_MOTREST= db.StringProperty(indexed=False)
-    SPA_MS= db.StringProperty(indexed=False)
-    SPA_MUT= db.StringProperty(indexed=False)
-    SPA_OT= db.StringProperty(indexed=False)
-    SPA_PACH= db.StringProperty(indexed=False)
-    SPA_PAP= db.StringProperty(indexed=False)
-    SPA_PER= db.StringProperty(indexed=False)
-    SPA_PHY= db.StringProperty(indexed=False)
-    SPA_PS= db.StringProperty(indexed=False)
-    SPA_PSC= db.StringProperty(indexed=False)
-    SPA_PSEC= db.StringProperty(indexed=False)
-    SPA_PSL= db.StringProperty(indexed=False)
-    SPA_RECREL= db.StringProperty(indexed=False)
-    SPA_RRA= db.StringProperty(indexed=False)
-    SPA_S= db.StringProperty(indexed=False)
-    SPA_SIDI= db.StringProperty(indexed=False)
-    SPA_SM= db.StringProperty(indexed=False)
-    SPA_SPP= db.StringProperty(indexed=False)
-    SPA_SSTR= db.StringProperty(indexed=False)
-    SPA_URGSUSE= db.StringProperty(indexed=False)
-    SPA_VHA= db.StringProperty(indexed=False)
-    SPA_WPP= db.StringProperty(indexed=False)
-    SPA_WSTR= db.StringProperty(indexed=False)
-    SPA_other_txt= db.StringProperty(indexed=False)
-    TI_CSB= db.StringProperty(indexed=False)
-    TI_PSB= db.StringProperty(indexed=False)
-    TI_PSCR= db.StringProperty(indexed=False)
-    TI_conf_behav= db.StringProperty(indexed=False)
-    TI_decis_balnc= db.StringProperty(indexed=False)
-    TI_emot_supp= db.StringProperty(indexed=False)
-    TI_encour= db.StringProperty(indexed=False)
-    TI_explore= db.StringProperty(indexed=False)
-    TI_other_txt= db.StringProperty(indexed=False)
-    TI_play_therapy= db.StringProperty(indexed=False)
-    TI_pos_reinforce= db.StringProperty(indexed=False)
-    TI_prob_solv= db.StringProperty(indexed=False)
-    TI_real_test= db.StringProperty(indexed=False)
-    TI_refl_listen= db.StringProperty(indexed=False)
-    TI_valid= db.StringProperty(indexed=False)
+    ASS_ABLE= ndb.StringProperty(indexed=False)
+    ASS_CONST= ndb.StringProperty(indexed=False)
+    ASS_COOP= ndb.StringProperty(indexed=False)
+    ASS_EFFRT= ndb.StringProperty(indexed=False)
+    ASS_INSIG= ndb.StringProperty(indexed=False)
+    ASS_OR= ndb.StringProperty(indexed=False)
+    ASS_other_txt= ndb.StringProperty(indexed=False)
+    ASS_present= ndb.StringProperty(indexed=False)
+    ASS_present_txt= ndb.StringProperty(indexed=False)
+    G_1_decr= ndb.StringProperty(indexed=False)
+    G_1_decr_txt= ndb.StringProperty(indexed=False)
+    G_1_impr= ndb.StringProperty(indexed=False)
+    G_1_impr_txt= ndb.StringProperty(indexed=False)
+    G_2_decr= ndb.StringProperty(indexed=False)
+    G_2_decr_txt= ndb.StringProperty(indexed=False)
+    G_2_impr= ndb.StringProperty(indexed=False)
+    G_2_impr_txt= ndb.StringProperty(indexed=False)
+    G_cop_skills= ndb.StringProperty(indexed=False)
+    G_expr= ndb.StringProperty(indexed=False)
+    G_id_res= ndb.StringProperty(indexed=False)
+    G_other_txt= ndb.StringProperty(indexed=False)
+    G_sc_skills= ndb.StringProperty(indexed=False)
+    G_verb= ndb.StringProperty(indexed=False)
+    PLN_CONT= ndb.StringProperty(indexed=False)
+    PLN_FREQ= ndb.StringProperty(indexed=False)
+    PLN_NXT= ndb.StringProperty(indexed=False)
+    PLN_PSY= ndb.StringProperty(indexed=False)
+    PLN_other_txt= ndb.StringProperty(indexed=False)
+    RA_none= ndb.StringProperty(indexed=False)
+    RA_others_att= ndb.StringProperty(indexed=False)
+    RA_others_idea= ndb.StringProperty(indexed=False)
+    RA_others_plan= ndb.StringProperty(indexed=False)
+    RA_prop_att= ndb.StringProperty(indexed=False)
+    RA_prop_idea= ndb.StringProperty(indexed=False)
+    RA_prop_plan= ndb.StringProperty(indexed=False)
+    RA_self_att= ndb.StringProperty(indexed=False)
+    RA_self_idea= ndb.StringProperty(indexed=False)
+    RA_self_plan= ndb.StringProperty(indexed=False)
+    SPA_ACTOUT= ndb.StringProperty(indexed=False)
+    SPA_AGI= ndb.StringProperty(indexed=False)
+    SPA_AHA= ndb.StringProperty(indexed=False)
+    SPA_ALCHUSE= ndb.StringProperty(indexed=False)
+    SPA_ANG= ndb.StringProperty(indexed=False)
+    SPA_ARG= ndb.StringProperty(indexed=False)
+    SPA_AX= ndb.StringProperty(indexed=False)
+    SPA_DIFTRAN= ndb.StringProperty(indexed=False)
+    SPA_DIT= ndb.StringProperty(indexed=False)
+    SPA_DM= ndb.StringProperty(indexed=False)
+    SPA_DRGUSE= ndb.StringProperty(indexed=False)
+    SPA_DRT= ndb.StringProperty(indexed=False)
+    SPA_DWF= ndb.StringProperty(indexed=False)
+    SPA_EABOR= ndb.StringProperty(indexed=False)
+    SPA_EW= ndb.StringProperty(indexed=False)
+    SPA_FA= ndb.StringProperty(indexed=False)
+    SPA_FDP= ndb.StringProperty(indexed=False)
+    SPA_FINDIF= ndb.StringProperty(indexed=False)
+    SPA_FRU= ndb.StringProperty(indexed=False)
+    SPA_GF= ndb.StringProperty(indexed=False)
+    SPA_HSC= ndb.StringProperty(indexed=False)
+    SPA_HV= ndb.StringProperty(indexed=False)
+    SPA_I= ndb.StringProperty(indexed=False)
+    SPA_IMPU= ndb.StringProperty(indexed=False)
+    SPA_INT= ndb.StringProperty(indexed=False)
+    SPA_INTI= ndb.StringProperty(indexed=False)
+    SPA_INTP= ndb.StringProperty(indexed=False)
+    SPA_IRR= ndb.StringProperty(indexed=False)
+    SPA_LE= ndb.StringProperty(indexed=False)
+    SPA_LF= ndb.StringProperty(indexed=False)
+    SPA_LI= ndb.StringProperty(indexed=False)
+    SPA_LM= ndb.StringProperty(indexed=False)
+    SPA_MARC= ndb.StringProperty(indexed=False)
+    SPA_MEDDIF= ndb.StringProperty(indexed=False)
+    SPA_MEDNC= ndb.StringProperty(indexed=False)
+    SPA_ML= ndb.StringProperty(indexed=False)
+    SPA_MOTREST= ndb.StringProperty(indexed=False)
+    SPA_MS= ndb.StringProperty(indexed=False)
+    SPA_MUT= ndb.StringProperty(indexed=False)
+    SPA_OT= ndb.StringProperty(indexed=False)
+    SPA_PACH= ndb.StringProperty(indexed=False)
+    SPA_PAP= ndb.StringProperty(indexed=False)
+    SPA_PER= ndb.StringProperty(indexed=False)
+    SPA_PHY= ndb.StringProperty(indexed=False)
+    SPA_PS= ndb.StringProperty(indexed=False)
+    SPA_PSC= ndb.StringProperty(indexed=False)
+    SPA_PSEC= ndb.StringProperty(indexed=False)
+    SPA_PSL= ndb.StringProperty(indexed=False)
+    SPA_RECREL= ndb.StringProperty(indexed=False)
+    SPA_RRA= ndb.StringProperty(indexed=False)
+    SPA_S= ndb.StringProperty(indexed=False)
+    SPA_SIDI= ndb.StringProperty(indexed=False)
+    SPA_SM= ndb.StringProperty(indexed=False)
+    SPA_SPP= ndb.StringProperty(indexed=False)
+    SPA_SSTR= ndb.StringProperty(indexed=False)
+    SPA_URGSUSE= ndb.StringProperty(indexed=False)
+    SPA_VHA= ndb.StringProperty(indexed=False)
+    SPA_WPP= ndb.StringProperty(indexed=False)
+    SPA_WSTR= ndb.StringProperty(indexed=False)
+    SPA_other_txt= ndb.StringProperty(indexed=False)
+    TI_CSB= ndb.StringProperty(indexed=False)
+    TI_PSB= ndb.StringProperty(indexed=False)
+    TI_PSCR= ndb.StringProperty(indexed=False)
+    TI_conf_behav= ndb.StringProperty(indexed=False)
+    TI_decis_balnc= ndb.StringProperty(indexed=False)
+    TI_emot_supp= ndb.StringProperty(indexed=False)
+    TI_encour= ndb.StringProperty(indexed=False)
+    TI_explore= ndb.StringProperty(indexed=False)
+    TI_other_txt= ndb.StringProperty(indexed=False)
+    TI_play_therapy= ndb.StringProperty(indexed=False)
+    TI_pos_reinforce= ndb.StringProperty(indexed=False)
+    TI_prob_solv= ndb.StringProperty(indexed=False)
+    TI_real_test= ndb.StringProperty(indexed=False)
+    TI_refl_listen= ndb.StringProperty(indexed=False)
+    TI_valid= ndb.StringProperty(indexed=False)
 
-    notes = db.StringProperty(multiline=True)
+    notes = ndb.TextProperty()
 
 
-class Insurance(db.Model):
+class Insurance(ndb.Model):
 
-    name = db.StringProperty()
-    mod_code = db.StringProperty()
-    modality_of_session = db.StringProperty()
+    name = ndb.StringProperty()
+    mod_code = ndb.StringProperty()
+    modality_of_session = ndb.StringProperty()
 
 
 class MainPage(webapp2.RequestHandler):
@@ -254,34 +252,6 @@ class Insurance_init(webapp2.RequestHandler):
         i.put()
         self.response.write("done!")
 
-
-# not used
-class InsuranceHandler(webapp2.RequestHandler):
-    def get(self):
-
-        name = self.request.get('name')
-        mod_code = self.request.get('modcode')
-        modality_of_session = self.request.get('modsession')
-        q = self.request.get('query')
-
-        query = db.Query(Insurance)
-        res = [{'Insurance': x.name, 'mod_code': x.mod_code, 'mod': x.modality_of_session} for x in
-               query.run(limit=10)]
-        obj = {'Insurance': res}
-        if name is not '' and mod_code is not '' and modality_of_session is not '' and q is '':
-            I = Insurance(name=name, mod_code=mod_code, modality_of_session=modality_of_session)
-            I.put()
-
-        if q is not '' and name is not '' and modality_of_session is not '':
-            query.filter('name =', name)
-            query.filter('modality_of_session =', modality_of_session)
-
-            res = [{'mod_code': x.mod_code} for x in
-                   query.run(limit=10)]
-            obj = {'Insurance_code': res}
-
-        self.response.write(json.dumps(obj))
-
         
 class PatientHandler(webapp2.RequestHandler):
 
@@ -292,7 +262,7 @@ class PatientHandler(webapp2.RequestHandler):
         for (k,v) in self.request.POST.items():
             parms[k] = v
         parms['session_number'] = int(parms['session_number'] or "0")
-        parms['parent'] = user_key(user.user_id())
+        parms['parent'] = ndb_user_key(user.user_id())
         p = Patient(**parms)
         p.put()
 
@@ -303,10 +273,9 @@ class PatientHandler(webapp2.RequestHandler):
         user = users.get_current_user()
         uid = user.user_id()
 
-        query = db.Query(Patient)
-        query.ancestor(user_key(uid))
+        query = Patient.query(ancestor=ndb_user_key(uid))
 
-        s = list(query.run())
+        s = list(query.fetch())
         obj = {'patient_list': s}
 
         self.response.headers['Content-Type'] = 'application/json'
@@ -321,22 +290,19 @@ class BillingHandler(webapp2.RequestHandler):
     	user = users.get_current_user()
         uid = user.user_id()
 
-        query = db.Query(Session)
-        query.ancestor(user_key(uid))
-
-        query.order('name')
-        query.filter('is_billed =', False)
+        query = Session.query(ancestor=ndb_user_key(uid))
+        query = query.filter(Session.is_billed == False)
+        query = query.order(Session.name)
 
         res = [{'session_date': x.date, 'name': x.name, 'bill_code': x.mod_code,
-                'diag_code': x.diag_code, 'insurance': x.insurance} for x in query.run()]
-
+                'diag_code': x.diag_code, 'insurance': x.insurance} for x in query.fetch()]
 
         self.response.headers['Content-Type'] = 'application/json'
         self.response.write(json.dumps({'Bill': res}))
 
         if self.request.get('bill') == "Y":
-            bill_time = dt.now()
-            for s in query.run():
+            bill_time = datetime.datetime.now()
+            for s in query.fetch():
                 s.is_billed = True
                 s.billing_time = bill_time
                 s.put()
@@ -351,12 +317,12 @@ class SessionsHandler(webapp2.RequestHandler):
         parms = {}
         for (k,v) in self.request.POST.items():
             parms[k] = v
-            query = db.Query(Insurance)
 
-        # get insurance code
-        query.filter('name =', parms['insurance'])
-        query.filter('modality_of_session =', parms['modality'])
-        res = list(query.run(limit=1))
+        query = Insurance.query()
+        query = query.filter(Insurance.name == parms['insurance'])
+        query = query.filter(Insurance.modality_of_session == parms['modality'])
+        res = list(query.fetch(limit=1))
+
         parms['mod_code'] = res[0].mod_code
         parms['is_billed'] = False
 
@@ -365,11 +331,15 @@ class SessionsHandler(webapp2.RequestHandler):
         parms['timestamp'] = datetime.datetime.now()
 
         # increment number of sessions for patient
-        patient = db.get(db.Key(parms['patient_id']))
-        db.run_in_transaction(patient.increment, 1)
+        key = ndb.Key(urlsafe=parms['patient_id'])
+        patient = key.get()
+        ndb.transaction(patient.increment)
         parms['session_number'] = patient.session_number
 
-        parms['parent'] = user_key(user.user_id())
+        parms['parent'] = ndb_user_key(user.user_id())
+
+        del parms['seshNo']
+        del parms['session_id']
         
         session = Session(**parms)
         session.put()
@@ -382,16 +352,15 @@ class SessionsHandler(webapp2.RequestHandler):
         user = users.get_current_user()
         uid = user.user_id()
 
-        query = db.Query(Session)
-        query.ancestor(user_key(uid))
+        query = Session.query(ancestor=ndb_user_key(uid))
 
-        query.order('-date_object')
+        query = query.order(-Session.date_object)
 
         pid = self.request.get('pid')
 
         if pid !=  "" or pid:
-            query.filter('patient_id = ', pid)
+            query = query.filter(Session.patient_id == pid)
 
-        obj = list(query.run(limit=200))
+        obj = list(query.fetch(limit=200))
 
         self.response.write(json.dumps(obj, cls=ModelEncoder))
