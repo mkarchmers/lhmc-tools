@@ -20,6 +20,13 @@ indexes:
   ancestor: yes
   properties:
   - name: is_billed
+  - name: insurance
+  - name: name
+
+- kind: Session
+  ancestor: yes
+  properties:
+  - name: is_billed
   - name: name
 
 - kind: Session

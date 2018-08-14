@@ -239,7 +239,9 @@
                           <select id="modality" name="modality" >
                             <option id="ind" value="Individual">Individual</option>
                             <option id="fam" value="Family with patient">Family with patient</option>
-                            <option id="grp" value="Family without patient">Family without patient</option>
+                            <option id="fwo" value="Family without patient">Family without patient</option>
+                            <option id="grp" value="Group">Group</option>
+                            <option id="eval" value="Evaluation">Evaluation</option>
                           </select>
                         </li>
                         <li class="list-group-item">
@@ -601,11 +603,17 @@
                   <div class="form-group">
                     <select name="insurance" class="form-control" id="insurance" placeholder="insurance">
                       <option>BlueCrossBlueShield</option>
-                      <option>other</option>
+                      <option>None</option>
                     </select>
                   </div>
                   <div class="form-group">
                     <input name="session_number" type="text" class="form-control" id="session_number" placeholder="session number">
+                  </div>
+                  <div class="form-group">
+                    <select name="status" class="form-control" id="status" placeholder="status">
+                      <option>Active</option>
+                      <option>Inactive</option>
+                    </select>
                   </div>
                 </form>
               </div>            
@@ -707,6 +715,7 @@
         form.select('#dob-date').property('value',item['dob']);
         form.select('#insurance').property('value',item['insurance']);
         form.select('#session_number').property('value',item['session_number']);
+        form.select('#status').property('value',item['status']);
 
       }
 

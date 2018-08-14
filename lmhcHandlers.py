@@ -40,10 +40,11 @@ class ModelEncoder(json.JSONEncoder):
 
 class Patient(ndb.Model):
 
-    name = ndb.StringProperty()
+    name = ndb.StringProperty(indexed=False)
     dob = ndb.StringProperty(indexed=False)
-    insurance = ndb.StringProperty()
+    insurance = ndb.StringProperty(indexed=False)
     session_number = ndb.IntegerProperty(indexed=False)
+    status = ndb.StringProperty()
 
     def increment(self, amount=1):
         self.session_number += amount
@@ -55,7 +56,7 @@ class Session(ndb.Model):
     patient_id = ndb.StringProperty()
 
     is_billed = ndb.BooleanProperty()
-    billing_time = ndb.DateTimeProperty()
+    billing_time = ndb.DateTimeProperty(indexed=False)
     insurance = ndb.StringProperty()
     mod_code = ndb.StringProperty(indexed=False)
 
@@ -63,14 +64,14 @@ class Session(ndb.Model):
 
     date = ndb.StringProperty(indexed=False)
     date_object = ndb.DateProperty()
-    timestamp = ndb.DateTimeProperty()
+    timestamp = ndb.DateTimeProperty(indexed=False)
 
     name = ndb.StringProperty()
 
     dob = ndb.StringProperty(indexed=False)
     diag = ndb.StringProperty(indexed=False)
-    diag_code = ndb.StringProperty()
-    modality = ndb.StringProperty()
+    diag_code = ndb.StringProperty(indexed=False)
+    modality = ndb.StringProperty(indexed=False)
     new_issue = ndb.StringProperty(indexed=False)
     no_new_issue = ndb.StringProperty(indexed=False)
 
@@ -188,13 +189,13 @@ class Session(ndb.Model):
     TI_refl_listen= ndb.StringProperty(indexed=False)
     TI_valid= ndb.StringProperty(indexed=False)
 
-    notes = ndb.TextProperty()
+    notes = ndb.TextProperty(indexed=False)
 
 
 class Insurance(ndb.Model):
 
     name = ndb.StringProperty()
-    mod_code = ndb.StringProperty()
+    mod_code = ndb.StringProperty(indexed=False)
     modality_of_session = ndb.StringProperty()
 
 
@@ -291,6 +292,8 @@ class BillingHandler(webapp2.RequestHandler):
         uid = user.user_id()
 
         query = Session.query(ancestor=ndb_user_key(uid))
+        query = query.order(Session.insurance)
+        query = query.filter(Session.insurance != 'None')
         query = query.filter(Session.is_billed == False)
         query = query.order(Session.name)
 
@@ -318,12 +321,15 @@ class SessionsHandler(webapp2.RequestHandler):
         for (k,v) in self.request.POST.items():
             parms[k] = v
 
-        query = Insurance.query()
-        query = query.filter(Insurance.name == parms['insurance'])
-        query = query.filter(Insurance.modality_of_session == parms['modality'])
-        res = list(query.fetch(limit=1))
+        if parms['insurance'] != 'None':
+            query = Insurance.query()
+            query = query.filter(Insurance.name == parms['insurance'])
+            query = query.filter(Insurance.modality_of_session == parms['modality'])
+            res = list(query.fetch(limit=1))
+            parms['mod_code'] = res[0].mod_code
+        else:
+            parms['mod_code'] = 'None'
 
-        parms['mod_code'] = res[0].mod_code
         parms['is_billed'] = False
 
         user_date_lst = parms['date'].split('/')
