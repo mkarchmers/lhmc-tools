@@ -248,8 +248,12 @@ class Insurance_init(webapp2.RequestHandler):
         i.put()
         i = Insurance()
         i.name = "BlueCrossBlueShield"
-        i.mod_code = "90000"
+        i.mod_code = "90853"
         i.modality_of_session = "Group"
+        i.put()
+        i.name = "BlueCrossBlueShield"
+        i.mod_code = "90791"
+        i.modality_of_session = "Evaluation"
         i.put()
         self.response.write("done!")
 
