@@ -194,8 +194,7 @@
                       <ul class="SI-group list-group">
                         <li class="list-group-item">
                           <div class="input-group">
-                            First: <input type="text" id="fname" name="fname" class="data-ro">
-                            Last: <input type="text" id="lname" name="lname" class="data-ro">
+                            Name: <input type="text" id="name" name="name" class="data-ro">
                           </div>
                         </li>
                         <li class="list-group-item">
@@ -593,12 +592,8 @@
 
               <div class="patient_form">
                 <form id="new_patient_form" action="/patient" method="post">
-                <!--<form id="new_patient_form" action="javascript:postNewPatient(this);" method="post">-->
                   <div class="form-group">
-                    <input name="fname" type="text" class="form-control" id="fnameInput" placeholder="first name">
-                  </div>
-                  <div class="form-group">
-                    <input name="lname" type="text" class="form-control" id="lnameInput" placeholder="last name">
+                    <input name="name" type="text" class="form-control" id="nameInput" placeholder="name">
                   </div>
                   <div class="form-group date">
                     <input name="dob" id="dob-date" type="text" class="form-control" name="dob" placeholder="dob">
@@ -708,8 +703,7 @@
           .attr('disabled',true);
         d3.select('#patientFormLabel').text('Patient info');
 
-        form.select('#fnameInput').property('value',item['fname']);
-        form.select('#lnameInput').property('value',item['lname']);
+        form.select('#nameInput').property('value',item['name']);
         form.select('#dob-date').property('value',item['dob']);
         form.select('#insurance').property('value',item['insurance']);
         form.select('#session_number').property('value',item['session_number']);
@@ -722,8 +716,8 @@
           alert('dob cannot be empty');
           return
         }
-        if (($('#fnameInput').val() == "") || ($('#lnameInput').val() == "")){
-          alert('names cannot be empty');
+        if ($('#nameInput').val() == ""){
+          alert('name cannot be empty');
           return
         }
 
@@ -755,7 +749,7 @@
 
       function display_notes(patient){
         d3.select('#notesListLabel')
-          .text('Notes for ' + capitalize(patient.fname) + " " + capitalize(patient.lname));
+          .text('Notes for ' + patient.name );
         $('#notesList').modal('show');
 
         $('#notesCalendar').fullCalendar('destroy');
@@ -779,7 +773,7 @@
       }
 
       function load_patients(){
-        var row = function(item){return item.lname + ', ' + item.fname};
+        var row = function(item){return item.name};
         var sessionNo = function(item){return item.session_number};
 
         $.getJSON('/patient', function(data){
@@ -896,7 +890,7 @@
 
         setFormDisabled('#new_session_form', true);
 
-        ['fname', 'lname', 'dob', 'notes'].forEach(function(s){
+        ['name', 'dob', 'notes'].forEach(function(s){
           document.getElementById(s).value = data[s];
         });
 
@@ -1050,8 +1044,7 @@
         // populate current values
         // patient
         //console.log(patient);
-        document.getElementById('fname').value = patient.fname;
-        document.getElementById('lname').value = patient.lname;
+        document.getElementById('name').value = patient.name;
         document.getElementById('dob').value = patient.dob;
         document.getElementById('insurance').value = patient.insurance;
         document.getElementById('patient_id').value = patient.id;
@@ -1064,7 +1057,7 @@
 
       function processPatientData(data){
         return data.map(function(d){
-          return {title: d.fname + ' ' + d.lname,
+          return {title: d.name,
                   date: d.date,
                   color: (d.is_billed? 'red':'green'),
                   data: d}
@@ -1077,8 +1070,7 @@
             var bills = data.Bill;
             var csv = 'Name,Session Date,Procedure Code,DSM 5,Insurance\n';
             bills.forEach(function (row) {
-                //csv += capitalize(row.first) + " " + capitalize(row.last) + ',';
-                csv += row.first + " " + row.last + ',';
+                csv += row.name + ',';
                 csv += row.session_date + ',';
                 csv += row.bill_code + ',';
                 csv += row.diag_code + ",";

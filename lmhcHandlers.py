@@ -42,8 +42,7 @@ class ModelEncoder(json.JSONEncoder):
 
 class Patient(db.Model):
 
-    fname = db.StringProperty(indexed=False)
-    lname = db.StringProperty()
+    name = db.StringProperty()
     dob = db.StringProperty(indexed=False)
     insurance = db.StringProperty()
     session_number = db.IntegerProperty(indexed=False)
@@ -68,8 +67,8 @@ class Session(db.Model):
     date_object = db.DateProperty()
     timestamp = db.DateTimeProperty()
 
-    fname = db.StringProperty(indexed=False)
-    lname = db.StringProperty()
+    name = db.StringProperty()
+
     dob = db.StringProperty(indexed=False)
     diag = db.StringProperty(indexed=False)
     diag_code = db.StringProperty()
@@ -325,10 +324,10 @@ class BillingHandler(webapp2.RequestHandler):
         query = db.Query(Session)
         query.ancestor(user_key(uid))
 
-        query.order('date_object')
+        query.order('name')
         query.filter('is_billed =', False)
 
-        res = [{'session_date': x.date, 'first': x.fname, 'last': x.lname, 'bill_code': x.mod_code,
+        res = [{'session_date': x.date, 'name': x.name, 'bill_code': x.mod_code,
                 'diag_code': x.diag_code, 'insurance': x.insurance} for x in query.run()]
 
 
