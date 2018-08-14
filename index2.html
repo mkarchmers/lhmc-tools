@@ -203,6 +203,7 @@
                             DOB: <input id="dob" name="dob" class="data-ro" >
                             <input id="insurance" name="insurance" class="data-ro"  hidden>
                             <input id="patient_id" name="patient_id" class="data-ro"  hidden>
+                            <input id="session_id" name="session_id" class="data-ro"  hidden>
                           </div>
                         </li>
                         <li class="list-group-item">
@@ -745,10 +746,10 @@
       }
 
       function processNotesData(data){
-        return data.relevant_list.map(function(d){
-          return {title: d.data.notes,
-                  date: d.data.date,
-                  data: d.data}
+        return data.map(function(d){
+          return {title: d.notes,
+                  date: d.date,
+                  data: d}
           })
       }
 
@@ -768,7 +769,7 @@
             lazyFetching: true,
             defaultView: 'listMonth',
             events: {
-              url: '/sessions?pid='+patient.pid,
+              url: '/sessions?pid='+patient.id,
               type: 'GET',
               success: processNotesData,
             },
@@ -1011,12 +1012,12 @@
         $('#notes').val('')
 
 
-        $.getJSON('/sessions?pid=' + patient.pid, function (data) {
+        $.getJSON('/sessions?pid=' + patient.id, function (data) {
             $('#seshdate').datepicker('destroy');
 
 
             //console.log(data);
-            if (data.relevant_list.length == 0){
+            if (data.length == 0){
               $('#seshdate').datepicker({
                   autoclose: true,
                   todayBtn: "linked",
@@ -1024,8 +1025,8 @@
               return;
             }
 
-            var latest_data = data.relevant_list[0]['data'];
-            //console.log(latest_data);
+            //var latest_data = data.relevant_list[0]['data'];
+            var latest_data = data[0];
 
             var latest = moment(latest_data.date);
             //console.log(latest.format("YYYY/MM/DD"));
@@ -1053,7 +1054,7 @@
         document.getElementById('lname').value = patient.lname;
         document.getElementById('dob').value = patient.dob;
         document.getElementById('insurance').value = patient.insurance;
-        document.getElementById('patient_id').value = patient.pid;
+        document.getElementById('patient_id').value = patient.id;
         // incrememnt session number
         document.getElementById('seshNo').value = patient.session_number + 1
 
@@ -1062,11 +1063,11 @@
       }
 
       function processPatientData(data){
-        return data.patient_list.map(function(d){
+        return data.map(function(d){
           return {title: d.fname + ' ' + d.lname,
-                  date: d.data.date,
-                  color: (d.data.is_billed? 'red':'green'),
-                  data: d.data}
+                  date: d.date,
+                  color: (d.is_billed? 'red':'green'),
+                  data: d}
           })
       }
 

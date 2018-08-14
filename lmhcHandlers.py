@@ -6,10 +6,8 @@ import urllib
 import urllib2
 import logging
 from google.appengine.ext import db
-from datetime import datetime as dt
-from datetime import date as d
+import datetime
 import random as r
-import hashlib as hs
 from google.appengine.api import users
 from google.appengine.ext import ndb
 
@@ -29,10 +27,15 @@ class ModelEncoder(json.JSONEncoder):
 
         if isinstance(obj, db.Model): 
             properties = obj.properties().items() 
-            output = {} 
+            output = {'id': str(obj.key())} 
+            print output
             for field, value in properties: 
-                output[field] = getattr(obj, field) 
-            return output 
+                output[field] = getattr(obj, field)
+            return output
+        elif isinstance(obj, datetime.datetime):
+            return str(obj)
+        elif isinstance(obj, datetime.date):
+            return "%02i/%02i/%i"%(obj.month,obj.day,obj.year)
 
         return json.JSONEncoder.default(self, obj) 
 
@@ -42,7 +45,6 @@ class Patient(db.Model):
     fname = db.StringProperty(indexed=False)
     lname = db.StringProperty()
     dob = db.StringProperty(indexed=False)
-    pid = db.StringProperty()
     insurance = db.StringProperty()
     session_number = db.IntegerProperty(indexed=False)
     user_id = db.StringProperty()
@@ -55,9 +57,8 @@ class Patient(db.Model):
 class Session(db.Model):
 
     user_id = db.StringProperty()
-
     patient_id = db.StringProperty()
-    session_id = db.StringProperty()
+
     is_billed = db.BooleanProperty()
     billing_time = db.DateTimeProperty()
     insurance = db.StringProperty()
@@ -257,6 +258,7 @@ class Insurance_init(webapp2.RequestHandler):
         self.response.write("done!")
 
 
+# not used
 class InsuranceHandler(webapp2.RequestHandler):
     def get(self):
 
@@ -294,7 +296,6 @@ class PatientHandler(webapp2.RequestHandler):
             parms[k] = v
         parms['session_number'] = int(parms['session_number'] or "0")
         parms['user_id'] = user.user_id()
-        parms['pid'] = str(hs.md5(parms['lname']).hexdigest())
         p = Patient(**parms)
         p.put()
 
@@ -308,8 +309,6 @@ class PatientHandler(webapp2.RequestHandler):
         query = db.Query(Patient)
         query.filter('user_id =', uid)
 
-        #s = [{'fname': x.fname, 'lname': x.lname, 'dob': x.dob, 'pid': x.pid,
-        #      'insurance': x.insurance, 'session_number': x.session_number} for x in query.run()]
         s = list(query.run())
         obj = {'patient_list': s}
 
@@ -329,7 +328,6 @@ class BillingHandler(webapp2.RequestHandler):
         query.order('date_object')
         query.filter('is_billed =', False)
         query.filter('user_id = ', uid)
-        #query.projection()
 
         res = [{'session_date': x.date, 'first': x.fname, 'last': x.lname, 'bill_code': x.mod_code,
                 'diag_code': x.diag_code, 'insurance': x.insurance} for x in query.run()]
@@ -358,7 +356,6 @@ class SessionsHandler(webapp2.RequestHandler):
             query = db.Query(Insurance)
 
         # get insurance code
-        print parms
         query.filter('name =', parms['insurance'])
         query.filter('modality_of_session =', parms['modality'])
         res = list(query.run(limit=1))
@@ -366,15 +363,11 @@ class SessionsHandler(webapp2.RequestHandler):
         parms['is_billed'] = False
 
         user_date_lst = parms['date'].split('/')
-        parms['date_object'] = d(int(user_date_lst[2]), int(user_date_lst[0]), int(user_date_lst[1]))
-        parms['timestamp'] = dt.now()
-        parms['session_id'] = str(r.randint(0, 10000000000))
+        parms['date_object'] = datetime.date(int(user_date_lst[2]), int(user_date_lst[0]), int(user_date_lst[1]))
+        parms['timestamp'] = datetime.datetime.now()
 
-        # increment session number for patient
-        query = db.Query(Patient)
-        query.filter('user_id = ', uid)        
-        query.filter('pid =', parms['patient_id'])
-        patient = list(query.run(limit=1))[0]
+        # increment number of sessions for patient
+        patient = db.get(db.Key(parms['patient_id']))
         db.run_in_transaction(patient.increment, 1)
         parms['session_number'] = patient.session_number
 
@@ -400,16 +393,6 @@ class SessionsHandler(webapp2.RequestHandler):
         if pid !=  "" or pid:
             query.filter('patient_id = ', pid)
 
+        obj = list(query.run(limit=200))
 
-        s = [{'fname': x.fname, 'lname': x.lname, 'session_date': x.date_object, 'session_id': x.session_id,
-              'timestamp': x.timestamp,'pid': x.patient_id, 'uid': x.user_id,
-              'data': vars(x)['_entity']} for x in query.run(limit=100)]
-
-        relevant = [x for x in s if x['pid'] == pid and x['uid'] == uid]
-        if len(relevant) > 0:
-            obj = {'relevant_list': relevant, 'latest_relevant': (lambda x: relevant[0] if len(relevant) > 0 else '')(0)}
-        else:
-            obj = {'patient_list': s, 'relevant_list': relevant,
-                   'latest_relevant': (lambda x: relevant[0] if len(relevant) > 0 else '')(0)}
-
-        self.response.write(json.dumps(obj, default=str))
+        self.response.write(json.dumps(obj, cls=ModelEncoder))
