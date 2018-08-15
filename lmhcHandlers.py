@@ -273,6 +273,10 @@ class Permissions_init(webapp2.RequestHandler):
         eh = EmailHash(id = ident)
         eh.Hash = ident
         eh.put()
+        ident = 'd980f0ec1b5d23bd04ed702536e4b90f'
+        eh = EmailHash(id = ident)
+        eh.Hash = ident
+        eh.put()
         self.response.write("done!")
 
 
