@@ -768,22 +768,23 @@
         $('#notesList').modal('show');
 
         $('#notesCalendar').fullCalendar('destroy');
-        $('#notesCalendar').fullCalendar({
-             header: {
-                left: 'prev,next',
-                center: 'title',
-                right: ''
-              },
+        $.getJSON('/sessions?pid='+patient.id, function(data){
 
-            lazyFetching: true,
-            defaultView: 'listMonth',
-            events: {
-              url: '/sessions?pid='+patient.id,
-              type: 'GET',
-              success: processNotesData,
-            },
-            eventClick: calendarEventClick,
+          $('#notesCalendar').fullCalendar({
+               header: {
+                  left: 'prev,next',
+                  center: 'title',
+                  right: ''
+                },
+
+              lazyFetching: true,
+              defaultView: 'listMonth',
+              events: processNotesData(data),
+              
+              eventClick: calendarEventClick,
           });
+
+        })
 
       }
 
