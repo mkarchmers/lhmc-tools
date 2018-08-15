@@ -200,9 +200,9 @@
                         <li class="list-group-item">
                           <div class="form-row">
                             DOB: <input id="dob" name="dob" class="data-ro" >
-                            <input id="insurance" name="insurance" class="data-ro"  hidden>
-                            <input id="patient_id" name="patient_id" class="data-ro"  hidden>
-                            <input id="session_id" name="session_id" class="data-ro"  hidden>
+                            <input id="insurance" name="insurance" class="data-ro" hidden >
+                            <input id="patient_id" name="patient_id" class="data-ro" hidden>
+                            <input id="session_id" name="session_id" class="data-ro" hidden>
                           </div>
                         </li>
                         <li class="list-group-item">
@@ -339,14 +339,6 @@
                       <ul class="SI-group list-group">
                         <li class="list-group-item">
                           <table class="table table-responsive">
-                            <!--
-                            <thead>
-                              <tr>
-                                <th>Improve</th>
-                                <th>Decrease</th>
-                              </tr>
-                            </thead>
-                          -->
                             <tbody>
                               <tr>
                                 <td>
@@ -909,6 +901,10 @@
         ['name', 'dob', 'notes'].forEach(function(s){
           document.getElementById(s).value = data[s];
         });
+
+        document.getElementById('insurance').value = data['insurance'];
+        document.getElementById('patient_id').value = data['patient_id']
+        document.getElementById('session_id').value = data['id']
 
         document.getElementById('seshdate').value = data['date'];
         document.getElementById('seshNo').value = data['session_number'];
