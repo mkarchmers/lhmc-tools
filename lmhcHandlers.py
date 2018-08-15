@@ -22,6 +22,7 @@ def ndb_user_key(uid):
     """
     return ndb.Key('User', uid)
 
+
 class ModelEncoder(json.JSONEncoder):
     def default(self, obj): 
 
@@ -197,12 +198,30 @@ class EmailHash(ndb.Model):
 
     Hash = ndb.StringProperty()
 
+    @classmethod
+    def validate(cls, email):
+
+        candidate_hash = hs.md5(email.lower()).hexdigest()
+        key = ndb.Key(EmailHash, candidate_hash)
+
+        return key.get() is not None
+
 
 class Insurance(ndb.Model):
 
     name = ndb.StringProperty()
     mod_code = ndb.StringProperty(indexed=False)
     modality_of_session = ndb.StringProperty()
+
+    @classmethod
+    def get_code(cls, name, modality):
+
+        query = Insurance.query()
+        query = query.filter(Insurance.name == name)
+        query = query.filter(Insurance.modality_of_session == modality)
+        res = list(query.fetch(limit=1))
+        
+        return None if len(res) == 0 else res[0].mod_code
 
 
 class MainPage(webapp2.RequestHandler):
@@ -211,12 +230,7 @@ class MainPage(webapp2.RequestHandler):
     def get(self):
         user = users.get_current_user()
 
-        # test user permissions // all emails are hashed in lowercase
-        query = EmailHash.query()
-        candidate_hash = hs.md5(user.email().lower()).hexdigest()
-
-        query = query.filter(EmailHash.Hash == candidate_hash)
-        permitted = len(query.fetch(limit=1)) == 1
+        permitted = EmailHash.validate(user.email())
 
         if user:
             url = users.create_logout_url(self.request.uri)
@@ -235,13 +249,13 @@ class MainPage(webapp2.RequestHandler):
         
         template = JINJA_ENVIRONMENT.get_template('index2.html')
         self.response.write(template.render(template_values))
-        
 
 
 class EmailHandler(webapp2.RequestHandler):
     def get(self):
         user = users.get_current_user()
         email = "not logged in" if (user is None) else user.email()
+
         self.response.write(email)
 
 
@@ -249,14 +263,17 @@ class Permissions_init(webapp2.RequestHandler):
 
     def get(self):
 
-        eh = EmailHash()
-        eh.Hash = '361e54ab7e96f7610187da7ba3691184'
+        ident = '361e54ab7e96f7610187da7ba3691184'
+        eh = EmailHash(id = ident)
+        eh.Hash = ident
         eh.put()
-        eh = EmailHash()
-        eh.Hash = 'bdb63475a053e834d0fd1a1d93d5034e'
+        ident = 'bdb63475a053e834d0fd1a1d93d5034e'
+        eh = EmailHash(id = ident)
+        eh.Hash = ident
         eh.put()
-        eh = EmailHash()
-        eh.Hash = '6215d7ccc7413110ea60829fb1284565 '
+        ident = '6215d7ccc7413110ea60829fb1284565'
+        eh = EmailHash(id = ident)
+        eh.Hash = ident
         eh.put()
         self.response.write("done!")
 
@@ -321,7 +338,6 @@ class PatientHandler(webapp2.RequestHandler):
         self.response.write(json.dumps(obj, cls=ModelEncoder))
 
 
-
 class BillingHandler(webapp2.RequestHandler):
 
     def get(self):
@@ -360,11 +376,7 @@ class SessionsHandler(webapp2.RequestHandler):
             parms[k] = v
 
         if parms['insurance'] != 'None':
-            query = Insurance.query()
-            query = query.filter(Insurance.name == parms['insurance'])
-            query = query.filter(Insurance.modality_of_session == parms['modality'])
-            res = list(query.fetch(limit=1))
-            parms['mod_code'] = res[0].mod_code
+            parms['mod_code'] = Insurance.get_code(parms['insurance'], parms['modality'])
         else:
             parms['mod_code'] = 'None'
 
