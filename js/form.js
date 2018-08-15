@@ -1,8 +1,7 @@
 //
 
 var PITextArray = [
-	"fname", //ro
-	"lname", //ro
+	"name", //ro
 	"dob", //ro
 	"insurance", //ro
 	"patient_id", //ro
