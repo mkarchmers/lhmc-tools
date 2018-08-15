@@ -117,7 +117,7 @@
   </head>
 
   <body>
-
+{% if permission %}
     <nav class="navbar navbar-default navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
@@ -642,7 +642,13 @@
       </div>
     </div>
     
-
+{% else %}
+<div class="col-sm-5 col-sm-offset-1">
+  <h3>This account does not have the proper permissions.</h3>
+  <br>
+  <a href="{{ url|safe }}">Switch accounts</a> 
+</div>
+{% endif %}
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script

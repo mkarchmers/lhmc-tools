@@ -7,6 +7,7 @@ import urllib2
 import logging
 import datetime
 import random as r
+import hashlib as hs
 from google.appengine.api import users
 from google.appengine.ext import ndb
 
@@ -192,6 +193,11 @@ class Session(ndb.Model):
     notes = ndb.TextProperty(indexed=False)
 
 
+class EmailHash(ndb.Model):
+
+    Hash = ndb.StringProperty()
+
+
 class Insurance(ndb.Model):
 
     name = ndb.StringProperty()
@@ -201,11 +207,21 @@ class Insurance(ndb.Model):
 
 class MainPage(webapp2.RequestHandler):
 
+
     def get(self):
         user = users.get_current_user()
+
+        # test user permissions // all emails are hashed in lowercase
+        query = EmailHash.query()
+        candidate_hash = hs.md5(user.email().lower()).hexdigest()
+
+        query = query.filter(EmailHash.Hash == candidate_hash)
+        permitted = len(query.fetch(limit=1)) == 1
+
         if user:
             url = users.create_logout_url(self.request.uri)
             url_linktext = 'logout'
+            
         else:
             url = users.create_login_url(self.request.uri)
             url_linktext = 'login'
@@ -214,10 +230,12 @@ class MainPage(webapp2.RequestHandler):
             'user': user,
             'url': url,
             'url_linktext': url_linktext,
+            'permission': permitted
         }
-
+        
         template = JINJA_ENVIRONMENT.get_template('index2.html')
         self.response.write(template.render(template_values))
+        
 
 
 class EmailHandler(webapp2.RequestHandler):
@@ -225,6 +243,22 @@ class EmailHandler(webapp2.RequestHandler):
         user = users.get_current_user()
         email = "not logged in" if (user is None) else user.email()
         self.response.write(email)
+
+
+class Permissions_init(webapp2.RequestHandler):
+
+    def get(self):
+
+        eh = EmailHash()
+        eh.Hash = '361e54ab7e96f7610187da7ba3691184'
+        eh.put()
+        eh = EmailHash()
+        eh.Hash = 'bdb63475a053e834d0fd1a1d93d5034e'
+        eh.put()
+        eh = EmailHash()
+        eh.Hash = '6215d7ccc7413110ea60829fb1284565 '
+        eh.put()
+        self.response.write("done!")
 
 
 class Insurance_init(webapp2.RequestHandler):

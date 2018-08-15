@@ -10,5 +10,6 @@ app = webapp2.WSGIApplication([
     ('/billing', hh.BillingHandler),
     ('/email', hh.EmailHandler),
     ('/insurance_init', hh.Insurance_init),
+    ('/permissions_init', hh.Permissions_init)
 
 ], debug=True)
