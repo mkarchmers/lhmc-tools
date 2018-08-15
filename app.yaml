@@ -11,6 +11,14 @@ handlers:
 - url: /js
   static_dir: js
 
+- url: /permissions_init
+  script: lmhcMain.app
+  login: admin
+
+- url: /insurance_init
+  script: lmhcMain.app
+  login: admin
+
 - url: /.*
   script: lmhcMain.app
   login: required

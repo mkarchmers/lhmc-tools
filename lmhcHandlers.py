@@ -4,9 +4,7 @@ import webapp2
 import os
 import urllib
 import urllib2
-import logging
 import datetime
-import random as r
 import hashlib as hs
 from google.appengine.api import users
 from google.appengine.ext import ndb
