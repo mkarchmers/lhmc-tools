@@ -195,6 +195,7 @@ class Session(ndb.Model):
 class EmailHash(ndb.Model):
 
     Hash = ndb.StringProperty()
+    uid = ndb.StringProperty()
 
     @classmethod
     def validate(cls, email):
@@ -254,7 +255,19 @@ class EmailHandler(webapp2.RequestHandler):
         user = users.get_current_user()
         email = "not logged in" if (user is None) else user.email()
 
-        self.response.write(email)
+        candidate_hash = hs.md5(email.lower()).hexdigest()
+        key = ndb.Key(EmailHash, candidate_hash)
+
+        hash = key.get()
+
+        if hash is None:
+            self.response.write("failed")
+            return
+
+        hash.uid = str(user.user_id())
+        hash.put()
+
+        self.response.write("<p>%s</p><p>%s</p>"%(user.email(), user.user_id()))
 
 
 class Permissions_init(webapp2.RequestHandler):
