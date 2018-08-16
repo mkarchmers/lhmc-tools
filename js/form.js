@@ -17,7 +17,7 @@ var SITextArray = [
 	"date",
 	"seshNo", //ro
 	"modality",
-	"newIssue",
+	"new_issue",
 ]; // 4
 
 var RACheckArray = [
@@ -190,11 +190,33 @@ var PLNTextArray = [
 
 // utility functions to build the form
 
+/*
+if check, text is clear
+if text != "", uncheck
+*/
 function associateCheckText(chk, txt){
 	$('input[name='+chk+']').change(function(){
-		$('input[name='+txt+']').toggle(this.checked);
+		if (this.checked){
+			$('input[name='+txt+']').val("")
+		}
 	})
+	$('input[name='+txt+']').change(function(){
+		if (this.value==""){
+			document.getElementsByName(chk)[0].checked = true;
+		}
+		else {
+			document.getElementsByName(chk)[0].checked = false;
+		}
+	})
+}
 
+/*
+if text != "", check
+*/
+function linkTextCheck(chk, txt){
+	$('input[name='+txt+']').change(function(){
+		document.getElementsByName(chk)[0].checked = (this.value != "");
+	})	
 }
 
 function addOtherToList(selection, name){

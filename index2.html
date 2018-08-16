@@ -229,7 +229,7 @@
                     <div class="panel-body">
                       <ul class="SI-group list-group">
                         <li class="list-group-item">
-                        Date: <input id="seshdate" name="date" >
+                        Date: <input id="seshdate" name="date" class="non-editable">
                         </li>
                         <li class="list-group-item">
                         Session #: <input type="text" id="seshNo" name="seshNo" class="data-ro" >
@@ -984,7 +984,19 @@
       }
 
       function edit_session(){
-        alert('edit')
+
+        setFormDisabled('#new_session_form', null);
+        d3.selectAll('.data-ro')
+          .attr('readonly',true);
+        d3.selectAll('.non-editable')
+          .attr('readonly',true);
+        d3.select('#sessionSubmit')
+          .classed('visible',true)
+          .classed('invisible',null)
+        d3.select('#sessionEdit')
+          .classed('visible',null)
+          .classed('invisible',true)
+
 
         // setFormDisabled('#session_info', null)
         // // $('#sessionEdit').attr('text','save and submit')
@@ -1003,6 +1015,8 @@
         setFormDisabled('#session_info', null);
         d3.selectAll('.data-ro')
           .attr('readonly',true);
+        d3.selectAll('.non-editable')
+          .attr('readonly',false);          
         d3.select('#sessionSubmit')
           .classed('visible',true)
           .classed('invisible',null)
@@ -1054,8 +1068,7 @@
         d3.select('#sessionInfoLabel').text('New session');
 
         // populate current values
-        // patient
-        //console.log(patient);
+        // DO NOT populate session_id
         document.getElementById('name').value = patient.name;
         document.getElementById('dob').value = patient.dob;
         document.getElementById('insurance').value = patient.insurance;
@@ -1112,8 +1125,12 @@
         addOtherToList(d3.select('#collapseASS').select('ul'),"ASS_other_txt")
         addOtherToList(d3.select('#collapsePLN').select('ul'),"PLN_other_txt")
 
-        //associateCheckText('G_1_impr', 'G_1_impr_txt');
-        //associateCheckText('G_1_decr', 'G_1_decr_txt');
+        associateCheckText("no_new_issue", "new_issue")
+        linkTextCheck("G_1_impr", "G_1_impr_txt")
+        linkTextCheck("G_1_decr", "G_1_decr_txt")
+        linkTextCheck("G_2_impr", "G_2_impr_txt")
+        linkTextCheck("G_2_decr", "G_2_decr_txt")
+
         $('input[name=date]').change(function(){
           freq = $('select[name=PLN_FREQ').val();
           weeks = 1;
@@ -1155,14 +1172,11 @@
             });
           })
         
-
         $(document).on('click','.navbar-collapse.in',function(e) {
           if( $(e.target).is('a') ) {
               $(this).collapse('hide');
           }
         });
-
-
       });
     </script>
 

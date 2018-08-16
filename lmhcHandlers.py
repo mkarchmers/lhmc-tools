@@ -377,30 +377,54 @@ class SessionsHandler(webapp2.RequestHandler):
         for (k,v) in self.request.POST.items():
             parms[k] = v
 
+        session_id = parms.get('session_id', None)
+
+        del parms['session_id']
+        del parms['seshNo']
+
         if parms['insurance'] != 'None':
             parms['mod_code'] = Insurance.get_code(parms['insurance'], parms['modality'])
         else:
             parms['mod_code'] = 'None'
 
-        parms['is_billed'] = False
-
         user_date_lst = parms['date'].split('/')
         parms['date_object'] = datetime.date(int(user_date_lst[2]), int(user_date_lst[0]), int(user_date_lst[1]))
         parms['timestamp'] = datetime.datetime.now()
 
-        # increment number of sessions for patient
-        key = ndb.Key(urlsafe=parms['patient_id'])
-        patient = key.get()
-        ndb.transaction(patient.increment)
-        parms['session_number'] = patient.session_number
+        if session_id is None:
+            # new session
+            # increment number of sessions for patient
+            key = ndb.Key(urlsafe=parms['patient_id'])
+            patient = key.get()
+            ndb.transaction(patient.increment)
+            parms['session_number'] = patient.session_number
 
-        parms['parent'] = ndb_user_key(user.user_id())
+            parms['is_billed'] = False
 
-        del parms['seshNo']
-        del parms['session_id']
-        
-        session = Session(**parms)
-        session.put()
+            parms['parent'] = ndb_user_key(user.user_id())
+            
+            session = Session(**parms)
+            session.put()
+        else:
+            # edit session
+            key = ndb.Key(urlsafe=session_id)
+            session = key.get()
+
+            # reset attributes that are not in parms
+            # these have values of "on"
+            for k in session._properties.keys():
+                v = getattr(session, k)
+                if v is None:
+                    continue
+                if v == "on" and k not in parms:
+                    setattr(session, k, None)
+
+            # set new attributes
+            for k,v in parms.iteritems():
+                print k
+                setattr(session, k, v)
+
+            session.put()
 
         self.redirect('/')
 
