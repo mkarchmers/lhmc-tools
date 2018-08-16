@@ -391,7 +391,7 @@ class SessionsHandler(webapp2.RequestHandler):
         parms['date_object'] = datetime.date(int(user_date_lst[2]), int(user_date_lst[0]), int(user_date_lst[1]))
         parms['timestamp'] = datetime.datetime.now()
 
-        if session_id is None:
+        if session_id is None or session_id == "":
             # new session
             # increment number of sessions for patient
             key = ndb.Key(urlsafe=parms['patient_id'])
