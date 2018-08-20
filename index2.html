@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>LHMC-tool</title>
+    <title>LMHC-tool</title>
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -47,13 +47,13 @@
           outline: none;
       }
       #aaccordion{
-          border: 2px solid #3485ef;
+          border: 2px solid #5F9EA0;
           border-radius: 20px;
           overflow: hidden;
       }
       #aaccordion .panel{
           border: none;
-          border-bottom: 2px solid #3485ef;
+          border-bottom: 2px solid #5F9EA0;
           box-shadow: none;
           border-radius: 0;
           margin: 0;
@@ -72,7 +72,7 @@
           font-weight: 600;
           color: #fff;
           text-transform: uppercase;
-          background: #3485ef;
+          background: #5F9EA0;
           text-align: left;
           border: none;
           border-radius: 0;
@@ -81,10 +81,10 @@
       }
       #aaccordion .panel-title a.collapsed{
           background: #fff;
-          color: #3485ef;
+          color: #5F9EA0;
       }
       #aaccordion .panel-title a.collapsed:hover{
-          background: #3485ef;
+          background: #5F9EA0;
           color: #fff;
       }
       #aaccordion .panel-title a.collapsed:hover:after{
@@ -166,7 +166,13 @@
       </div>
     </nav>
     
-    <div id="calendar"> </div>
+    <div class="container">
+      <div class="row">
+        <div class="col-xs-12">
+          <div id="calendar"> </div>
+        </div>
+      </div>
+    </div>
 
     <!-- session modal -->
     <div class="modal fade bs-example-modal-lg" id="session_info" tabindex="-1" role="dialog" aria-labelledby="sessionInfoLabel">
