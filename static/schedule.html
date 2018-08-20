@@ -33,6 +33,10 @@
       #external-events .fc-event {
         margin: 1em 0;
         cursor: move;
+        background-color: LightGray;
+        border-color: Gray;
+        color: Gray;
+        padding: 2px;
       }
 
       .fc-center h2 {
@@ -116,24 +120,11 @@
         return (freq==7? "weekly" : "bi-weekly")
       }
 
-      function badge(element, f){
-        d = $(element).parent().data()
-        $(element).text(d.event.data.freq)
-        d.event.data.freq = (d.event.data.freq == 7? 14 : 7);
-        d.event.className = getClassNameForFreq(d.event.data.freq)
-        $(element).parent().data(d)
-
-        $(element).parent().toggleClass('bi-weekly')
-        $(element).parent().toggleClass('weekly')
-        $(element).toggleClass('weekly')
-        $(element).toggleClass('bi-weekly')
-      }
-
       var schedule = {};
 
       function addEvent(event){
-        var start = event.start;
-        var end = event.end;
+        start = event.start;
+        end = event.end;
         schedule[event.title] = {
           name: event.title,
           moment: start.format(),
@@ -160,10 +151,10 @@
       function createSeries(event){
 
         // add series
-        var freq = event.data['freq'];
+        freq = event.data['freq'];
         [-2,-1,1,2,3,4,5].forEach(function(i){
-          var start = moment(event.start);
-          var end = moment(event.end);
+          start = moment(event.start);
+          end = moment(event.end);
           start.add(i*freq,'day')
           end.add(i*freq,'day')
           d = {
@@ -179,20 +170,20 @@
 
       function displaySchedule(){
 
-        var cal = $('#calendar')
+        cal = $('#calendar')
 
         cal.fullCalendar('removeEvents', function(e){return true});
 
-        var view = cal.fullCalendar('getView')
+        view = cal.fullCalendar('getView')
 
-        for (var k in schedule){
+        for (k in schedule){
           item = schedule[k]
 
-          var d = moment(item.moment).diff(view.start,'day')
+          d = moment(item.moment).diff(view.start,'day')
           if (d < 0){d = d-1} // not clear why this is needed
           d = d%item.freq
-          var start = moment(view.start).add(d,'day')
-          var event = {
+          start = moment(view.start).add(d,'day')
+          event = {
             title: item.name,
             className: getClassNameForFreq(item.freq),
             start: moment(start.format()+"T"+item.start),
@@ -208,26 +199,43 @@
       function addPatientDiv(event){
 
             freq = event.data.freq;
-            var className = getClassNameForFreq(freq);
+            className = getClassNameForFreq(freq);
 
-            event_cond = {
+            data = event.data;
+            data['freq'] = 7;
+            weekly_event = {
               title: event.title,
-              data: event.data,
-              className: className,
+              data: data,
+              className: "weekly",
               allDay: false,
               stick: true,
             }
-
-            var btn = $("<span class='badge-pill' onclick='badge(this);'></span")
-              .addClass((className=='weekly'?'bi-weekly':'weekly'))
-              .text((freq==7? 14:7))
-
-            var div = $('<div></div>')
-              .addClass('fc-event patient ' + className)
-              .text(event.title)
-              .data('event', event_cond) 
+            weekly = $("<span class='badge-pill'></span")
+              .addClass('weekly')
+              .data('event', weekly_event)
+              .text(7)
               .draggable()
-              .append(btn)
+
+            data = event.data;
+            data['freq'] = 14;
+            bi_weekly_event = {
+              title: event.title,
+              data: event.data,
+              className: "bi-weekly",
+              allDay: false,
+              stick: true,
+            }
+            bi_weekly = $("<span></span>")
+              .addClass('badge-pill bi-weekly')
+              .data('event', bi_weekly_event)
+              .text(14)
+              .draggable()
+
+            div = $('<div></div>')
+              .addClass('fc-event')
+              .text(event.title)
+              .append(bi_weekly)
+              .append(weekly)
 
             $('#external-events').append(div)
       }
@@ -268,7 +276,7 @@
 
       function clearSchedule(){
 
-        var cal = $('#calendar');
+        cal = $('#calendar');
         cal.fullCalendar('removeEvents', function(e){return true});
         cal.fullCalendar('render');
         // disregards scrollTime option.
@@ -318,7 +326,7 @@
           allDaySlot: false,
           minTime: "07:00:00",
           maxTime: "23:00:00",
-          scrollTime: "16:00:00",
+          scrollTime: "15:30:00",
           slotDuration: "00:15:00",
           eventLimit: true,
           editable: true,
@@ -363,7 +371,7 @@
             d = $(this).data('event');
 
             // add series
-            var freq = d.data['freq'];
+            freq = d.data['freq'];
             [-2,-1,1,2,3,4,5].forEach(function(i){
               var m = moment(mom)
               m.add(i*freq,'day')
@@ -375,10 +383,11 @@
             })
 
             // remove from list of external events
-            $(this).remove();
+            $(this).parent().remove();
 
           },
           eventReceive: function(event){
+            
             end_time = moment(event.start);
             end_time.add(45,'minute');
             event.end = end_time;
