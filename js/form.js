@@ -7,7 +7,7 @@ var PITextArray = [
 	"patient_id", //ro
 	"diag",
 	"diag_code",
-]; // 7
+]; // 6
 
 var SICheckArray = [
 	"no_new_issue",
