@@ -244,9 +244,10 @@
 
         $.getJSON('/patient', function(data){
 
+        $('#external-events div').remove()
+
           data = data.patient_list.filter(function(item){return !(item.name in schedule)})
 
-          $('#external-events div.patient').remove()
           data.forEach(function(item){
 
             addPatientDiv({
@@ -387,7 +388,7 @@
 
           },
           eventReceive: function(event){
-            
+
             end_time = moment(event.start);
             end_time.add(45,'minute');
             event.end = end_time;
