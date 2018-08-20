@@ -201,7 +201,7 @@
             freq = event.data.freq;
             className = getClassNameForFreq(freq);
 
-            data = event.data;
+            data = $.extend({}, event.data);
             data['freq'] = 7;
             weekly_event = {
               title: event.title,
@@ -216,11 +216,11 @@
               .text(7)
               .draggable()
 
-            data = event.data;
+            data = $.extend({}, event.data);
             data['freq'] = 14;
             bi_weekly_event = {
               title: event.title,
-              data: event.data,
+              data: data,
               className: "bi-weekly",
               allDay: false,
               stick: true,
