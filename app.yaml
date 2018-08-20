@@ -11,6 +11,9 @@ handlers:
 - url: /js
   static_dir: js
 
+- url: /static
+  static_dir: static
+
 - url: /.*_init
   script: lmhcMain.app
   login: admin
