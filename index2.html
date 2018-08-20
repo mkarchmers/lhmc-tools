@@ -708,7 +708,7 @@
       function display_patient_info(item){
         enablePatientDisplay('.patient_form')
 
-        var form = d3.select('#new_patient_form');
+        form = d3.select('#new_patient_form');
         form.selectAll('.form-control')
           .attr('disabled',true);
         d3.select('#submit-patient')
@@ -787,13 +787,13 @@
       }
 
       function load_patients(){
-        var row = function(item){return item.name};
-        var sessionNo = function(item){return item.session_number};
+        row = function(item){return item.name};
+        sessionNo = function(item){return item.session_number};
 
         $.getJSON('/patient', function(data){
-          var table = d3.select('#patientTable');
-          var tbody = table.select('tbody');
-          var selection = tbody.selectAll('a')
+          table = d3.select('#patientTable');
+          tbody = table.select('tbody');
+          selection = tbody.selectAll('a')
             .data(data.patient_list);
             
           selection.text(row)
@@ -942,23 +942,23 @@
 
       function validate_session(){
         
-        var f = $('#seshdate').val();
+        f = $('#seshdate').val();
         if (f == ""){
           alert("date cannot be empty");
           return false;
         }
-        var f = $('#notes').val();
+        f = $('#notes').val();
         if ((f == "") || (f == "Client reported:") ){
           alert("notes must be entered");
           return false;
         }
-        var f = $('#diag_code').val();
+        f = $('#diag_code').val();
         if (f == ""){
           alert("diagnosis code cannot be empty");
           return false;
         } 
 
-        var new_issue_filled =  $('#new_issue').val() != "";
+        new_issue_filled =  $('#new_issue').val() != "";
         if (!document.getElementById('no_new_issue').checked){
           if (!new_issue_filled){
             alert("new issue cannot be empty when 'None Reported' checkbox is unchecked");
@@ -1051,11 +1051,9 @@
               return;
             }
 
-            //var latest_data = data.relevant_list[0]['data'];
-            var latest_data = data[0];
+            latest_data = data[0];
 
-            var latest = moment(latest_data.date);
-            //console.log(latest.format("YYYY/MM/DD"));
+            latest = moment(latest_data.date);
 
             // restrict datepicker
             $('#seshdate').datepicker({
@@ -1098,8 +1096,8 @@
       function generate_bill(route) {
 
         $.getJSON(route, function (data) {
-            var bills = data.Bill;
-            var csv = 'Name,Session Date,Procedure Code,DSM 5,Insurance\n';
+            bills = data.Bill;
+            csv = 'Name,Session Date,Procedure Code,DSM 5,Insurance\n';
             bills.forEach(function (row) {
                 csv += row.name + ',';
                 csv += row.session_date + ',';
@@ -1109,10 +1107,10 @@
                 csv += "\n";
             });
 
-            var hiddenElement = document.createElement('a');
+            hiddenElement = document.createElement('a');
             hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
             hiddenElement.target = '_blank';
-            var now = moment();
+            now = moment();
             hiddenElement.download = 'billing_'+now.format("YYYY-MM-DD:HH:mm")+'.csv';
             hiddenElement.click();
         });
@@ -1152,7 +1150,7 @@
         
 
         $("#patientSearchInput").on("keyup", function() {
-          var value = $(this).val().toLowerCase();
+          value = $(this).val().toLowerCase();
           $("#patientList tr").filter(function() {
             $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
           });
