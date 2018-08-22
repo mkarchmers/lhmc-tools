@@ -788,9 +788,9 @@
 
       function load_patients(){
         row = function(item){return item.name};
-        sessionNo = function(item){return item.session_number};
 
         $.getJSON('/patient', function(data){
+
           table = d3.select('#patientTable');
           tbody = table.select('tbody');
           selection = tbody.selectAll('a')
@@ -812,10 +812,9 @@
           tbody.selectAll('a')
             .data(data.patient_list)
             .append('span')
-            .classed('badge',true)
-            .classed('badge-primary',true)
+            .classed('glyphicon',true)
+            .classed('glyphicon-plus',true)
             .classed('badge-pill',true)
-            .text(sessionNo)
             .on('click',function(item){
               new_session(item);
               d3.event.stopPropagation();
@@ -831,22 +830,17 @@
               d3.event.stopPropagation();
             });
 
-            /*
-          tbody.selectAll('a')
-            .data(data.patient_list)
-            .append('p')
-            .text('w')
-            */
-
         })
       }
 
       function write_checbox(name, write) {
         document.getElementsByName(name)[0].checked = (write == "on");
+        //$('[name='+name+']').prop('checked', (write == "on"))
       }
 
       function write_dropdown(name, write) {
         document.getElementById(name).value = write
+        //$('#'+name).val(write)
       }
 
       function populateSessionData(data){
