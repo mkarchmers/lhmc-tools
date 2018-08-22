@@ -9,7 +9,9 @@ app = webapp2.WSGIApplication([
     ('/sessions', hh.SessionsHandler),
     ('/billing', hh.BillingHandler),
     ('/email', hh.EmailHandler),
+    ('/schedule', hh.ScheduleHandler),
     ('/insurance_init', hh.Insurance_init),
-    ('/permissions_init', hh.Permissions_init)
+    ('/permissions_init', hh.Permissions_init),
+    ('/test', hh.Test)
 
-], debug=True)
+], debug=False)

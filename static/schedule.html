@@ -27,6 +27,7 @@
       }
 
       #calendar-container {
+        /*height: 600;*/
         margin-top: 20px;
       }
 
@@ -78,7 +79,7 @@
             <div class="btn-group btn-group-xs">
               <button onClick="saveSchedule();">Save</button>
               <button onClick="clearSchedule();">Clear</button>
-              <button onClick="load();">Load</button>
+              <button onClick="loadSchedule();">Load</button>
             </div>
 
             <div id="external-events">
@@ -136,7 +137,7 @@
         }
       }
 
-      function load(){
+      function loadSchedule(){
         schedule = {}
         $.getJSON('/schedule', function(data){
           data.forEach(function(item){
@@ -282,7 +283,7 @@
         // disregards scrollTime option.
         // fix: switch views and back
         cal.fullCalendar('changeView',"month");
-        cal.fullCalendar('changeView',"agendaBiWeekly");
+        cal.fullCalendar('changeView',"agendaWeek");
         schedule = {};
         loadPatients();
       }
@@ -300,29 +301,28 @@
 
       $(function() {
 
-        load();
+        loadSchedule();
 
         // initialize the calendar
         // -----------------------------------------------------------------
-
         $('#calendar').fullCalendar({
+          height: 600,
           header: {
             left: 'prev,next',
             center: 'title',
-            right: 'agendaBiWeekly,month'
+            right: 'agendaWeek,agendaBiWeekly,month'
           },
           views: {
             agendaBiWeekly: {
               type: 'agenda',
               duration: { days: 14 },
-              buttonText: 'week'
+              buttonText: ' 2week',
             }
           },       
 
           columnHeaderFormat: 'ddd',
-          themeSystem: 'bootstrap3',
           weekends: false,
-          defaultView: 'agendaBiWeekly',
+          defaultView: 'agendaWeek',
           allDaySlot: false,
           minTime: "07:00:00",
           maxTime: "23:00:00",

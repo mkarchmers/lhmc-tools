@@ -38,34 +38,46 @@
         max-width: 900px;
         margin: 40px auto;
       }
+
+      #patientPage {
+        margin: 40px auto;
+      }
+
       .fc-center h2{
         font-size: 20px;
       }
+      .fc-day-header {
+        font-size: 10px;
+      }
+      .fc-time {
+        font-size: 10px;
+      }
+      
 
       a:hover,a:focus{
           text-decoration: none;
           outline: none;
       }
-      #aaccordion{
+      #accordion{
           border: 2px solid #5F9EA0;
           border-radius: 20px;
           overflow: hidden;
       }
-      #aaccordion .panel{
+      #accordion .panel{
           border: none;
           border-bottom: 2px solid #5F9EA0;
           box-shadow: none;
           border-radius: 0;
           margin: 0;
       }
-      #aaccordion .panel:last-child{
+      #accordion .panel:last-child{
           border-bottom: none;
       }
-      #aaccordion .panel-heading{
+      #accordion .panel-heading{
           padding: 0;
           border: none;
       }
-      #aaccordion .panel-title a{
+      #accordion .panel-title a{
           display: block;
           padding: 10px;
           font-size: 14px;
@@ -79,18 +91,18 @@
           position: relative;
           transition: all 0.3s ease 0s;
       }
-      #aaccordion .panel-title a.collapsed{
+      #accordion .panel-title a.collapsed{
           background: #fff;
           color: #5F9EA0;
       }
-      #aaccordion .panel-title a.collapsed:hover{
+      #accordion .panel-title a.collapsed:hover{
           background: #5F9EA0;
           color: #fff;
       }
-      #aaccordion .panel-title a.collapsed:hover:after{
+      #accordion .panel-title a.collapsed:hover:after{
           color: #fff;
       }
-      #aaccordion .panel-body{
+      #accordion .panel-body{
           padding: 10px;
           border: none;
           font-size: 14px;
@@ -130,7 +142,8 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="#">Home</a></li>
+            <li><a onclick="patientPage()">Patients</a></li>
+            <li><a onclick="historyPage();">History</a></li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Billing<span class="caret"></span></a>
               <ul class="dropdown-menu">
@@ -138,7 +151,6 @@
                 <li><a onclick="billing(1)">final</a></li>
               </ul>
             </li>
-            <li><a onclick="patients()">Patients</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
             <!--
@@ -166,9 +178,32 @@
       </div>
     </nav>
     
-    <div class="container">
+    <div class="contaier" id="patientPage">
+
       <div class="row">
-        <div class="col-xs-12">
+        <div class="col-xs-offset-2 col-xs-8">
+          <div id="patient_display"> 
+            <input class="form-control" id="patientSearchInput" type="text" placeholder="Search..">
+            <br>
+            <table id="patientTable" class="table table-bordered table-striped">
+              <tbody></tbody>
+              
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-xs-offset-2 col-xs-8">
+          <button id="new-patient" type="button" class="btn btn-default" onclick="new_patient()">New</button>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="container" id="historyPage">
+      <div class="row">
+        <div class="col-xs-offset-2 col-xs-8">
           <div id="calendar"> </div>
         </div>
       </div>
@@ -184,13 +219,13 @@
           </div>
           <div class="modal-body">   
             <form id="new_session_form" action="/sessions" method='post'>
-              <div class="panel-group" id="aaccordion" role="tablist" aria-multiselectable="true">
+              <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 
                 <!-- PI -->
                 <div class="panel panel-default">
                   <div class="panel-heading" role="tab" id="headingPI">
                     <h4 class="panel-title">
-                      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#aaccordion" href="#collapsePI" aria-expanded="true" aria-controls="collapsePI">
+                      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapsePI" aria-expanded="true" aria-controls="collapsePI">
                         Patient info
                       </a>
                     </h4>
@@ -226,7 +261,7 @@
                 <div class="panel panel-default">
                   <div class="panel-heading" role="tab" id="headingSI">
                     <h4 class="panel-title">
-                      <a id="a-SI" role="button" data-toggle="collapse" data-parent="#aaccordion" href="#collapseSI" aria-expanded="false" aria-controls="collapseSI">
+                      <a id="a-SI" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSI" aria-expanded="false" aria-controls="collapseSI">
                         Session info
                       </a>
                     </h4>
@@ -270,7 +305,7 @@
                 <div class="panel panel-default">
                   <div class="panel-heading" role="tab" id="headingRA">
                     <h4 class="panel-title">
-                      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#aaccordion" href="#collapseRA" aria-expanded="false" aria-controls="collapseRA">
+                      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseRA" aria-expanded="false" aria-controls="collapseRA">
                         Risk assessment
                       </a>
                     </h4>
@@ -318,7 +353,7 @@
                 <div class="panel panel-default">
                   <div class="panel-heading" role="tab" id="headingTI">
                     <h4 class="panel-title">
-                      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#aaccordion" href="#collapseTI" aria-expanded="false" aria-controls="collapseTI">
+                      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTI" aria-expanded="false" aria-controls="collapseTI">
                         Therapeutic Interventions
                       </a>
                     </h4>
@@ -335,7 +370,7 @@
                 <div class="panel panel-default">
                   <div class="panel-heading" role="tab" id="headingGO">
                     <h4 class="panel-title">
-                      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#aaccordion" href="#collapseGO" aria-expanded="false" aria-controls="collapseGO">
+                      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseGO" aria-expanded="false" aria-controls="collapseGO">
                         Goals
                       </a>
                     </h4>
@@ -414,7 +449,7 @@
                 <div class="panel panel-default">
                   <div class="panel-heading" role="tab" id="headingSPA">
                     <h4 class="panel-title">
-                      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#aaccordion" href="#collapseSPA" aria-expanded="false" aria-controls="collapseSPA">
+                      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSPA" aria-expanded="false" aria-controls="collapseSPA">
                         Symptoms / Problem Areas
                       </a>
                     </h4>
@@ -431,7 +466,7 @@
                 <div class="panel panel-default">
                   <div class="panel-heading" role="tab" id="headingNO">
                     <h4 class="panel-title">
-                      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#aaccordion" href="#collapseNO" aria-expanded="false" aria-controls="collapseNO">
+                      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseNO" aria-expanded="false" aria-controls="collapseNO">
                         Notes
                       </a>
                     </h4>
@@ -449,7 +484,7 @@
                 <div class="panel panel-default">
                   <div class="panel-heading" role="tab" id="headingASS">
                     <h4 class="panel-title">
-                      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#aaccordion" href="#collapseASS" aria-expanded="false" aria-controls="collapseASS">
+                      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseASS" aria-expanded="false" aria-controls="collapseASS">
                         Assessment
                       </a>
                     </h4>
@@ -524,7 +559,7 @@
                 <div class="panel panel-default">
                   <div class="panel-heading" role="tab" id="headingPLN">
                     <h4 class="panel-title">
-                      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#aaccordion" href="#collapsePLN" aria-expanded="false" aria-controls="collapsePLN">
+                      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapsePLN" aria-expanded="false" aria-controls="collapsePLN">
                         Plan
                       </a>
                     </h4>
@@ -572,7 +607,7 @@
     </div>   
 
     <!-- Patients modal -->
-    <div class="modal fade bs-example-modal-lg" id="patientList" tabindex="-1" role="dialog" >
+    <div class="modal fade bs-example-modal-lg" id="patientForm" tabindex="-1" role="dialog" >
       <div class="modal-dialog modal_lg" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -582,13 +617,14 @@
           </div>
           <div class="modal-body">
   
+              <!--
               <div class="patient_display">
                 <input class="form-control" id="patientSearchInput" type="text" placeholder="Search..">
                 <br>
                 <table id="patientTable" class="table table-bordered table-striped">
                   <tbody></tbody>
                 </table>
-              </div>
+              </div>-->
 
               <div class="patient_form">
                 <form id="new_patient_form" action="/patient" method="post">
@@ -619,7 +655,6 @@
           </div>
           <div class="modal-footer">
             <button id="submit-patient" type="button" class="patient_form btn btn-default" onclick="submit_patient()">Submit</button>
-            <button id="new-patient" type="button" class="patient_display btn btn-default" onclick="new_patient()">New</button>
           </div>
         </div>
       </div>
@@ -664,12 +699,19 @@
 
     <script>
 
-      // utility functions to handle different forms
-      function enablePatientDisplay(what){
-        ['.patient_display', '.patient_form'].forEach(function(cls){
-          d3.selectAll(cls).style('display',(what==cls?'block':'none'))
-        })
+      function patientPage(){
+        $('#patientPage').show()
+        $('#historyPage').hide()
+
+        load_patients()
       }
+
+      function historyPage(){
+        $('#patientPage').hide()
+        $('#historyPage').show()
+      }
+
+      // utility functions to handle different forms
 
       function setFormDisabled(id, value){
         d3.select(id)
@@ -697,16 +739,12 @@
           .classed('visible',true)
           .classed('invisible',null)
 
-        $('#patientList').modal('hide');
-        $('#notesList').modal('hide');
-
         $('#session_info').modal('show');
       }
 
 
 
       function display_patient_info(item){
-        enablePatientDisplay('.patient_form')
 
         form = d3.select('#new_patient_form');
         form.selectAll('.form-control')
@@ -720,6 +758,8 @@
         form.select('#insurance').property('value',item['insurance']);
         form.select('#session_number').property('value',item['session_number']);
         form.select('#status').property('value',item['status']);
+
+        $('#patientForm').modal('show')
 
       }
 
@@ -738,7 +778,7 @@
       }
 
       function new_patient(){
-        enablePatientDisplay('.patient_form')
+
         d3.select('#new_patient_form')
           .selectAll('.form-control')
           .attr('disabled',null)
@@ -750,6 +790,9 @@
               startView: 2
           });
         d3.select('#patientFormLabel').text('New patient');
+
+        $('#patientForm').modal('show');
+
       }
 
       function processNotesData(data){
@@ -922,13 +965,6 @@
         $('#calendar').fullCalendar('changeView', 'listMonth')
       }
 
-      function patients(){
-        enablePatientDisplay('.patient_display')
-  
-        load_patients();
-        $('#patientList').modal('show');
-      }
-
       function billing(final){
         route = "/billing?bill=" + (final? "Y" : "");
         generate_bill(route);
@@ -972,14 +1008,12 @@
       function submit_session(){
 
         if (!validate_session()){
-          //alert("submition failed");
           return;
         };
 
         document.getElementById("new_session_form").submit();
 
         $('#session_info').modal('hide');
-        $('#patientList').modal('show');
         load_patients();
       }
 
@@ -997,17 +1031,6 @@
           .classed('visible',null)
           .classed('invisible',true)
 
-
-        // setFormDisabled('#session_info', null)
-        // // $('#sessionEdit').attr('text','save and submit')
-        // // $('#sessionEdit').attr('onclick', 'submit_session()')
-        // d3.select('#sessionSubmit')
-        //   .classed('visible',true)
-        //   .classed('invisible',null)
-        // d3.select('#sessionEdit')
-        //   .classed('visible',null)
-        //   .classed('invisible',true)
-
       }
 
       function new_session(patient){
@@ -1023,9 +1046,6 @@
         d3.select('#sessionEdit')
           .classed('visible',null)
           .classed('invisible',true)
-
-
-        $('#patientList').modal('hide');
 
         $('#session_info').modal('show');
         $("#new_session_form")[0].reset();
@@ -1145,7 +1165,7 @@
 
         $("#patientSearchInput").on("keyup", function() {
           value = $(this).val().toLowerCase();
-          $("#patientList tr").filter(function() {
+          $("#patientTable tr").filter(function() {
             $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
           });
         });
@@ -1175,6 +1195,8 @@
               $(this).collapse('hide');
           }
         });
+
+        patientPage();
       });
     </script>
 
