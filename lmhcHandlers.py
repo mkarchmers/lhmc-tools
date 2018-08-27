@@ -9,7 +9,7 @@ import hashlib as hs
 from google.appengine.api import users
 from google.appengine.ext import ndb
 
-from lmhc import models
+import models
 
 
 JINJA_ENVIRONMENT = jinja2.Environment(
@@ -292,107 +292,4 @@ class ScheduleHandler(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'application/json'
         self.response.write(json.dumps(obj, cls=models.ModelEncoder))
 
-class Test(webapp2.RequestHandler):
-
-    def get(self):
-
-        from cStringIO import StringIO
-
-        pdfFile = StringIO()
-
-        from reportlab.lib import colors
-        from reportlab.lib.enums import TA_JUSTIFY
-        from reportlab.lib.pagesizes import letter
-        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
-        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-        from reportlab.lib.units import inch
-         
-        doc = SimpleDocTemplate(pdfFile,pagesize=letter,
-                                rightMargin=72,leftMargin=72,
-                                topMargin=72,bottomMargin=18)
-        Story=[]
-        logo = "python_logo.png"
-        magName = "Pythonista"
-        issueNum = 12
-        subPrice = "99.00"
-        limitedDate = "03/05/2010"
-        freeGift = "tin foil hat"
-         
-        formatted_time = "12:00"
-        full_name = "Mike Driscoll"
-        address_parts = ["411 State St.", "Marshalltown, IA 50158"]
-         
-         
-        styles=getSampleStyleSheet()
-        styleSheet = getSampleStyleSheet()
-        styles.add(ParagraphStyle(name='Justify', alignment=TA_JUSTIFY))
-        ptext = '<font size=12>%s</font>' % formatted_time
-         
-        Story.append(Paragraph(ptext, styles["Normal"]))
-        Story.append(Spacer(1, 12))
-         
-        # Create return address
-        ptext = '<font size=12>%s</font>' % full_name
-        Story.append(Paragraph(ptext, styles["Normal"]))       
-        for part in address_parts:
-            ptext = '<font size=12>%s</font>' % part.strip()
-            Story.append(Paragraph(ptext, styles["Normal"]))   
-         
-        Story.append(Spacer(1, 12))
-        ptext = '<font size=12>Dear %s:</font>' % full_name.split()[0].strip()
-        Story.append(Paragraph(ptext, styles["Normal"]))
-        Story.append(Spacer(1, 12))
-         
-        ptext = '<font size=12>We would like to welcome you to our subscriber base for %s Magazine! \
-                You will receive %s issues at the excellent introductory price of $%s. Please respond by\
-                %s to start receiving your subscription and get the following free gift: %s.</font>' % (magName, 
-                                                                                                        issueNum,
-                                                                                                        subPrice,
-                                                                                                        limitedDate,
-                                                                                                        freeGift)
-        Story.append(Paragraph(ptext, styles["Justify"]))
-        Story.append(Spacer(1, 12))
-         
-         
-        ptext = '<font size=12>Thank you very much and we look forward to serving you.</font>'
-        Story.append(Paragraph(ptext, styles["Justify"]))
-        Story.append(Spacer(1, 12))
-        ptext = '<font size=12>Sincerely,</font>'
-        Story.append(Paragraph(ptext, styles["Normal"]))
-        Story.append(Spacer(1, 48))
-        ptext = '<font size=12>Ima Sucker</font>'
-        Story.append(Paragraph(ptext, styles["Normal"]))
-        Story.append(Spacer(1, 12))
-
-        P0 = Paragraph('<b>Name:</b>',styles["Normal"])  
-
-        data= [['A', 'B', 'C', P0, 'D'],
-               ['20', '21', '22', '23', '24'],
-               ['30', '31', '32', '33', '34']]
-         
-        t=Table(data,style=[('GRID',(1,1),(-2,-2),1,colors.green),
-                            ('BOX',(0,0),(1,-1),2,colors.red),
-                            ('LINEABOVE',(1,2),(-2,2),1,colors.blue),
-                            ('LINEBEFORE',(2,1),(2,-2),1,colors.pink),
-                            ('BACKGROUND', (0, 0), (0, 1), colors.pink),
-                            ('BACKGROUND', (1, 1), (1, 2), colors.lavender),
-                            ('BACKGROUND', (2, 2), (2, 3), colors.orange),
-                            ('BOX',(0,0),(-1,-1),2,colors.black),
-                            ('GRID',(0,0),(-1,-1),0.5,colors.black),
-                            ('VALIGN',(3,0),(3,0),'BOTTOM'),
-                            ('BACKGROUND',(3,0),(3,0),colors.limegreen),
-                            ('BACKGROUND',(3,1),(3,1),colors.khaki),
-                            ('ALIGN',(3,1),(3,1),'CENTER'),
-                            ('BACKGROUND',(3,2),(3,2),colors.beige),
-                            ('ALIGN',(3,2),(3,2),'LEFT'),
-        ])
-        t._argW[3]=1.5*inch        
-
-        Story.append(t)
-
-        doc.build(Story)
-
-        self.response.headers['content-type'] = 'application/pdf'
-        self.response.headers['Content-Disposition'] = 'attachment; filename=file.pdf'
-        self.response.out.write(pdfFile.getvalue())
          

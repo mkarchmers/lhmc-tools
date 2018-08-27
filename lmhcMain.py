@@ -1,6 +1,7 @@
 import webapp2
 
 import lmhcHandlers as hh
+import billingHandlers as bh
 
 app = webapp2.WSGIApplication([
 
@@ -12,6 +13,6 @@ app = webapp2.WSGIApplication([
     ('/schedule', hh.ScheduleHandler),
     ('/insurance_init', hh.Insurance_init),
     ('/permissions_init', hh.Permissions_init),
-    ('/test', hh.Test)
+    ('/test', bh.Test)
 
 ], debug=False)

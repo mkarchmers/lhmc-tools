@@ -16,116 +16,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/fullcalendar.min.css" />
 
-    <style type="text/css">
-      body {
-        padding-top: 40px;
-        padding-bottom: 40px;
-        background-color: #f5f5f5;
-      }
+    <link rel="stylesheet" href="js/lmhc.css"/>
 
-      .visible {
-        visibility: visible;
-      }
-      .invisible {
-        visibility: hidden;
-      }
-
-      .glyphicon-align-justify{
-        padding-right: 10px;
-      }
-
-      #calendar {
-        max-width: 900px;
-        margin: 40px auto;
-      }
-
-      #patientPage {
-        margin: 40px auto;
-      }
-
-      .fc-center h2{
-        font-size: 20px;
-      }
-      .fc-day-header {
-        font-size: 10px;
-      }
-      .fc-time {
-        font-size: 10px;
-      }
-      
-
-      a:hover,a:focus{
-          text-decoration: none;
-          outline: none;
-      }
-      #accordion{
-          border: 2px solid #5F9EA0;
-          border-radius: 20px;
-          overflow: hidden;
-      }
-      #accordion .panel{
-          border: none;
-          border-bottom: 2px solid #5F9EA0;
-          box-shadow: none;
-          border-radius: 0;
-          margin: 0;
-      }
-      #accordion .panel:last-child{
-          border-bottom: none;
-      }
-      #accordion .panel-heading{
-          padding: 0;
-          border: none;
-      }
-      #accordion .panel-title a{
-          display: block;
-          padding: 10px;
-          font-size: 14px;
-          font-weight: 600;
-          color: #fff;
-          text-transform: uppercase;
-          background: #5F9EA0;
-          text-align: left;
-          border: none;
-          border-radius: 0;
-          position: relative;
-          transition: all 0.3s ease 0s;
-      }
-      #accordion .panel-title a.collapsed{
-          background: #fff;
-          color: #5F9EA0;
-      }
-      #accordion .panel-title a.collapsed:hover{
-          background: #5F9EA0;
-          color: #fff;
-      }
-      #accordion .panel-title a.collapsed:hover:after{
-          color: #fff;
-      }
-      #accordion .panel-body{
-          padding: 10px;
-          border: none;
-          font-size: 14px;
-          color: #888;
-          line-height: 25px;
-      }
-
-      .SI-group{
-          max-height: 300px;
-          margin-bottom: 10px;
-          overflow:scroll;
-          -webkit-overflow-scrolling: touch;
-      }
-      .SI-group .list-group-item{
-        padding: 5px;
-      }
-      .SI-group .list-group-item input{
-        font-weight: bold;
-      }
-
-      .badge-pill { float:right }
-
-    </style>
   </head>
 
   <body>
@@ -138,7 +30,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">LHMC tools</a>
+          <a class="navbar-brand" href="#">LMHC tools</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -181,20 +73,24 @@
     <div class="contaier" id="patientPage">
 
       <div class="row">
-        <div class="col-xs-offset-2 col-xs-8">
+        <div class="col-sm-offset-1 col-sm-10">
           <div id="patient_display"> 
-            <input class="form-control" id="patientSearchInput" type="text" placeholder="Search..">
+            <div class="input-group">
+              <input class="form-control" id="patientSearchInput" type="text" placeholder="Search..">
+              <span class="input-group-addon" aria-hidden="true">
+                <a onclick="$('#patientSearchInput').val('');$('#patientSearchInput').keyup();">&times;</a>
+              </span>
+            </div>
             <br>
             <table id="patientTable" class="table table-bordered table-striped">
               <tbody></tbody>
-              
             </table>
           </div>
         </div>
       </div>
 
       <div class="row">
-        <div class="col-xs-offset-2 col-xs-8">
+        <div class="col-sm-offset-1 col-sm-10">
           <button id="new-patient" type="button" class="btn btn-default" onclick="new_patient()">New</button>
         </div>
       </div>
@@ -203,7 +99,7 @@
 
     <div class="container" id="historyPage">
       <div class="row">
-        <div class="col-xs-offset-2 col-xs-8">
+        <div class="col-sm-offset-1 col-sm-10">
           <div id="calendar"> </div>
         </div>
       </div>
@@ -1102,7 +998,7 @@
         return data.map(function(d){
           return {title: d.name,
                   date: d.date,
-                  color: (d.is_billed? 'red':'green'),
+                  color: (d.is_billed? '#A52A2A': '#5F9EA0'),
                   data: d}
           })
       }
@@ -1162,17 +1058,17 @@
           $('input[name=PLN_NXT]').val(nxt);
         })
         
-
-        $("#patientSearchInput").on("keyup", function() {
+        $("#patientSearchInput").keyup(function(){
           value = $(this).val().toLowerCase();
           $("#patientTable tr").filter(function() {
             $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-          });
+          });          
         });
 
         $.getJSON('/sessions?pid=',function(data){
         
           $('#calendar').fullCalendar({
+               height: 550,
                header: {
                   left: 'prev,next today',
                   //left: '',
@@ -1185,6 +1081,7 @@
               eventLimit: true, // allow "more" link when too many events
      
               defaultView: 'listMonth',
+              //listDayAltFormat: false,
               events: processPatientData(data),
               eventClick: calendarEventClick,
             });

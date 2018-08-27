@@ -22,6 +22,10 @@ handlers:
   script: lmhcMain.app
   login: required
   secure: always
+
+- url: /_ah/bounce
+  script: bounceMail.app
+  login: admin
 # [END handlers]
 
 # [START libraries]
@@ -31,3 +35,6 @@ libraries:
 - name: jinja2
   version: latest
 # [END libraries]
+
+inbound_services:
+- mail_bounce
