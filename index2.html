@@ -166,7 +166,13 @@
                     <div class="panel-body">
                       <ul class="SI-group list-group">
                         <li class="list-group-item">
-                        Date: <input id="seshdate" name="date" class="non-editable">
+                          <div class="input-group">
+                            Date: <input id="seshdate" name="date" class="non-editable">
+                            <div class="input-group-apend">
+                                <input type="checkbox" name="no-show" id="no-show">
+                                <span class="input-group-text">No show</span>
+                            </div>
+                          </div>
                         </li>
                         <li class="list-group-item">
                         Session #: <input type="text" id="seshNo" name="seshNo" class="data-ro" >
@@ -841,6 +847,11 @@
           document.getElementById(s).value = data[s];
         });
 
+        if (data['notes'] == 'No show'){
+          write_checbox('no-show','on');
+          //console.log("No show")
+        }
+
         document.getElementById('insurance').value = data['insurance'];
         document.getElementById('patient_id').value = data['patient_id']
         document.getElementById('session_id').value = data['id']
@@ -1045,6 +1056,20 @@
         linkTextCheck("G_2_impr", "G_2_impr_txt")
         linkTextCheck("G_2_decr", "G_2_decr_txt")
 
+        // no_show listeners
+        $('input[name="no-show"]').change(function(){
+          //console.log("no show")
+          if (this.checked){
+            //console.log('checked')
+            $("#notes").val("No show")
+          }
+          else {
+            //console.log('unchecked')
+            $("#notes").val("Client reported:")
+          }
+        })
+
+        // PLN_FREQ
         $('input[name=date]').change(function(){
           freq = $('select[name=PLN_FREQ').val();
           weeks = 1;
