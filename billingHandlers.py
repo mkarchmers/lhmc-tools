@@ -8,7 +8,7 @@ from google.appengine.api import users
 from google.appengine.api import mail
 
 from reportlab.lib import colors
-from reportlab.lib.enums import TA_RIGHT
+from reportlab.lib.enums import TA_RIGHT, TA_LEFT
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -19,6 +19,10 @@ import models
 class Test(webapp2.RequestHandler):
 
     def getData(self):
+
+        def order(a,b):
+            nc = cmp(a[0], b[0])
+            return cmp(a[1],b[1]) if nc == 0 else nc
 
         user = users.get_current_user()
         uid = user.user_id()
@@ -31,6 +35,7 @@ class Test(webapp2.RequestHandler):
 
         titles = ['Name', 'Session date', 'Procedure code', 'DSM 5', 'Insurance']
         entries = [[s.name, s.date, s.mod_code, s.diag_code, s.insurance] for s in sessions]
+        entries = sorted(entries, order)
 
         start = None
         end = None
@@ -39,15 +44,13 @@ class Test(webapp2.RequestHandler):
         if len(sessions) > 0:
             first = sessions.pop()
             if first:
-                start = datetime.datetime.strptime(first.date,"%m/%d/%Y")
-                end = datetime.datetime.strptime(first.date,"%m/%d/%Y")
+                start = first.date_object
+                end = first.date_object
                 for s in sessions:
-                    this_start = datetime.datetime.strptime(s.date,"%m/%d/%Y")
-                    this_end = datetime.datetime.strptime(s.date,"%m/%d/%Y")
-                    if this_start < start:
-                        start = this_start
-                    if this_end > end:
-                        end = this_end
+                    if s.date_object < start:
+                        start = s.date_object
+                    if s.date_object > end:
+                        end = s.date_object
 
         return {"titles": titles, "entries": entries, "range": (start, end)}
 
@@ -69,11 +72,21 @@ class Test(webapp2.RequestHandler):
 
     def get(self):
 
+        user = users.get_current_user()
+
+
         pdfFile = StringIO()
 
         styles=getSampleStyleSheet() 
+        styles.add(ParagraphStyle(name='Header', 
+                                alignment=TA_LEFT,
+                                fontSize=12,
+                                textColor=colors.red))
         styles.add(ParagraphStyle(name='Right', 
                                 alignment=TA_RIGHT,
+                                fontSize=11))
+        styles.add(ParagraphStyle(name='Left', 
+                                alignment=TA_LEFT,
                                 fontSize=11))
 
         doc = SimpleDocTemplate(pdfFile,
@@ -83,6 +96,10 @@ class Test(webapp2.RequestHandler):
         Story=[]         
          
         data = self.getData()
+
+        Story.append(Paragraph("<i>Westside Billing</i>: Mental Health Billing Service", styles["Header"]))
+        Story.append(Spacer(1, 38))
+        Story.append(Paragraph('Provider Name: <b>%s</b>'%user.nickname(), styles["Left"]))
 
         try:
             start, end = (data['range'][0].strftime('%m/%d/%Y'), data['range'][1].strftime('%m/%d/%Y'))
