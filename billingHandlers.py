@@ -7,6 +7,7 @@ import pytz
 
 from google.appengine.api import users
 from google.appengine.api import mail
+from google.appengine.ext import ndb
 
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_RIGHT, TA_LEFT
@@ -19,7 +20,7 @@ import models
 
 class Test(webapp2.RequestHandler):
 
-    def getData(self, end_date):
+    def getData(self, end_date, mark):
 
         def order(a,b):
             nc = cmp(a[0], b[0])
@@ -37,14 +38,20 @@ class Test(webapp2.RequestHandler):
         if end_date is not None:
             sessions = [s for s in sessions if s.date_object <= end_date]
 
+        if mark:
+            bill_time = datetime.datetime.now()
+            for x in sessions:
+                x.billing_time = bill_time
+                x.is_billed = True
+                x.put()
+
         titles = ['Name', 'Session date', 'Procedure code', 'DSM 5', 'Insurance']
         entries = [[s.name, s.date, s.mod_code, s.diag_code, s.insurance] for s in sessions]
         entries = sorted(entries, order)
 
+        # find date range
         start = None
         end = None
-
-        # find date range
         if len(sessions) > 0:
             first = sessions.pop()
             if first:
@@ -56,9 +63,10 @@ class Test(webapp2.RequestHandler):
                     if s.date_object > end:
                         end = s.date_object
 
+
         return {"titles": titles, "entries": entries, "range": (start, end)}
 
-    def getPdf(self, user, end_date, data):
+    def getPdf(self, user, date, data):
 
         pdfFile = StringIO()
 
@@ -92,7 +100,7 @@ class Test(webapp2.RequestHandler):
             pass
 
         Story.append(Paragraph('Provider Name: <b>%s</b>'%user.nickname(), styles["Left"]))
-        Story.append(Paragraph(datetime.datetime.now(pytz.timezone('US/Eastern')).strftime('Date: <b>%m/%d/%Y</b>'), 
+        Story.append(Paragraph(date.strftime('Date: <b>%m/%d/%Y</b>'), 
                                 styles['Right']))
         Story.append(Spacer(1, 38))
 
@@ -120,17 +128,13 @@ class Test(webapp2.RequestHandler):
         except:
             pass
 
-        t=Table(matrix, style=tStyle)
-
-        Story.append(t)
+        Story.append(Table(matrix, style=tStyle))
 
         doc.build(Story)
 
-        return pdfFile        
+        return pdfFile
 
-
-
-    def mail(self, date, body, bill):
+    def mail(self, to, date, body, bill):
 
         user = users.get_current_user()
 
@@ -143,7 +147,7 @@ class Test(webapp2.RequestHandler):
             to= "Mauricio Karchmer <mkarchmers@hotmail.com>",
             subject= "my first bill",
             body= body,
-            attachments= [("bill.pdf", bill)],
+            attachments= [(date.strftime("bill_%m%d%Y.pdf"), bill)],
             )
 
     def get(self):
@@ -154,11 +158,15 @@ class Test(webapp2.RequestHandler):
         if end_date is not None:
             end_date = datetime.datetime.strptime(end_date, '%m/%d/%Y').date()
 
-        data = self.getData(end_date)
-        pdfFile = self.getPdf(user, end_date, data)
+        mark = self.request.get('mark', False)
 
-        #self.mail(None, None, pdfFile.getvalue())
+        date = datetime.datetime.now(pytz.timezone('US/Eastern'))
+
+        data = self.getData(end_date, mark)
+        pdfFile = self.getPdf(user, date, data)
+
+        #self.mail(date, None, pdfFile.getvalue())
 
         self.response.headers['content-type'] = 'application/pdf'
-        self.response.headers['Content-Disposition'] = 'attachment; filename=file.pdf'
+        self.response.headers['Content-Disposition'] = 'attachment; filename=bill_%s.pdf'%date.date()
         self.response.out.write(pdfFile.getvalue())
