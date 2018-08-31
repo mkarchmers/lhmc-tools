@@ -3,6 +3,7 @@
 from cStringIO import StringIO
 import webapp2
 import datetime
+import pytz
 
 from google.appengine.api import users
 from google.appengine.api import mail
@@ -18,7 +19,7 @@ import models
 
 class Test(webapp2.RequestHandler):
 
-    def getData(self):
+    def getData(self, end_date):
 
         def order(a,b):
             nc = cmp(a[0], b[0])
@@ -32,6 +33,9 @@ class Test(webapp2.RequestHandler):
         query = query.order(models.Session.name)
 
         sessions = [x for x in query.fetch() if x.insurance != 'None']
+
+        if end_date is not None:
+            sessions = [s for s in sessions if s.date_object <= end_date]
 
         titles = ['Name', 'Session date', 'Procedure code', 'DSM 5', 'Insurance']
         entries = [[s.name, s.date, s.mod_code, s.diag_code, s.insurance] for s in sessions]
@@ -54,33 +58,14 @@ class Test(webapp2.RequestHandler):
 
         return {"titles": titles, "entries": entries, "range": (start, end)}
 
-    def mail(self, bill):
-
-        user = users.get_current_user()
-
-        body = '''
-            this is my first bill. See attached.
-        '''
-
-        mail.send_mail(
-            sender= user.email(),
-            to= "Mauricio Karchmer <mkarchmers@hotmail.com>",
-            subject= "my first bill",
-            body= body,
-            attachments= [("bill.pdf", bill)],
-            )
-
-    def get(self):
-
-        user = users.get_current_user()
-
+    def getPdf(self, user, end_date, data):
 
         pdfFile = StringIO()
 
         styles=getSampleStyleSheet() 
         styles.add(ParagraphStyle(name='Header', 
                                 alignment=TA_LEFT,
-                                fontSize=12,
+                                fontSize=13,
                                 textColor=colors.red))
         styles.add(ParagraphStyle(name='Right', 
                                 alignment=TA_RIGHT,
@@ -95,19 +80,21 @@ class Test(webapp2.RequestHandler):
                                 topMargin=72,bottomMargin=18)
         Story=[]         
          
-        data = self.getData()
-
         Story.append(Paragraph("<i>Westside Billing</i>: Mental Health Billing Service", styles["Header"]))
         Story.append(Spacer(1, 38))
-        Story.append(Paragraph('Provider Name: <b>%s</b>'%user.nickname(), styles["Left"]))
 
         try:
             start, end = (data['range'][0].strftime('%m/%d/%Y'), data['range'][1].strftime('%m/%d/%Y'))
             ptext = 'Sessions from <b>%s</b> to <b>%s</b>' % (start, end)
-            Story.append(Paragraph(ptext, styles["Right"]))
+            Story.append(Paragraph(ptext, styles["Left"]))
             Story.append(Spacer(1, 38))
         except:
             pass
+
+        Story.append(Paragraph('Provider Name: <b>%s</b>'%user.nickname(), styles["Left"]))
+        Story.append(Paragraph(datetime.datetime.now(pytz.timezone('US/Eastern')).strftime('Date: <b>%m/%d/%Y</b>'), 
+                                styles['Right']))
+        Story.append(Spacer(1, 38))
 
         P0 = Paragraph('<b>Name:</b>', styles["Normal"])  
 
@@ -139,7 +126,38 @@ class Test(webapp2.RequestHandler):
 
         doc.build(Story)
 
-        #self.mail(pdfFile.getvalue())
+        return pdfFile        
+
+
+
+    def mail(self, date, body, bill):
+
+        user = users.get_current_user()
+
+        body = '''
+            this is my first bill. See attached.
+        '''
+
+        mail.send_mail(
+            sender= user.email(),
+            to= "Mauricio Karchmer <mkarchmers@hotmail.com>",
+            subject= "my first bill",
+            body= body,
+            attachments= [("bill.pdf", bill)],
+            )
+
+    def get(self):
+
+        user = users.get_current_user()
+
+        end_date = self.request.get('end', None)
+        if end_date is not None:
+            end_date = datetime.datetime.strptime(end_date, '%m/%d/%Y').date()
+
+        data = self.getData(end_date)
+        pdfFile = self.getPdf(user, end_date, data)
+
+        #self.mail(None, None, pdfFile.getvalue())
 
         self.response.headers['content-type'] = 'application/pdf'
         self.response.headers['Content-Disposition'] = 'attachment; filename=file.pdf'
