@@ -37,13 +37,6 @@
             <li><a onclick="patientPage()">Patients</a></li>
             <li><a onclick="historyPage();">History</a></li>
             <li><a onclick="billingPage();">Billing</a></li>
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Billing<span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a onclick="billing(0)">tentative</a></li>
-                <li><a onclick="billing(1)">final</a></li>
-              </ul>
-            </li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
             <!--
@@ -996,10 +989,12 @@
         $('#calendar').fullCalendar('changeView', 'listMonth')
       }
 
+      /*
       function billing(final){
         route = "/billing?bill=" + (final? "Y" : "");
         generate_bill(route);
       }
+      */
 
       function validate_session(){
         
@@ -1139,6 +1134,7 @@
           })
       }
 
+      /*  done in python
       function generate_bill(route) {
 
         $.getJSON(route, function (data) {
@@ -1161,7 +1157,7 @@
             hiddenElement.click();
         });
 
-      }      
+      }*/   
 
       var events = [];
 
