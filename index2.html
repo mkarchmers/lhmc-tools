@@ -36,6 +36,7 @@
           <ul class="nav navbar-nav">
             <li><a onclick="patientPage()">Patients</a></li>
             <li><a onclick="historyPage();">History</a></li>
+            <li><a onclick="billingPage();">Billing</a></li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Billing<span class="caret"></span></a>
               <ul class="dropdown-menu">
@@ -96,11 +97,39 @@
       </div>
     </div>
 
-
     <div class="container" id="historyPage">
       <div class="row">
         <div class="col-sm-offset-1 col-sm-10">
           <div id="calendar"> </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container" id="billingPage">
+      <div class="row">
+        <div class="col-sm-offset-1 col-sm-4">
+          Billing period up to:
+          <input type="text" id="billing-date" name="billing-date"/>
+        </div>
+        <div class="col-sm-4">
+          <button type="button" class="btn btn-primary btn-xs" onclick="getCSV();">CSV</button>
+          <button type="button" class="btn btn-primary btn-xs" onclick="getPDF();">PDF</button>
+          <button type="button" class="btn btn-danger btn-xs" onclick="confirmEmail();">Mail</button>
+        </div>
+      </div>
+
+      <div class="row confirm-email">
+        <div class="col-sm-offset-1 col-sm-8">
+          <span >
+          </span>
+            <br>
+            Sending a final email is not reversible. The action marks sessions as billed.
+          </span>
+        </div>
+      </div>
+      <div class="row confirm-email">
+        <div class="col-sm-7">
+          <button type="button" class="btn btn-danger btn-xs badge-pill" onclick="sendBillingEmail();">Confirm</button>
         </div>
       </div>
     </div>
@@ -519,15 +548,6 @@
           </div>
           <div class="modal-body">
   
-              <!--
-              <div class="patient_display">
-                <input class="form-control" id="patientSearchInput" type="text" placeholder="Search..">
-                <br>
-                <table id="patientTable" class="table table-bordered table-striped">
-                  <tbody></tbody>
-                </table>
-              </div>-->
-
               <div class="patient_form">
                 <form id="new_patient_form" action="/patient" method="post">
                   <div class="form-group">
@@ -578,10 +598,14 @@
     </div>
     
 {% else %}
-<div class="col-sm-5 col-sm-offset-1">
-  <h3>This account does not have the proper permissions.</h3>
-  <br>
-  <a href="{{ url|safe }}">Switch accounts</a> 
+<div class="container">
+  <div class="row">
+    <div class="col-sm-5 col-sm-offset-1">
+      <h3>This account does not have the proper permissions.</h3>
+      <br>
+      <a href="{{ url|safe }}">Switch accounts</a> 
+    </div>
+  </div>
 </div>
 {% endif %}
 
@@ -601,9 +625,70 @@
 
     <script>
 
+      var new_patient_flag = true;
+      var new_session_flag = true;      
+
+      function validateBillingDate(date){
+        if (date == ''){
+          alert('must specify billing date')
+          return false
+        }
+        return true
+      }
+
+      function getCSV(){
+        date = $('#billing-date').val()
+        if (!validateBillingDate(date)){
+          return
+        }
+        window.open('/bill?type=csv&end='+date)
+      }
+
+      function getPDF(){
+        date = $('#billing-date').val()
+        if (!validateBillingDate(date)){
+          return
+        }
+        window.open('/bill?type=pdf&end='+date)
+      }
+
+      function confirmEmail(){
+        date = $('#billing-date').val()
+        if (!validateBillingDate(date)){
+          return
+        }
+        $('.confirm-email').show()
+      }
+
+      function sendBillingEmail(){
+        date = $('#billing-date').val()
+
+        // refresh to display billed sessions
+        new_session_flag = true;
+
+        window.open('/bill?type=pdf&email=true&mark=true&end='+date)
+
+        billingPage()
+      }
+
+      function billingPage(){
+        $('#patientPage').hide()
+        $('#historyPage').hide()
+        $('#billingPage').show()
+
+        $('.confirm-email').hide()
+
+        $('#billing-date').val('')
+        $('#billing-date').datepicker({
+              autoclose: true,
+          });
+
+      }
+
       function patientPage(){
         $('#patientPage').show()
         $('#historyPage').hide()
+        $('#billingPage').hide()
 
         load_patients()
       }
@@ -611,6 +696,9 @@
       function historyPage(){
         $('#patientPage').hide()
         $('#historyPage').show()
+        $('#billingPage').hide()
+
+        load_sessions();
       }
 
       // utility functions to handle different forms
@@ -731,7 +819,43 @@
 
       }
 
+      function load_sessions(){
+
+        if (!new_session_flag){
+          return
+        }
+        new_session_flag = false;
+
+        $.getJSON('/sessions?pid=',function(data){
+        
+          $('#calendar').fullCalendar({
+               height: 550,
+               header: {
+                  left: 'prev,next today',
+                  //left: '',
+                  center: 'title',
+                  //right: '',
+                  right: 'month,listMonth'
+                },
+
+              lazyFetching: true,
+              eventLimit: true, // allow "more" link when too many events
+     
+              defaultView: 'listMonth',
+              //listDayAltFormat: false,
+              events: processPatientData(data),
+              eventClick: calendarEventClick,
+            });
+          })        
+      }
+
       function load_patients(){
+
+        if (!new_patient_flag){
+          return
+        }
+        new_patient_flag = false
+
         row = function(item){return item.name};
 
         $.getJSON('/patient', function(data){
@@ -920,8 +1044,9 @@
 
         document.getElementById("new_session_form").submit();
 
+        console.log('submitted')
+
         $('#session_info').modal('hide');
-        load_patients();
       }
 
       function edit_session(){
@@ -1083,6 +1208,7 @@
           $('input[name=PLN_NXT]').val(nxt);
         })
         
+        // patient search
         $("#patientSearchInput").keyup(function(){
           value = $(this).val().toLowerCase();
           $("#patientTable tr").filter(function() {
@@ -1090,28 +1216,8 @@
           });          
         });
 
-        $.getJSON('/sessions?pid=',function(data){
-        
-          $('#calendar').fullCalendar({
-               height: 550,
-               header: {
-                  left: 'prev,next today',
-                  //left: '',
-                  center: 'title',
-                  //right: '',
-                  right: 'month,listMonth'
-                },
 
-              lazyFetching: true,
-              eventLimit: true, // allow "more" link when too many events
-     
-              defaultView: 'listMonth',
-              //listDayAltFormat: false,
-              events: processPatientData(data),
-              eventClick: calendarEventClick,
-            });
-          })
-        
+        // close navbar dropdown after choice
         $(document).on('click','.navbar-collapse.in',function(e) {
           if( $(e.target).is('a') ) {
               $(this).collapse('hide');
