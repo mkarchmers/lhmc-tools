@@ -7,18 +7,20 @@ import pytz
 
 from google.appengine.api import users
 from google.appengine.api import mail
-from google.appengine.ext import ndb
 
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_RIGHT, TA_LEFT
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import inch
 
 import models
 
-class Test(webapp2.RequestHandler):
+# needs to be stored in datastore.
+WESTSIDE_EMAIL = "Mauricio Karchmer <mkarchmers.hotmail.com>"
+PDF_PSWD = "1harvardstreet"
+
+class BillingHandler2(webapp2.RequestHandler):
 
     def getData(self, end_date, mark):
 
@@ -66,6 +68,15 @@ class Test(webapp2.RequestHandler):
 
         return {"titles": titles, "entries": entries, "range": (start, end)}
 
+    def getCSV(self, data):
+
+        csv = ','.join(data['titles'])
+
+        for e in data['entries']:
+            csv += '\n'+','.join(e)
+
+        return csv
+
     def getPdf(self, user, date, data):
 
         pdfFile = StringIO()
@@ -82,7 +93,7 @@ class Test(webapp2.RequestHandler):
                                 alignment=TA_LEFT,
                                 fontSize=11))
 
-        doc = SimpleDocTemplate(pdfFile,
+        doc = SimpleDocTemplate(pdfFile, encrypt=PDF_PSWD,
                                 pagesize=letter,
                                 rightMargin=72,leftMargin=72,
                                 topMargin=72,bottomMargin=18)
@@ -134,18 +145,22 @@ class Test(webapp2.RequestHandler):
 
         return pdfFile
 
+    def getEmailBody(self, data):
+
+        body = '\n\n'
+        body += 'Attached please find a list of sessions to be billed'
+        body += "\n\nThere are a total of " + str(len(data['entries'])) + " sessions in this bill\n\n"
+
+        return body
+
     def mail(self, to, date, body, bill):
 
         user = users.get_current_user()
 
-        body = '''
-            this is my first bill. See attached.
-        '''
-
         mail.send_mail(
             sender= user.email(),
-            to= "Mauricio Karchmer <mkarchmers@hotmail.com>",
-            subject= "my first bill",
+            to= to,
+            subject= "bill",
             body= body,
             attachments= [(date.strftime("bill_%m%d%Y.pdf"), bill)],
             )
@@ -158,15 +173,35 @@ class Test(webapp2.RequestHandler):
         if end_date is not None:
             end_date = datetime.datetime.strptime(end_date, '%m/%d/%Y').date()
 
-        mark = self.request.get('mark', False)
+        mark = self.request.get('mark', 'false') # mark as is-billed = true (final and irreversible)
+        mark = (mark == 'true')
+        file_type = self.request.get('type', 'pdf')
+        email = self.request.get('email', 'false') # only if type = pdf
+        email = (email == 'true')
 
         date = datetime.datetime.now(pytz.timezone('US/Eastern'))
 
         data = self.getData(end_date, mark)
-        pdfFile = self.getPdf(user, date, data)
 
-        #self.mail(date, None, pdfFile.getvalue())
+        if file_type == 'pdf':
+            pdfFile = self.getPdf(user, date, data)
 
-        self.response.headers['content-type'] = 'application/pdf'
-        self.response.headers['Content-Disposition'] = 'attachment; filename=bill_%s.pdf'%date.date()
-        self.response.out.write(pdfFile.getvalue())
+            self.response.headers['content-type'] = 'application/pdf'
+            self.response.headers['Content-Disposition'] = 'attachment; filename=bill_%s.pdf'%date.date()
+            self.response.out.write(pdfFile.getvalue())
+
+            if email: 
+                to = [WESTSIDE_EMAIL, user.email()]
+                body = self.getEmailBody(data)
+
+                self.mail(to, date, body, pdfFile.getvalue())
+
+        else: # csv
+            csv = self.getCSV(data)
+
+            self.response.headers['content-type'] = 'application/csv'
+            self.response.headers['Content-Disposition'] = 'attachment; filename=bill_%s.csv'%date.date()
+            self.response.out.write(csv)
+
+
+
