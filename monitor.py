@@ -19,7 +19,7 @@ Sample backend module deployed by backend.yaml and accessed in main.py
 import json
 import webapp2
 from google.appengine.api import modules
-from lmhc import models
+import models
 
 
 class MonitorHandler(webapp2.RequestHandler):
