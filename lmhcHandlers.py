@@ -146,7 +146,9 @@ class PatientHandler(webapp2.RequestHandler):
         s = list(query.fetch())
         obj = {'patient_list': s}
 
-        self.response.headers['Content-Type'] = 'application/json'
+        self.response.headers['Content-Type'] = 'application/json;charset=UTF-8'
+        self.response.headers['Access-Control-Allow-Methods'] = 'DELETE, HEAD, GET, OPTIONS, POST, PUT'
+        self.response.headers['Access-Control-Max-Age'] = '1728000'
         self.response.write(json.dumps(obj, cls=models.ModelEncoder))
 
 
@@ -166,7 +168,9 @@ class BillingHandler(webapp2.RequestHandler):
         res = [{'session_date': x.date, 'name': x.name, 'bill_code': x.mod_code,
                 'diag_code': x.diag_code, 'insurance': x.insurance} for x in query.fetch()]
 
-        self.response.headers['Content-Type'] = 'application/json'
+        self.response.headers['Content-Type'] = 'application/json;charset=UTF-8'
+        self.response.headers['Access-Control-Allow-Methods'] = 'DELETE, HEAD, GET, OPTIONS, POST, PUT'
+        self.response.headers['Access-Control-Max-Age'] = '1728000'
         self.response.write(json.dumps({'Bill': res}))
 
         if self.request.get('bill') == "Y":
@@ -241,7 +245,6 @@ class SessionsHandler(webapp2.RequestHandler):
         self.redirect('/')
 
     def get(self):
-        self.response.headers['Content-Type'] = 'application/json'
 
         user = users.get_current_user()
         uid = user.user_id()
@@ -257,6 +260,9 @@ class SessionsHandler(webapp2.RequestHandler):
 
         obj = list(query.fetch(limit=200))
 
+        self.response.headers['Content-Type'] = 'application/json;charset=UTF-8'
+        self.response.headers['Access-Control-Allow-Methods'] = 'DELETE, HEAD, GET, OPTIONS, POST, PUT'
+        self.response.headers['Access-Control-Max-Age'] = '1728000'
         self.response.write(json.dumps(obj, cls=models.ModelEncoder))
 
 
@@ -291,7 +297,9 @@ class ScheduleHandler(webapp2.RequestHandler):
 
         obj = list(query.fetch(limit=200))
 
-        self.response.headers['Content-Type'] = 'application/json'
+        self.response.headers['Content-Type'] = 'application/json;charset=UTF-8'
+        self.response.headers['Access-Control-Allow-Methods'] = 'DELETE, HEAD, GET, OPTIONS, POST, PUT'
+        self.response.headers['Access-Control-Max-Age'] = '1728000'
         self.response.write(json.dumps(obj, cls=models.ModelEncoder))
 
          
