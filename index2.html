@@ -860,6 +860,7 @@
           tbody.selectAll('a')
             .data(data.patient_list)
             .append('span')
+            .classed('invisible', function(d){return (d.status == "Inactive")})
             .classed('glyphicon',true)
             .classed('glyphicon-plus',true)
             .classed('badge-pill',true)
