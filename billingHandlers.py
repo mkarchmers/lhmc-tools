@@ -17,7 +17,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 import models
 
 # needs to be stored in datastore.
-WESTSIDE_EMAIL = "Mauricio Karchmer <mkarchmers.hotmail.com>"
+WESTSIDE_EMAIL = "Mauricio Karchmer <mkarchmers@hotmail.com>"
 PDF_PSWD = "1harvardstreet"
 
 class BillingHandler2(webapp2.RequestHandler):
@@ -157,13 +157,17 @@ class BillingHandler2(webapp2.RequestHandler):
 
         user = users.get_current_user()
 
-        mail.send_mail(
-            sender= user.email(),
-            to= to,
-            subject= "bill",
-            body= body,
-            attachments= [(date.strftime("bill_%m%d%Y.pdf"), bill)],
-            )
+        if isinstance(to, str):
+        	to = [to]
+
+       	for t in to:
+	        mail.send_mail(
+	            sender= user.email(),
+	            to= t,
+	            subject= "bill",
+	            body= body,
+	            attachments= [(date.strftime("bill_%m%d%Y.pdf"), bill)],
+	            )
 
     def get(self):
 

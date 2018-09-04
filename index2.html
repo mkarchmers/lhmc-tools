@@ -39,20 +39,6 @@
             <li><a onclick="billingPage();">Billing</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-            <!--
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Calendar <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a onclick="prev()">Prev</a></li>
-                <li><a onclick="next()">Next</a></li>
-                <li><a onclick="gotoday()"">Today</a></li>
-                <li role="separator" class="divider"></li>
-                <li class="dropdown-header">view</li>
-                <li><a onclick="viewMonth()">Month</a></li>
-                <li><a onclick="viewList()">List</a></li>
-              </ul>
-            </li>
-          -->
             <li class="active"><a href="{{ url|safe }}">{{ url_linktext }}</a></li>
             <li><a disabled>
               {% if user %}
