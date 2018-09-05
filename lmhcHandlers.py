@@ -147,6 +147,7 @@ class PatientHandler(webapp2.RequestHandler):
         obj = {'patient_list': s}
 
         self.response.headers['Content-Type'] = 'application/json;charset=UTF-8'
+        self.response.headers['Access-Control-Allow-Origin'] = '*'
         self.response.headers['Access-Control-Allow-Methods'] = 'DELETE, HEAD, GET, OPTIONS, POST, PUT'
         self.response.headers['Access-Control-Max-Age'] = '1728000'
         self.response.write(json.dumps(obj, cls=models.ModelEncoder))
@@ -169,6 +170,7 @@ class BillingHandler(webapp2.RequestHandler):
                 'diag_code': x.diag_code, 'insurance': x.insurance} for x in query.fetch()]
 
         self.response.headers['Content-Type'] = 'application/json;charset=UTF-8'
+        self.response.headers['Access-Control-Allow-Origin'] = '*'
         self.response.headers['Access-Control-Allow-Methods'] = 'DELETE, HEAD, GET, OPTIONS, POST, PUT'
         self.response.headers['Access-Control-Max-Age'] = '1728000'
         self.response.write(json.dumps({'Bill': res}))
@@ -261,6 +263,7 @@ class SessionsHandler(webapp2.RequestHandler):
         obj = list(query.fetch(limit=200))
 
         self.response.headers['Content-Type'] = 'application/json;charset=UTF-8'
+        self.response.headers['Access-Control-Allow-Origin'] = '*'
         self.response.headers['Access-Control-Allow-Methods'] = 'DELETE, HEAD, GET, OPTIONS, POST, PUT'
         self.response.headers['Access-Control-Max-Age'] = '1728000'
         self.response.write(json.dumps(obj, cls=models.ModelEncoder))
@@ -298,6 +301,7 @@ class ScheduleHandler(webapp2.RequestHandler):
         obj = list(query.fetch(limit=200))
 
         self.response.headers['Content-Type'] = 'application/json;charset=UTF-8'
+        self.response.headers['Access-Control-Allow-Origin'] = '*'
         self.response.headers['Access-Control-Allow-Methods'] = 'DELETE, HEAD, GET, OPTIONS, POST, PUT'
         self.response.headers['Access-Control-Max-Age'] = '1728000'
         self.response.write(json.dumps(obj, cls=models.ModelEncoder))
