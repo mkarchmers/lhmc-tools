@@ -113,11 +113,11 @@
     </div>
 
     <!-- session modal -->
-    <div class="modal fade bs-example-modal-lg" id="session_info" tabindex="-1" role="dialog" aria-labelledby="sessionInfoLabel">
+    <div class="modal fade bs-example-modal-lg" id="session_info" tabindex="-1" role="dialog" aria-labelledby="sessionInfoLabel" data-backdrop="static" data-keyboard="false">
       <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <button type="button" id="session-info-close" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             <h4 class="modal-title" id="sessionInfoLabel">Session</h4>
           </div>
           <div class="modal-body">   
@@ -1156,6 +1156,12 @@
         linkTextCheck("G_1_decr", "G_1_decr_txt")
         linkTextCheck("G_2_impr", "G_2_impr_txt")
         linkTextCheck("G_2_decr", "G_2_decr_txt")
+
+        $('#session-info-close').on('click', function(event){
+          if (!confirm('close without submitting?')){
+            event.stopPropagation()
+          }
+        })
 
         // no_show listeners
         $('input[name="no-show"]').change(function(){
