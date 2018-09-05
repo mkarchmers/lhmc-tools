@@ -644,9 +644,11 @@
         // refresh to display billed sessions
         new_session_flag = true;
 
-        window.open('/bill?type=pdf&email=true&mark=true&end='+date)
+        $.getJSON('/bill?type=pdf&email=true&mark=true&end='+date, function(data){
+          console.log(data)
+          billingPage()
+        })
 
-        billingPage()
       }
 
       function billingPage(){

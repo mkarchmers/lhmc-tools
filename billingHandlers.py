@@ -148,7 +148,7 @@ class BillingHandler2(webapp2.RequestHandler):
     def getEmailBody(self, data):
 
         body = '\n\n'
-        body += 'Attached please find a list of sessions to be billed'
+        body += 'Attached please find a list of sessions to be billed (same password)'
         body += "\n\nThere are a total of " + str(len(data['entries'])) + " sessions in this bill\n\n"
 
         return body
@@ -164,7 +164,7 @@ class BillingHandler2(webapp2.RequestHandler):
 	        mail.send_mail(
 	            sender= user.email(),
 	            to= t,
-	            subject= "bill",
+	            subject= "insurance billing",
 	            body= body,
 	            attachments= [(date.strftime("bill_%m%d%Y.pdf"), bill)],
 	            )
@@ -190,15 +190,20 @@ class BillingHandler2(webapp2.RequestHandler):
         if file_type == 'pdf':
             pdfFile = self.getPdf(user, date, data)
 
-            self.response.headers['content-type'] = 'application/pdf'
-            self.response.headers['Content-Disposition'] = 'attachment; filename=bill_%s.pdf'%date.date()
-            self.response.out.write(pdfFile.getvalue())
-
             if email: 
                 to = [WESTSIDE_EMAIL, user.email()]
                 body = self.getEmailBody(data)
 
                 self.mail(to, date, body, pdfFile.getvalue())
+
+                self.response.headers['Content-Type'] = 'application/json;charset=UTF-8'
+                self.response.out.write('{"status": "success"}')
+
+            else:
+                self.response.headers['content-type'] = 'application/pdf'
+                self.response.headers['Content-Disposition'] = 'attachment; filename=bill_%s.pdf'%date.date()
+                self.response.out.write(pdfFile.getvalue())
+
 
         else: # csv
             csv = self.getCSV(data)
