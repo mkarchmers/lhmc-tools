@@ -40,4 +40,4 @@ class MonitorHandler(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication([
     ('/', MonitorHandler),
-], debug=True)
+], debug=False)
