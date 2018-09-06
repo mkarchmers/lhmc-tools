@@ -712,6 +712,7 @@
           .classed('visible',true)
           .classed('invisible',null)
 
+        $('#notesList').modal('hide');
         $('#session_info').modal('show');
       }
 
@@ -1165,7 +1166,7 @@
 
         // confirms closing of SI modal
         $('#session-info-close').on('click', function(event){
-          if (!confirm('close without submitting?')){
+          if ($('#sessionSubmit').hasClass('visible') && !confirm('close without submitting?')){
             event.stopPropagation()
           }
         })
