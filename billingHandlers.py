@@ -17,7 +17,8 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 import models
 
 # needs to be stored in datastore.
-WESTSIDE_EMAIL = "Mauricio Karchmer <mkarchmers@hotmail.com>"
+#WESTSIDE_EMAIL = "Mauricio Karchmer <mkarchmers@hotmail.com>"
+WESTSIDE_EMAIL = "<jennifergilchrist@westsidebilling.com>"
 PDF_PSWD = "1harvardstreet"
 
 class BillingHandler2(webapp2.RequestHandler):
