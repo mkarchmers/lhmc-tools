@@ -110,7 +110,6 @@ a:hover,a:focus{
     line-height: 25px;
 }
 
-
 .SI-group{
     max-height: 300px;
     margin-bottom: 10px;
@@ -123,3 +122,9 @@ a:hover,a:focus{
 .SI-group .list-group-item input{
   font-weight: bold;
 }
+::placeholder {
+  color: red;
+  opacity: 0.4;
+}
+
+

@@ -1061,6 +1061,7 @@
 
         $.getJSON('/sessions?pid=' + patient.id, function (data) {
             $('#seshdate').datepicker('destroy');
+            $('#seshdate').attr('placeholder', '')
 
 
             //console.log(data);
@@ -1073,6 +1074,8 @@
             }
 
             latest_data = data[0];
+
+            $('#seshdate').attr('placeholder', 'last on '+latest_data.date)
 
             latest = moment(latest_data.date);
 
@@ -1157,6 +1160,7 @@
         linkTextCheck("G_2_impr", "G_2_impr_txt")
         linkTextCheck("G_2_decr", "G_2_decr_txt")
 
+        // confirms closing of SI modal
         $('#session-info-close').on('click', function(event){
           if (!confirm('close without submitting?')){
             event.stopPropagation()
