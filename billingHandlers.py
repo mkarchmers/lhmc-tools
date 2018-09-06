@@ -1,5 +1,5 @@
 #
-
+import json
 from cStringIO import StringIO
 import webapp2
 import datetime
@@ -192,13 +192,19 @@ class BillingHandler2(webapp2.RequestHandler):
             pdfFile = self.getPdf(user, date, data)
 
             if email: 
-                to = [WESTSIDE_EMAIL, user.email()]
-                body = self.getEmailBody(data)
 
-                self.mail(to, date, body, pdfFile.getvalue())
+                status = "success"
+                no_sessions = len(data['entries'])
+                if no_sessions <= 0:
+                    status = "empty"
+                else:
+                    to = [WESTSIDE_EMAIL, user.email()]
+                    body = self.getEmailBody(data)
+
+                    self.mail(to, date, body, pdfFile.getvalue())
 
                 self.response.headers['Content-Type'] = 'application/json;charset=UTF-8'
-                self.response.out.write('{"status": "success"}')
+                self.response.out.write(json.dumps({'status':status, 'no_sessions': no_sessions}))
 
             else:
                 self.response.headers['content-type'] = 'application/pdf'

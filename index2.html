@@ -113,6 +113,15 @@
           </div>
         </div>
       </div>
+
+      <div class="row ack-email">
+        <div class="col-sm-offset-1 col-sm-8">
+          <br>
+          <div id="ack-message" class="alert" role="alert">
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- session modal -->
@@ -649,7 +658,21 @@
 
         $.getJSON('/bill?type=pdf&email=true&mark=true&end='+date, function(data){
           console.log(data)
-          billingPage()
+          $('.confirm-email').hide()
+          $('.ack-email').show()
+          status = data.status
+          msg = ''
+          _class = ''
+          if (status == 'success'){
+            msg = 'Email was sent succesfully.  Bill contains ' + data.no_sessions + ' billable sessions.'
+            _class = "alert-success"
+          }
+          else {
+            msg = "No email was sent. No billable sessions found in the date range."
+            _class = "alert-warning"
+          }
+          $('#ack-message').text(msg).addClass(_class)
+
         })
 
       }
@@ -660,6 +683,7 @@
         $('#billingPage').show()
 
         $('.confirm-email').hide()
+        $('.ack-email').hide()
 
         $('#billing-date').val('')
         $('#billing-date').datepicker({
