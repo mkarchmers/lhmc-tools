@@ -106,8 +106,11 @@
         </div>
       </div>
       <div class="row confirm-email">
-        <div class="col-sm-9">
-          <button type="button" class="btn btn-danger btn-xs badge-pill" onclick="sendBillingEmail();">Confirm</button>
+        <div class="col-sm-offset-7 col-sm-9">
+          <div class="button-group" role="group">
+            <button type="button" class="btn btn-primary btn-xs" onclick="billingPage();">Cancel</button>
+            <button type="button" class="btn btn-danger btn-xs" onclick="sendBillingEmail();">Confirm</button>
+          </div>
         </div>
       </div>
     </div>
