@@ -188,8 +188,8 @@
                           <div class="input-group">
                             Date: <input id="seshdate" name="date" class="non-editable">
                             <div class="input-group-apend">
-                                <input type="checkbox" name="no-show" id="no-show">
-                                <span class="input-group-text">No show</span>
+                                <input type="checkbox" name="to-do" id="to-do">
+                                <span class="input-group-text">TODO</span>
                             </div>
                           </div>
                         </li>
@@ -980,8 +980,8 @@
           document.getElementById(s).value = data[s];
         });
 
-        if (data['notes'] == 'No show'){
-          write_checbox('no-show','on');
+        if (data['notes'] == 'TODO'){
+          write_checbox('to-do','on');
           //console.log("No show")
         }
 
@@ -1196,11 +1196,11 @@
         })
 
         // no_show listeners
-        $('input[name="no-show"]').change(function(){
+        $('input[name="to-do"]').change(function(){
           //console.log("no show")
           if (this.checked){
             //console.log('checked')
-            $("#notes").val("No show")
+            $("#notes").val("TODO")
           }
           else {
             //console.log('unchecked')

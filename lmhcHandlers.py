@@ -197,8 +197,8 @@ class SessionsHandler(webapp2.RequestHandler):
 
         del parms['session_id']
         del parms['seshNo']
-        if 'no-show' in parms:
-            del parms['no-show']
+        if 'to-do' in parms:
+            del parms['to-do']
 
         if parms['insurance'] != 'None':
             parms['mod_code'] = models.Insurance.get_code(parms['insurance'], parms['modality'])
