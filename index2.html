@@ -833,13 +833,26 @@
           return
         }
         new_session_flag = false;
+        todo_flag = false;
 
         $.getJSON('/sessions?pid=',function(data){
         
           $('#calendar').fullCalendar({
+
+               themeSystem: 'bootstrap3',
+               customButtons: {
+                todo: {
+                  //text: "to-do's",
+                  click: function(){
+                    todo_flag=!todo_flag;
+                    $('#calendar').fullCalendar('rerenderEvents');
+                  },
+                  bootstrapGlyphicon: 'glyphicon-pencil',
+                }
+               },
                height: 550,
                header: {
-                  left: 'prev,next today',
+                  left: 'prev,next today todo',
                   //left: '',
                   center: 'title',
                   //right: '',
@@ -854,6 +867,7 @@
               events: processPatientData(data),
               eventClick: calendarEventClick,
               eventRender: function(event, element, view) {
+                /*
                 if (event.data.notes == 'TODO'){
                   if (view.name == 'month'){
                     element.css({'color':'Coral'});
@@ -861,6 +875,9 @@
                   else {
                     element.css({'color':'FireBrick'});
                   }
+                }*/
+                if (todo_flag){
+                  return (event.data.notes == 'TODO');
                 }
               }
           })
