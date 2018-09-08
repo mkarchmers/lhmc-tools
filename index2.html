@@ -853,8 +853,18 @@
               //listDayAltFormat: false,
               events: processPatientData(data),
               eventClick: calendarEventClick,
-            });
-          })        
+              eventRender: function(event, element, view) {
+                if (event.data.notes == 'TODO'){
+                  if (view.name == 'month'){
+                    element.css({'color':'Coral'});
+                  }
+                  else {
+                    element.css({'color':'FireBrick'});
+                  }
+                }
+              }
+          })
+        })
       }
 
       function load_patients(){
@@ -913,12 +923,10 @@
 
       function write_checbox(name, write) {
         document.getElementsByName(name)[0].checked = (write == "on");
-        //$('[name='+name+']').prop('checked', (write == "on"))
       }
 
       function write_dropdown(name, write) {
         document.getElementById(name).value = write
-        //$('#'+name).val(write)
       }
 
       function populateSessionData(data){

@@ -127,4 +127,11 @@ a:hover,a:focus{
   opacity: 0.4;
 }
 
-
+/*
+.test:after {
+  padding: 10px 5px;
+  font-family: "Glyphicons Halflings";
+  color: red;
+  content:"\270f";
+}
+*/
