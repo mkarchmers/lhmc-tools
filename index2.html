@@ -891,7 +891,7 @@
         }
         new_patient_flag = false
 
-        row = function(item){return item.name};
+        row = (item) => item.name;
 
         $.getJSON('/patient', function(data){
 
@@ -916,7 +916,7 @@
           tbody.selectAll('a')
             .data(data.patient_list)
             .append('span')
-            .classed('invisible', function(d){return (d.status == "Inactive")})
+            .classed('invisible', (d) => (d.status == "Inactive"))
             .classed('glyphicon',true)
             .classed('glyphicon-plus',true)
             .classed('badge-pill',true)
