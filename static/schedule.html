@@ -113,7 +113,7 @@
     <script>
 
       function getClassNameForFreq(freq){
-        return (freq==7? "weekly" : "bi-weekly")
+        return (freq==7? "weekly" : "bi-weekly");
       }
 
       var schedule = {};
@@ -129,56 +129,57 @@
           end: end.format('HH:mm:ss'),
           freq: event.data.freq,
           pid: event.data.pid,
-        }
+        };
       }
 
       function loadSchedule(){
-        schedule = {}
+        schedule = {};
         $.getJSON('/schedule', function(data){
           data.forEach(function(item){
-            delete item['id']
-            schedule[item.name] = item
-          })
+            delete item['id'];
+            schedule[item.name] = item;
+          });
           loadPatients();
           displaySchedule();
-        })
+        });
       }
 
       function createSeries(event){
 
         // add series
         freq = event.data['freq'];
-        [-2,-1,1,2,3,4,5].forEach(function(i){
+        
+        es = [-2,-1,1,2,3,4,5].map((i) => {
           start = moment(event.start);
           end = moment(event.end);
-          start.add(i*freq,'day')
-          end.add(i*freq,'day')
-          d = {
+          start.add(i*freq,'day');
+          end.add(i*freq,'day');
+          return {
             title: event.title,
             start: start,
             className: getClassNameForFreq(freq),
             end: end,
             data: event.data,
-          }
-          $('#calendar').fullCalendar('renderEvent', d, true);
-        })
+          };
+        });
+        $('#calendar').fullCalendar('renderEvents', es, true);
       }
 
       function displaySchedule(){
 
-        cal = $('#calendar')
+        cal = $('#calendar');
 
         cal.fullCalendar('removeEvents', function(e){return true});
 
-        view = cal.fullCalendar('getView')
+        view = cal.fullCalendar('getView');
 
         for (k in schedule){
-          item = schedule[k]
+          item = schedule[k];
 
-          d = moment(item.moment).diff(view.start,'day')
-          if (d < 0){d = d-1} // not clear why this is needed
-          d = d%item.freq
-          start = moment(view.start).add(d,'day')
+          d = moment(item.moment).diff(view.start,'day');
+          if (d < 0){d = d-1}; // not clear why this is needed
+          d = d%item.freq;
+          start = moment(view.start).add(d,'day');
           event = {
             title: item.name,
             className: getClassNameForFreq(item.freq),
@@ -186,9 +187,9 @@
             end: moment(start.format()+"T"+item.end),
             data:{freq: item.freq, pid: item.pid},
             stick: true,
-          }
-          cal.fullCalendar('renderEvent',event,true)
-          createSeries(event)
+          };
+          cal.fullCalendar('renderEvent', event, true);
+          createSeries(event);
         }
       }
 
@@ -204,12 +205,12 @@
               className: "weekly",
               allDay: false,
               stick: true,
-            }
+            };
             weekly = $("<span class='badge-pill'></span")
               .addClass('weekly')
               .data('event', weekly_event)
               .text(7)
-              .draggable()
+              .draggable();
 
             data = $.extend({}, event.data);
             data['freq'] = 14;
@@ -219,29 +220,29 @@
               className: "bi-weekly",
               allDay: false,
               stick: true,
-            }
+            };
             bi_weekly = $("<span></span>")
               .addClass('badge-pill bi-weekly')
               .data('event', bi_weekly_event)
               .text(14)
-              .draggable()
+              .draggable();
 
             div = $('<div></div>')
               .addClass('fc-event')
               .text(event.title)
               .append(bi_weekly)
-              .append(weekly)
+              .append(weekly);
 
-            $('#external-events').append(div)
+            $('#external-events').append(div);
       }
 
       function loadPatients(){
 
         $.getJSON('/patient', function(data){
 
-        $('#external-events div').remove()
+        $('#external-events div').remove();
 
-          data = data.patient_list.filter(function(item){return !(item.name in schedule)})
+          data = data.patient_list.filter(function(item){return !(item.name in schedule)});
 
           data.forEach(function(item){
 
@@ -257,15 +258,15 @@
         // first clears old schedule, then stores current entries
         $.post('/schedule',{'clear':true}, function(r){
           if (r == 'cleared'){
-            for (var k in schedule){
-              s = schedule[k]
+            for (k in schedule){
+              s = schedule[k];
               $.post('/schedule',s,function(r){
-                console.log("success " + r)
+                console.log("success " + r);
               })
             }
           }
           else {
-            alert('save failed')
+            alert('save failed');
           }     
         })
       }
@@ -331,7 +332,7 @@
 
             $('#calendar').fullCalendar('removeEvents', sameTitle(event));
 
-            addPatientDiv(event)
+            addPatientDiv(event);
             delete schedule[event.title];
           },
           eventResize: function(event, dl){
@@ -345,7 +346,7 @@
                 $('#calendar').fullCalendar('updateEvent', e);
               })
 
-              addEvent(event)
+              addEvent(event);
           },
           eventDrop: function(event, dl){
 
@@ -359,7 +360,7 @@
                 $('#calendar').fullCalendar('updateEvent', e);
               })
 
-              addEvent(event)
+              addEvent(event);
           },
           drop: function(mom) {
 
@@ -368,9 +369,9 @@
             // add series
             freq = d.data['freq'];
             [-2,-1,1,2,3,4,5].forEach(function(i){
-              var m = moment(mom)
-              m.add(i*freq,'day')
-              d['start'] = m
+              m = moment(mom);
+              m.add(i*freq,'day');
+              d['start'] = m;
               end_time = moment(m);
               end_time.add(45,'minute');
               d['end'] = end_time;
@@ -389,9 +390,9 @@
             $('#calendar').fullCalendar('updateEvent', event);
             addEvent(event);
           }
-        });
+        })
 
-      });
+      })
 
     </script>
 
