@@ -1036,6 +1036,10 @@
           alert("date cannot be empty");
           return false;
         }
+        if ($('#seshdate').attr('placeholder').endsWith(f) && $('#modality').val() == 'Individual'){
+          alert("Individual session cannot be dated on same day as latest session");
+          return false;
+        }
         f = $('#notes').val();
         if ((f == "") || (f == "Client reported:") ){
           alert("notes must be entered");
@@ -1136,7 +1140,7 @@
             $('#seshdate').datepicker({
                 autoclose: true,
                 todayBtn: "linked",
-                startDate: latest.add(1,'day').toDate(),
+                startDate: latest.toDate(),
             });
 
             populateSessionData(latest_data);
