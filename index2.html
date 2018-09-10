@@ -1237,8 +1237,7 @@
           }
         })
 
-        // PLN_FREQ
-        $('input[name=date]').change(function(){
+        function adjust_pln_nxt(){
           freq = $('select[name=PLN_FREQ').val();
           weeks = 1;
           if (freq == "Bi-weekly") {
@@ -1248,8 +1247,11 @@
             weeks = 4
           }
           nxt = moment($('input[name=date]').val()).add(weeks,'week').format('MM/DD/YYYY');
-          $('input[name=PLN_NXT]').val(nxt);
-        })
+          $('input[name=PLN_NXT]').val(nxt);          
+        }
+        // PLN_FREQ
+        $('input[name=date]').change(adjust_pln_nxt);
+        $('select[name=PLN_FREQ]').change(adjust_pln_nxt);
         
         // patient search
         $("#patientSearchInput").keyup(function(){
