@@ -240,10 +240,10 @@ function createFormSection(id, data){
 	  .append('input')
 	  .attr('type','checkbox')
 	  .attr('disabled',true)
-	  .attr('name',function(d){return d[0]});
+	  .attr('name', (d) => d[0]);
 	d3.select(id)
 	  .selectAll('li')
 	  .data(Object.entries(data))
 	  .append('span')
-	  .text(function(d){return " " + d[1]});
+	  .text((d) => (" " + d[1]));
 }
