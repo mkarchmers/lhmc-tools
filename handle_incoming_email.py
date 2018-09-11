@@ -2,6 +2,7 @@
 import webapp2
 import hashlib as hs
 import datetime
+import re
 
 from google.appengine.api import app_identity
 from google.appengine.api import mail
@@ -15,11 +16,12 @@ class InboundEmailHandler(InboundMailHandler):
 
     def get_hash(self, email):
 
-        candidate_hash = hs.md5(email.lower()).hexdigest()
+        email = re.sub(r'.*<','',email)
+        email = re.sub(r'>','',email)
+        candidate_hash = hs.md5(email).hexdigest()
         key = ndb.Key(models.EmailHash, candidate_hash)
 
         return key.get()
-
 
     def find_patient(self, uid, patient_name):
 
@@ -64,6 +66,10 @@ class InboundEmailHandler(InboundMailHandler):
         if date_object is None:
             body = "Subject must specify a valid date (%s).\n"%date
             return (None, body)
+        if date_object > datetime.date.today():
+            body = "Cannot add session for a day in the future (%s)."%date
+            return (None,body)
+
 
         hash = self.get_hash(sender)
         if hash is None:
@@ -73,6 +79,9 @@ class InboundEmailHandler(InboundMailHandler):
         patient = self.find_patient(hash.uid, patient_name)
         if patient is None:
             body = "patient %s not found.\n"%patient_name        
+            return (None, body)
+        if patient.status != 'Active':
+            body = "cannot add session for inactive patient.\n"
             return (None, body)
 
         pid = patient.key.urlsafe()
@@ -132,7 +141,8 @@ class InboundEmailHandler(InboundMailHandler):
             plaintext = body.decode()
 
         (session, body) = self.prepare(user_mail, subject, plaintext)
-        session.put()
+        if session is not None:
+            session.put()
 
         sender = 'support@{}.appspotmail.com'.format(app_identity.get_application_id())
 
