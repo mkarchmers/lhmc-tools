@@ -18,14 +18,19 @@ handlers:
   script: lmhcMain.app
   login: admin
 
+- url: /_ah/bounce
+  script: bounceMail.app
+  login: admin
+
+- url: /_ah/mail/.+
+  script: handle_incoming_email.app
+  login: admin
+
 - url: /.*
   script: lmhcMain.app
   login: required
   secure: always
 
-- url: /_ah/bounce
-  script: bounceMail.app
-  login: admin
 # [END handlers]
 
 # [START libraries]
@@ -39,4 +44,5 @@ libraries:
 # [END libraries]
 
 inbound_services:
+- mail
 - mail_bounce
