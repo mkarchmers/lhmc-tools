@@ -1036,7 +1036,8 @@
           alert("date cannot be empty");
           return false;
         }
-        if ($('#seshdate').attr('placeholder').endsWith(f) && $('#modality').val() == 'Individual'){
+        place = $('#seshdate').attr('placeholder')
+        if (place && place.endsWith(f) && $('#modality').val() == 'Individual'){
           alert("Individual session cannot be dated on same day as latest session");
           return false;
         }
