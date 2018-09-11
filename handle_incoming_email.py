@@ -144,7 +144,7 @@ class InboundEmailHandler(InboundMailHandler):
         if session is not None:
             session.put()
 
-        sender = 'support@{}.appspotmail.com'.format(app_identity.get_application_id())
+        sender = 'do-not-reply@{}.appspotmail.com'.format(app_identity.get_application_id())
 
         mail.send_mail(
                 sender= sender,
