@@ -59,13 +59,6 @@ class FormGenerator:
 		pdfFile = StringIO()
 
 		styles=getSampleStyleSheet() 
-		styles.add(ParagraphStyle(name='Header', 
-		                        alignment=TA_LEFT,
-		                        fontSize=13,
-		                        textColor=colors.red))
-		styles.add(ParagraphStyle(name='Right', 
-		                        alignment=TA_RIGHT,
-		                        fontSize=11))
 		styles.add(ParagraphStyle(name='Left', 
 		                        alignment=TA_LEFT,
 		                        fontSize=10))
