@@ -52,7 +52,7 @@ class FormGenerator:
 	def __init__(self, session):
 		self.session = session
 
-	def getPDF(self):
+	def getPDF(self, provider):
 
 		s = self.session
 
@@ -172,7 +172,7 @@ class FormGenerator:
 
 		Story.append(Spacer(1, 3))
 		row = [[Paragraph(s.notes, styles['LeftSm'])]]
-		Story.append(Table(row, style=[MID]))
+		Story.append(Table(row, style=[BOX,MID]))
 		#Story.append(Spacer(1, 5))
 
 		p = Paragraph("<b>Assessment: </b>", styles['Left'])
@@ -181,11 +181,10 @@ class FormGenerator:
 			styles['LeftXs'])])
 		row.append([Paragraph("Client <i>%s</i> show insightfulness, <i>%s</i> show effort in addressing problem areas."%(s.ASS_INSIG.lower(), s.ASS_EFFRT.lower()),
 			styles['LeftXs'])])
-		row.append([Paragraph("Client <i>%s</i> oriented times 3."%s.ASS_OR.lower(), 
-			styles['LeftXs'])])
+		p = "Client <i>%s</i> oriented times 3."%s.ASS_OR.lower()
 		if s.ASS_present_txt != "":
-			row.append([Paragraph("Client present with: <i>%s</i>"%s.ASS_present_txt, 
-				styles['LeftXs'])])
+			p += " Client present with: <i>%s</i>"%s.ASS_present_txt
+		row.append([Paragraph(p, styles['LeftXs'])])
 		row.append([Paragraph("Client <i>%s</i> able to talk about stress factors and how to better manage them."%s.ASS_ABLE.lower(), 
 			styles['LeftXs'])])
 		row.append([Paragraph("Client <i>%s</i> cooperative with therapist's efforts to assist him/her with problem areas."%s.ASS_COOP.lower(), 
@@ -204,7 +203,10 @@ class FormGenerator:
 		%s Continue psychiatric medications as directed by doctor.
 		""" % (s.PLN_CONT.lower(), s.PLN_FREQ.lower(), qCheck(s.PLN_PSY))
 		row.append([Paragraph(plan, styles['LeftXs'])])
-		row.append([Paragraph("Next Session date: %s"%s.PLN_NXT, styles['LeftXs'])])
+		Story.append(Table(row, style=[MID]))
+		row = []
+		row.append([Paragraph("<b>Next Session date:</b> %s"%s.PLN_NXT, styles['LeftXs']),
+					Paragraph("<b>Provider:</b> %s"%provider, styles['LeftXs'])])
 
 
 		Story.append(Table(row, style=[MID]))

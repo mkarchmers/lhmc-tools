@@ -320,7 +320,7 @@ class PrintHandler(webapp2.RequestHandler):
         key = ndb.Key(urlsafe=sid)
         session = key.get()
 
-        pdfFile = fc.FormGenerator(session).getPDF()
+        pdfFile = fc.FormGenerator(session).getPDF(user.nickname())
 
         self.response.headers['content-type'] = 'application/pdf'
         self.response.headers['Content-Disposition'] = 'attachment; filename=form.pdf'
