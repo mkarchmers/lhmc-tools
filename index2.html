@@ -1211,6 +1211,13 @@
 
       $( document ).ready(function() {
 
+        console.log('document ready')
+      })
+
+      $(window).on('load', function() {
+
+        console.log('window loaded')
+
         createFormSectionArr('#TI-array', TICheckArr);
         addOtherToList(d3.select('#TI-array'),"TI_other_txt")
 
