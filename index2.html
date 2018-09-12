@@ -606,7 +606,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/fullcalendar.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.1.1/d3.min.js"></script>
 
-    <script src="js/form.js"></script>
+    <!--<script src="js/form.js"></script>-->
 
     <script>
 
@@ -894,6 +894,7 @@
 
         $.getJSON('/patient', function(data){
 
+          console.log('patient info loaded')
           table = d3.select('#patientTable');
           tbody = table.select('tbody');
           selection = tbody.selectAll('a')
@@ -1212,27 +1213,6 @@
       $( document ).ready(function() {
 
         console.log('document ready')
-      })
-
-      $(window).on('load', function() {
-
-        console.log('window loaded')
-
-        createFormSectionArr('#TI-array', TICheckArr);
-        addOtherToList(d3.select('#TI-array'),"TI_other_txt")
-
-        createFormSectionArr('#Goals-array', GoalsCheckArr);
-        addOtherToList(d3.select('#Goals-array'),"G_other_txt")
-        createFormSectionArr('#SPA-array', SPACheckArr);
-        addOtherToList(d3.select('#SPA-array'),"SPA_other_txt")
-        addOtherToList(d3.select('#collapseASS').select('ul'),"ASS_other_txt")
-        addOtherToList(d3.select('#collapsePLN').select('ul'),"PLN_other_txt")
-
-        associateCheckText("no_new_issue", "new_issue")
-        linkTextCheck("G_1_impr", "G_1_impr_txt")
-        linkTextCheck("G_1_decr", "G_1_decr_txt")
-        linkTextCheck("G_2_impr", "G_2_impr_txt")
-        linkTextCheck("G_2_decr", "G_2_decr_txt")
 
         // confirms closing of SI modal
         $('#session-info-close').on('click', function(event){
@@ -1254,22 +1234,6 @@
           }
         })
 
-        function adjust_pln_nxt(){
-          freq = $('select[name=PLN_FREQ').val();
-          weeks = 1;
-          if (freq == "Bi-weekly") {
-            weeks = 2
-          }
-          if (freq == "Monthly") {
-            weeks = 4
-          }
-          nxt = moment($('input[name=date]').val()).add(weeks,'week').format('MM/DD/YYYY');
-          $('input[name=PLN_NXT]').val(nxt);          
-        }
-        // PLN_FREQ
-        $('input[name=date]').change(adjust_pln_nxt);
-        $('select[name=PLN_FREQ]').change(adjust_pln_nxt);
-        
         // patient search
         $("#patientSearchInput").keyup(function(){
           value = $(this).val().toLowerCase();
@@ -1277,7 +1241,6 @@
             $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
           });          
         });
-
 
         // close navbar dropdown after choice
         $(document).on('click','.navbar-collapse.in',function(e) {
@@ -1287,8 +1250,66 @@
         });
 
         patientPage();
+      })
 
-      });
+      /*
+      load form.json, once it is loaded, load form.js. Then finish SI form
+      */
+      $.ajax({ 
+        url: 'static/form.json', 
+        dataType: 'json',
+        success: function (data) { 
+
+            console.log('form.json loaded')
+            TICheckArr = data['TICheckArr']
+            GoalsCheckArr = data['GoalsCheckArr']
+            SPACheckArr = data['SPACheckArr']
+
+            $.getScript('js/form.js', function(data){
+
+              console.log('form.js loaded')
+
+              createFormSectionArr('#TI-array', TICheckArr);
+              addOtherToList(d3.select('#TI-array'),"TI_other_txt")
+
+              createFormSectionArr('#Goals-array', GoalsCheckArr);
+              addOtherToList(d3.select('#Goals-array'),"G_other_txt")
+              createFormSectionArr('#SPA-array', SPACheckArr);
+              addOtherToList(d3.select('#SPA-array'),"SPA_other_txt")
+              addOtherToList(d3.select('#collapseASS').select('ul'),"ASS_other_txt")
+              addOtherToList(d3.select('#collapsePLN').select('ul'),"PLN_other_txt")
+
+              associateCheckText("no_new_issue", "new_issue")
+              linkTextCheck("G_1_impr", "G_1_impr_txt")
+              linkTextCheck("G_1_decr", "G_1_decr_txt")
+              linkTextCheck("G_2_impr", "G_2_impr_txt")
+              linkTextCheck("G_2_decr", "G_2_decr_txt")
+
+
+              function adjust_pln_nxt(){
+                freq = $('select[name=PLN_FREQ').val();
+                weeks = 1;
+                if (freq == "Bi-weekly") {
+                  weeks = 2
+                }
+                if (freq == "Monthly") {
+                  weeks = 4
+                }
+                nxt = moment($('input[name=date]').val()).add(weeks,'week').format('MM/DD/YYYY');
+                $('input[name=PLN_NXT]').val(nxt);          
+              }
+              // PLN_FREQ
+              $('input[name=date]').change(adjust_pln_nxt);
+              $('select[name=PLN_FREQ]').change(adjust_pln_nxt);
+            });
+
+        },
+
+        error: function(err, status, a){
+          console.log(status)
+        }
+      });      
+
     </script>
 
   </body>

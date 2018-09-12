@@ -36,24 +36,6 @@ var RACheckArray = [
 	"RA_prop_att",
 ]; // 10
 
-var TICheckArr = []
-var GoalsCheckArr = []
-
-$.ajax({ 
-  url: 'static/form.json', 
-  dataType: 'json',
-  success: function (data) { 
-      //TICheckDict = data['TICheckDict']
-      //SPACheckDict = data['SPACheckDict']
-      TICheckArr = data['TICheckArr']
-      GoalsCheckArr = data['GoalsCheckArr']
-      SPACheckArr = data['SPACheckArr']
-  },
-  error: function(err, status, a){
-    console.log(status)
-  }
-});      
-
 /*
 var XTICheckDict = {
 
