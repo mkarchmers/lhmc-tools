@@ -36,8 +36,26 @@ var RACheckArray = [
 	"RA_prop_att",
 ]; // 10
 
+var TICheckArr = []
+var GoalsCheckArr = []
 
-var TICheckDict = {
+$.ajax({ 
+  url: 'static/form.json', 
+  dataType: 'json',
+  success: function (data) { 
+      //TICheckDict = data['TICheckDict']
+      //SPACheckDict = data['SPACheckDict']
+      TICheckArr = data['TICheckArr']
+      GoalsCheckArr = data['GoalsCheckArr']
+      SPACheckArr = data['SPACheckArr']
+  },
+  error: function(err, status, a){
+    console.log(status)
+  }
+});      
+
+/*
+var XTICheckDict = {
 
 	TI_refl_listen: "Reflective Listening",
 	TI_encour: "Encouragement",
@@ -53,7 +71,7 @@ var TICheckDict = {
 	TI_CSB: "Communication Skill Building",
 	TI_PSB: "Parenting Skill Building",
 	TI_emot_supp: "Emotional Supportiveness",
-}; // 14
+};*/ // 14
 
 
 var TITextArray = [
@@ -80,7 +98,8 @@ var GTextArray = [
 	"G_other_txt",
 ]; // 5
 
-var SPACheckDict = {
+/*
+var XSPACheckDict = {
 
 	SPA_AX: "Anxiousness",
 	SPA_EW: "Excessive worry",
@@ -153,7 +172,7 @@ var SPACheckDict = {
 	SPA_FINDIF: "Financial Difficulties",
 	SPA_MEDDIF: "Medical problems",
 	SPA_MEDNC: "Medication non-compliance",
-} // 59
+} */ // 59
 
 var SPATextArray = [
 	"SPA_other_txt",
@@ -230,6 +249,7 @@ function addOtherToList(selection, name){
 		.classed('form-control',true)
 }
 
+/*
 function createFormSection(id, data){
 	d3.select(id).select('ul')
 	  .selectAll('li')
@@ -244,6 +264,24 @@ function createFormSection(id, data){
 	d3.select(id)
 	  .selectAll('li')
 	  .data(Object.entries(data))
+	  .append('span')
+	  .text((d) => (" " + d[1]));
+}*/
+
+function createFormSectionArr(id, data){
+	d3.select(id)//.select('ul')
+	  .selectAll('li')
+	  .data(data)
+	  .enter()
+	  .append('li')
+	  .classed('list-group-item',true)
+	  .append('input')
+	  .attr('type','checkbox')
+	  .attr('disabled',true)
+	  .attr('name', (d) => d[0]);
+	d3.select(id)
+	  .selectAll('li')
+	  .data(data)
 	  .append('span')
 	  .text((d) => (" " + d[1]));
 }
