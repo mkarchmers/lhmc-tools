@@ -13,6 +13,7 @@ app = webapp2.WSGIApplication([
     ('/schedule', hh.ScheduleHandler),
     ('/insurance_init', hh.Insurance_init),
     ('/permissions_init', hh.Permissions_init),
-    ('/bill', bh.BillingHandler2)
+    ('/bill', bh.BillingHandler2),
+    ('/print', hh.PrintHandler)
 
 ], debug=False)

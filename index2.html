@@ -130,6 +130,8 @@
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" id="session-info-close" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <span class="glyphicon glyphicon-print badge-pill" id="session-print" onclick="printSession();"></span>
+
             <h4 class="modal-title" id="sessionInfoLabel">Session</h4>
           </div>
           <div class="modal-body">   
@@ -281,7 +283,7 @@
                   </div>
                   <div id="collapseTI" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTI">
                     <div class="panel-body">
-                      <ul class="SI-group list-group">
+                      <ul class="SI-group list-group" id="TI-array">
                       </ul>
                     </div>
                   </div>
@@ -345,22 +347,9 @@
                             </tbody>
                           </table>
                         </li>
+                      </ul>
                         
-                        <li class="list-group-item">
-                          <input type="checkbox" name="G_cop_skills" id="G_cop_skills"> Develop coping skills
-                        </li>
-                        <li class="list-group-item">
-                          <input type="checkbox" name="G_sc_skills" id="G_sc_skills"> Develop self-care skills
-                        </li>
-                        <li class="list-group-item">
-                          <input type="checkbox" name="G_id_res" id="G_id_res"> identify resistance & roadblocks
-                        </li>
-                        <li class="list-group-item">
-                          <input type="checkbox" name="G_expr" id="G_expr"> Increase capacity to verbalize thoughts and feelings and express self
-                        </li>
-                        <li class="list-group-item">
-                          <input type="checkbox" name="G_verb" id="G_verb"> Verbalize thoguhts and feelings in place of acting
-                        </li>
+                      <ul class="SI-group list-group" id="Goals-array">  
                       </ul>
                     </div>
                   </div>
@@ -377,7 +366,7 @@
                   </div>
                   <div id="collapseSPA" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSPA">
                     <div class="panel-body">
-                      <ul class="SI-group list-group">
+                      <ul class="SI-group list-group" id="SPA-array">
                       </ul>
                     </div>
                   </div>
@@ -439,7 +428,7 @@
                             <option value="Was">Was</option>
                             <option value="WasNot">Was not</option>
                           </select>
-                          oriented.
+                          oriented times 3.
                         </li>
 
                         <li class="list-group-item">
@@ -616,7 +605,11 @@
     <script>
 
       var new_patient_flag = true;
-      var new_session_flag = true;      
+      var new_session_flag = true;     
+
+      function printSession(){
+        window.open('/print?sid='+$('#session_id').val())
+      } 
 
       function validateBillingDate(date){
         if (date == ''){
@@ -959,8 +952,12 @@
         })
 
         // interventions
+        /*
         Object.keys(TICheckDict).forEach(function(k){
           write_checbox(k, data[k]);
+        })*/
+        TICheckArr.forEach(function(k){
+          write_checbox(k[0], data[k[0]]);
         })
         TITextArray.forEach(function(k){
           document.getElementById(k).value = data[k];
@@ -976,8 +973,12 @@
         })
 
         // SPA
+        /*
         Object.keys(SPACheckDict).forEach(function(k){
           write_checbox(k, data[k]);
+        })*/
+        SPACheckArr.forEach(function(k){
+          write_checbox(k[0], data[k[0]]);
         })
         SPATextArray.forEach(function(k){
           document.getElementById(k).value = data[k];
@@ -1204,11 +1205,13 @@
 
       $( document ).ready(function() {
 
-        createFormSection('#collapseTI', TICheckDict);
-        addOtherToList(d3.select('#collapseTI').select('ul'),"TI_other_txt")
-        addOtherToList(d3.select('#collapseGO').select('ul'),"G_other_txt")
-        createFormSection('#collapseSPA', SPACheckDict);
-        addOtherToList(d3.select('#collapseSPA').select('ul'),"SPA_other_txt")
+        createFormSectionArr('#TI-array', TICheckArr);
+        addOtherToList(d3.select('#TI-array'),"TI_other_txt")
+
+        createFormSectionArr('#Goals-array', GoalsCheckArr);
+        addOtherToList(d3.select('#Goals-array'),"G_other_txt")
+        createFormSectionArr('#SPA-array', SPACheckArr);
+        addOtherToList(d3.select('#SPA-array'),"SPA_other_txt")
         addOtherToList(d3.select('#collapseASS').select('ul'),"ASS_other_txt")
         addOtherToList(d3.select('#collapsePLN').select('ul'),"PLN_other_txt")
 
@@ -1271,6 +1274,7 @@
         });
 
         patientPage();
+
       });
     </script>
 

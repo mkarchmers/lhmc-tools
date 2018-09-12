@@ -307,3 +307,21 @@ class ScheduleHandler(webapp2.RequestHandler):
         self.response.write(json.dumps(obj, cls=models.ModelEncoder))
 
          
+class PrintHandler(webapp2.RequestHandler):
+
+    def get(self):
+
+        import formCreator as fc
+
+        user = users.get_current_user()
+        uid = user.user_id()
+
+        sid = self.request.get('sid')
+        key = ndb.Key(urlsafe=sid)
+        session = key.get()
+
+        pdfFile = fc.FormGenerator(session).getPDF()
+
+        self.response.headers['content-type'] = 'application/pdf'
+        self.response.headers['Content-Disposition'] = 'attachment; filename=form.pdf'
+        self.response.out.write(pdfFile.getvalue()) 
