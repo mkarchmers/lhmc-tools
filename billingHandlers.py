@@ -4,6 +4,7 @@ from cStringIO import StringIO
 import webapp2
 import datetime
 import pytz
+from collections import defaultdict
 
 from google.appengine.api import users
 from google.appengine.api import mail
@@ -13,6 +14,7 @@ from reportlab.lib.enums import TA_RIGHT, TA_LEFT
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
 
 import models
 
@@ -66,8 +68,14 @@ class BillingHandler2(webapp2.RequestHandler):
                     if s.date_object > end:
                         end = s.date_object
 
+        # summary: No. of sessions per code
+        summary = defaultdict(int)
+        for e in entries:
+            summary[e[2]] += 1
 
-        return {"titles": titles, "entries": entries, "range": (start, end)}
+        return {"titles": titles, "entries": entries, 
+                "range": (start, end),
+                "summary": summary}
 
     def getCSV(self, data):
 
@@ -118,9 +126,19 @@ class BillingHandler2(webapp2.RequestHandler):
 
         P0 = Paragraph('<b>Name:</b>', styles["Normal"])  
 
+        Story.append(Paragraph('<b>Summary:</b>', styles['Left']))
+        matrix = [['Code','Number']]
+        for k,v in data['summary'].items():
+            matrix.append([k,v])
+        matrix.append([Paragraph('<b>Total</b>', styles['Left']), Paragraph('<b>%i</b>'%len(data['entries']),styles['Left'])])
+        Story.append(Table(matrix, colWidths=[1*inch,1*inch], hAlign='LEFT'))
+        Story.append(Spacer(1, 10))
+
+        Story.append(Paragraph('<b>Details:</b>', styles['Left']))
+        Story.append(Spacer(1, 5))
         matrix = [ [Paragraph('<b>%s</b>'%t, styles["Normal"]) for t in data['titles']] ]
         matrix.extend(data['entries'])
-         
+
         tStyle = TableStyle([
             ('GRID',(0,0),(-1,-1),0.5,colors.black),
             ('BACKGROUND',(0,0),(-1,0),colors.beige), #titles
@@ -140,7 +158,10 @@ class BillingHandler2(webapp2.RequestHandler):
         except:
             pass
 
-        Story.append(Table(matrix, style=tStyle))
+        Story.append(Table(matrix, style=tStyle, repeatRows=1))
+        Story.append(Spacer(1, 38))
+
+
 
         doc.build(Story)
 
@@ -150,7 +171,12 @@ class BillingHandler2(webapp2.RequestHandler):
 
         body = '\n\n'
         body += 'Attached please find a list of sessions to be billed (same password)'
-        body += "\n\nThere are a total of " + str(len(data['entries'])) + " sessions in this bill\n\n"
+        body += '\n\nSummary:'
+        body += "\n\nThere are a total of " + str(len(data['entries'])) + " sessions in this bill\n"
+        body += "Number of sessions by code:\n\n"
+        summary = data['summary']
+        for k,v in summary.items():
+            body += "   %s\t%i\n"%(k,v)
 
         return body
 
