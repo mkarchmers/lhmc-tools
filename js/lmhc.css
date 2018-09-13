@@ -25,11 +25,7 @@ body {
   margin: 40px 10px;
 }
 
-#patientPage {
-  margin: 40px 10px;
-}
-
-#billingPage {
+#patientPage, #billingPage, #todoPage {
   margin: 40px 10px;
 }
 
