@@ -35,19 +35,6 @@ class InboundEmailHandler(InboundMailHandler):
 
         return None
 
-    def find_latest_session(self, uid, patient_id):
-
-        query = models.Session.query(ancestor=models.UserKey.get(uid))
-        query = query.order(-models.Session.date_object)
-        query = query.filter(models.Session.patient_id == patient_id)
-
-        res = list(query.fetch(limit=1))
-
-        if len(res) > 0:
-            return res[0]
-
-        return None
-
     def prepare(self, sender, subject, plaintext):
 
         parms = subject.split("ON")
