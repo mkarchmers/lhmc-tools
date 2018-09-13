@@ -10,6 +10,7 @@ from google.appengine.ext.webapp.mail_handlers import InboundMailHandler
 from google.appengine.ext import ndb
 
 import models
+import sessions
 
 
 class InboundEmailHandler(InboundMailHandler):
@@ -86,7 +87,7 @@ class InboundEmailHandler(InboundMailHandler):
 
         pid = patient.key.urlsafe()
 
-        latest = self.find_latest_session(hash.uid, pid)
+        latest = sessions.find_latest(hash.uid, pid)
 
         if latest is None:
             body = "This would be the first session for patient %s.\n"%patient_name
@@ -98,25 +99,10 @@ class InboundEmailHandler(InboundMailHandler):
             body += "New session date (%s) is on or prior to latest session on %s.\n"%(date_object, latest.date_object)
             return (None, body)
 
-        new_session = models.Session(parent=models.UserKey.get(hash.uid), **latest.to_dict())
+        new_session = sessions.new_session(hash.uid, patient, latest, date)
 
-        new_session.date = date
-        new_session.date_object = date_object
-
-        new_session.timestamp = datetime.datetime.now()
-
-        new_session.is_billed = False
-        new_session.billing_time = None
-
-        ndb.transaction(patient.increment)
-        new_session.session_number = patient.session_number
-
-        new_session.notes = "Client reported: " + plaintext if plaintext != "to-do" else "TODO"
-
-        freq = latest.PLN_FREQ
-        freq_map = {'Weekly': 7, 'Bi-weekly': 14, 'Monthly': 28}
-        next_date = new_session.date_object + datetime.timedelta(days=freq_map[freq])
-        new_session.PLN_NXT = next_date.strftime('%m/%d/%Y')
+        if plaintext != "to-do":
+            new_session.notes = "Client reported: " + plaintext
 
         body = "New session for %s on %s\n"%(patient_name, date)
         body += "Details:\n"
@@ -143,6 +129,8 @@ class InboundEmailHandler(InboundMailHandler):
         (session, body) = self.prepare(user_mail, subject, plaintext)
         if session is not None:
             session.put()
+
+        print body
 
         sender = 'do-not-reply@{}.appspotmail.com'.format(app_identity.get_application_id())
 
