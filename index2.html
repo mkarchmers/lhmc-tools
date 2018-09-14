@@ -778,7 +778,8 @@
         $('#todo-date').val('');
         $('#todo-date').datepicker({
               autoclose: true,
-              todayHighlight: true, 
+              todayHighlight: true,
+              endDate: new Date(),
           });
         $('#todo-date').change(function(){
           get_patients_for_todo($(this).val())
