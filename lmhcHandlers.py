@@ -10,6 +10,7 @@ from google.appengine.api import users
 from google.appengine.ext import ndb
 
 import models
+import sessions
 
 
 JINJA_ENVIRONMENT = jinja2.Environment(
@@ -324,4 +325,60 @@ class PrintHandler(webapp2.RequestHandler):
 
         self.response.headers['content-type'] = 'application/pdf'
         self.response.headers['Content-Disposition'] = 'attachment; filename=form.pdf'
-        self.response.out.write(pdfFile.getvalue()) 
+        self.response.out.write(pdfFile.getvalue())
+
+class NewHandler(webapp2.RequestHandler):
+
+    def post(self):
+
+        user = users.get_current_user()
+        uid = user.user_id()
+
+        parms = {}
+        for (k,v) in self.request.POST.items():
+            parms[k] = v
+
+        date = parms.get('date',None)
+        pid = parms.get('pid',None)
+
+        if date is None or pid is None:
+            self.response.write(json.dumps({
+                'status':'error',
+                'message':'missing arguments'}))
+            return
+
+        latest = sessions.find_latest(uid, pid)
+        if latest is None:
+            self.response.write(json.dumps({
+                'status':'error',
+                'message':'Cannot use for first session'}))
+            return
+
+        date_object = datetime.datetime.strptime(date, '%m/%d/%Y').date()
+        latest_date_object = datetime.datetime.strptime(latest.date, '%m/%d/%Y').date()
+
+        if date_object <= latest_date_object:
+            self.response.write(json.dumps({
+                'status':'error',
+                'message':'Latest session is dated %s which is after given date'%latest.date}))
+            return
+
+        key = ndb.Key(urlsafe=pid)
+        patient = key.get()
+
+        new_session = sessions.new_session(uid, patient, latest, date)
+
+        if new_session is None:
+            self.response.write(json.dumps({
+                'status':'error',
+                'message':'Unknown error creating new session'}))
+            return
+
+        new_session.put()
+
+        self.response.write(json.dumps({
+            'status':'ok',
+            'no_session': new_session.session_number,
+            'latest':latest.to_dict(),
+            }, cls=models.ModelEncoder))
+
