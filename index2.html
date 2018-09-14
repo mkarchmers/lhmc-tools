@@ -41,6 +41,7 @@
               <a class="dropdown-toggle" data-toggle="dropdown" href="#">Other <span class="caret"></a>
               <ul class="dropdown-menu">
                 <li><a href="static/schedule.html">Schedule</a></li>
+                <li><a onclick="todoPage();">To-do</a></li>
               </ul>
             </li>
           </ul>
@@ -129,6 +130,59 @@
       </div>
 
     </div>
+
+    <div id="todoPage">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-offset-1 col-sm-10">
+            <div id="todo">
+              <label for="#todo-date">Date:</label>
+              <input type="text" id="todo-date" name="todo-date"/>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="container" id="todoResults">
+        <div class="row">
+            <div class="spacer20"></div>
+        </div>
+        <div class="row">
+          <div class="col-sm-offset-1 col-sm-5" >
+            <div class="panel panel-default" id="eligible-panel">
+              <div class="panel-heading">
+                <p class="mylead" id="eligible"></p>
+              </div>
+            </div>
+            <ul class="list-group" id="todo-patients-list">
+            </ul>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-offset-1 col-sm-5" id="todo-patients-submit">
+            <button class="btn btn-xs btn-primary" onclick="validate_submit_todos();">Submit</button>
+          </div>
+        </div>
+
+        <div class="row confirm-todo">
+          <div class="col-sm-offset-1 col-sm-5">
+            <br/>
+            <div class="alert alert-danger" role="alert" id="todo-warning">
+              This will create X new sessions. This action is not reversible.
+            </div>
+          </div>
+        </div>
+        <div class="row confirm-todo">
+          <div class="col-sm-offset-1 col-sm-5">
+            <div class="button-group" role="group">
+              <button type="button" class="btn btn-primary btn-xs" onclick="todoPage();">Cancel</button>
+              <button type="button" class="btn btn-danger btn-xs" onclick="submit_todos();">Confirm</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
 
     <!-- session modal -->
     <div class="modal fade bs-example-modal-lg" id="session_info" tabindex="-1" role="dialog" aria-labelledby="sessionInfoLabel" data-backdrop="static" data-keyboard="false">
@@ -680,6 +734,7 @@
         $('#patientPage').hide()
         $('#historyPage').hide()
         $('#billingPage').show()
+        $('#todoPage').hide()
 
         $('.confirm-email').hide()
         $('.ack-email').hide()
@@ -687,6 +742,7 @@
         $('#billing-date').val('')
         $('#billing-date').datepicker({
               autoclose: true,
+              todayHighlight: true,
           });
 
       }
@@ -695,6 +751,7 @@
         $('#patientPage').show()
         $('#historyPage').hide()
         $('#billingPage').hide()
+        $('#todoPage').hide()
 
         load_patients()
       }
@@ -703,8 +760,135 @@
         $('#patientPage').hide()
         $('#historyPage').show()
         $('#billingPage').hide()
+        $('#todoPage').hide()
+
 
         load_sessions();
+      }
+
+      function todoPage(){
+        $('#patientPage').hide()
+        $('#historyPage').hide()
+        $('#billingPage').hide()
+        $('#todoPage').show()
+        $('#eligible, #eligible-panel').hide()
+        $('#todo-patients-list, #todo-patients-submit').hide()
+        $('.confirm-todo').hide()
+
+        $('#todo-date').val('');
+        $('#todo-date').datepicker({
+              autoclose: true,
+              todayHighlight: true, 
+          });
+        $('#todo-date').change(function(){
+          get_patients_for_todo($(this).val())
+        })
+      }
+
+      function eligible(date) {
+
+        return function(item){
+          mom_schedule = moment(item.moment);
+          mom_schedule.set('hour',0);
+          mom_schedule.set('minute',0);
+          mom_schedule.set('second',0);
+          d = moment(date).diff(mom_schedule,'day');
+          return d % item.freq == 0;
+        }
+      }
+
+      function get_patients_for_todo(date){
+        if (date != ''){
+
+          $.getJSON('/schedule',function(schedule){
+
+            eligible_items = schedule.filter(eligible(date))
+            if (eligible_items.length == 0){
+              $('#eligible').text('No eligible patients on this date')
+              $('#eligible, #eligible-panel').show()
+              $('#todo-patients-list, #todo-patients-submit').hide()
+              return;
+            }
+
+            $('#eligible').text('Eligible patients')
+            $('#eligible, #eligible-panel').show()
+            $('#todo-patients-list, #todo-patients-submit').show()
+
+            selection = d3.select('#todo-patients-list').selectAll('li')
+              .data(eligible_items)
+
+            selection.text((item) => item.name)
+              .attr('pid', (item) => item.pid)
+              .classed('list-group-item', true)
+              .classed('lead list-group-item-info', true)
+
+            selection.enter()
+              .append('li')
+              .text((item) => item.name)
+              .attr('pid', (item) => item.pid)
+              .classed('list-group-item', true)
+              .classed('lead list-group-item-info', true)
+
+            selection.exit()
+              .remove()
+
+            $('#todo-patients-list li').click(function(){$(this).remove()})
+          })
+        }
+      }
+
+      function validate_submit_todos(){
+
+        no_patients = $('#todo-patients-list li').length;
+
+        $('#todo-patients-submit').hide()
+        $('.confirm-todo').show()
+
+        $('#todo-warning').text(`This will create ${no_patients} new sessions. This action is not reversible.`)
+      }
+
+      function submit_todos(){
+
+        function post_success(el){
+          return function(r){
+            if (r.status == 'ok'){
+              let span = $('<span class="glyphicon glyphicon-ok"></span>');
+              span.attr('data-toggle','popover');
+              span.attr('title','Latest');
+              span.attr('data-placement','auto bottom');
+              span.attr('data-content',`Latest session was on ${r.latest.date}. New seesion is number ${r.no_session}.`);
+              span.popover();
+              el.append(span);
+
+              new_session_flag = true;
+            }
+            else {
+              let span = $('<span class="glyphicon glyphicon-remove"></span>');
+              span.attr('data-toggle','popover');
+              span.attr('title','Error');
+              span.attr('data-placement','auto bottom');
+              span.attr('data-content',r.message);
+              span.popover();
+              el.append(span);
+            }
+          }
+        }
+
+        $('.confirm-todo').hide()
+        $('#todo-patients-list li').unbind('click');
+        $('#eligible').text('Results');
+
+        $('#todo-patients-list li').each(function(){
+          el = $(this);
+
+          pid = el.attr('pid');
+          date = $('#todo-date').val();
+
+          console.log(date)
+          console.log(el.text())
+
+          $.post('/new',{'pid':pid, 'date':date}, post_success(el), 'json')
+        })
       }
 
       // utility functions to handle different forms
@@ -829,10 +1013,14 @@
       function load_sessions(){
 
         if (!new_session_flag){
+          console.log('does not need to refresh sessions')
           return
         }
+        console.log('loading new sessions')
         new_session_flag = false;
         todo_flag = false;
+
+        $('#calendar').fullCalendar('destroy');
 
         $.getJSON('/sessions?pid=',function(data){
         
@@ -841,7 +1029,6 @@
                themeSystem: 'bootstrap3',
                customButtons: {
                 todo: {
-                  //text: "to-do's",
                   click: function(){
                     todo_flag=!todo_flag;
                     $('#calendar').fullCalendar('rerenderEvents');
@@ -1249,6 +1436,7 @@
           }
         });
 
+        //todoPage();
         patientPage();
       })
 
