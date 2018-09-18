@@ -337,9 +337,11 @@ class NewHandler(webapp2.RequestHandler):
         parms = {}
         for (k,v) in self.request.POST.items():
             parms[k] = v
+        #print parms
 
         date = parms.get('date',None)
         pid = parms.get('pid',None)
+        notes = parms.get('notes', 'TODO')
 
         if date is None or pid is None:
             self.response.write(json.dumps({
@@ -374,6 +376,7 @@ class NewHandler(webapp2.RequestHandler):
                 'message':'Unknown error creating new session'}))
             return
 
+        new_session.notes = notes
         new_session.put()
 
         self.response.write(json.dumps({
