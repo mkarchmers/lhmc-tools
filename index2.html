@@ -137,7 +137,7 @@
           <div class="col-sm-offset-1 col-sm-10">
             <div id="todo">
               <label for="#todo-date">Date:</label>
-              <input type="text" id="todo-date" name="todo-date"/>
+              <input type="text" id="todo-date"/>
             </div>
           </div>
         </div>
@@ -848,14 +848,14 @@
               li.attr('pid',item.pid);
               li.prepend(item.name);
               span = li.find('span').first();
-              href = item.pid+'-href'
-              span.attr('id', href);
+              span_id = item.pid+'-span'
+              span.attr('id', span_id);
 
               notes = item.pid+'-notes'
               tmp.find('div').first().attr('id', notes)
 
               tmp.clone().appendTo('#todo-patients-list')
-              $('#'+href).click(collapse_notes(notes))
+              $('#'+span_id).click(collapse_notes(notes))
             })
 
             /*
