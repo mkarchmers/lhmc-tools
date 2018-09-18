@@ -26,10 +26,10 @@ body {
 
 .badge-pill { float:right; }
 
-.glyphicon-align-justify{ padding-right: 10px; }
+.glyphicon-align-justify{ padding-right: 10px;}
 .glyphicon-print{ margin-right: 5px; color: grey;}
-.glyphicon-ok{ margin-right: 5px; color:green; float:right;}
-.glyphicon-remove{ margin-right: : 5px; color:red; float:right;}
+.glyphicon-ok{ margin-right: 10px; color:green; float:right;}
+.glyphicon-remove{ margin-right: : 10px; color:red; float:right;}
 
 #calendar {
   max-width: 900px;
