@@ -41,7 +41,7 @@
               <a class="dropdown-toggle" data-toggle="dropdown" href="#">Other <span class="caret"></a>
               <ul class="dropdown-menu">
                 <li><a href="static/schedule.html">Schedule</a></li>
-                <li><a onclick="todoPage();">To-do</a></li>
+                <li><a onclick="todoPage();">Workflows</a></li>
               </ul>
             </li>
           </ul>
@@ -133,8 +133,15 @@
 
     <div id="todoPage">
       <div class="container">
-        <div class="row">
-          <div class="col-sm-offset-1 col-sm-10">
+        <div class="row" id="todo-what">
+          <div class="col-sm-5">
+            <button type="button" class="btn btn-default btn-lg btn-block" onclick="addTodos();">Add to-do's</button>
+            <button type="button" class="btn btn-default btn-lg btn-block" onclick="finishTodos();">Finish to-do's</button>
+          </div>
+        </div>
+
+        <div class="row" id="todo-add">
+          <div class="col-sm-5">
             <div id="todo">
               <label for="#todo-date">Date:</label>
               <input type="text" id="todo-date"/>
@@ -142,12 +149,13 @@
           </div>
         </div>
       </div>
+
       <div class="container" id="todoResults">
         <div class="row">
             <div class="spacer20"></div>
         </div>
         <div class="row">
-          <div class="col-sm-offset-1 col-sm-5" >
+          <div class="col-sm-5" >
             <div class="panel panel-default" id="eligible-panel">
               <div class="panel-heading">
                 <p class="mylead" id="eligible">No eligible patients on this date</p>
@@ -157,7 +165,7 @@
             <ul class="list-group" id="todo-patients-list">
               <template id="todo-patient-list-tmpl">
                 <div id="PID">
-                  <li class="list-group-item lead list-group-item-info" pid="PID">
+                  <li class="list-group-item lead list-group-item-info">
                     <span role="button" class="add-note glyphicon glyphicon-align-justify badge-pill"></span>
                   </li>
                   <div class="notes-area collapse " id="PID-notes">
@@ -170,13 +178,13 @@
         </div>
 
         <div class="row">
-          <div class="col-sm-offset-1 col-sm-5" id="todo-patients-submit">
+          <div class="col-sm-5" id="todo-patients-submit">
             <button class="btn btn-xs btn-primary" onclick="validate_submit_todos();">Submit</button>
           </div>
         </div>
 
         <div class="row confirm-todo">
-          <div class="col-sm-offset-1 col-sm-5">
+          <div class="col-sm-5">
             <br/>
             <div class="alert alert-danger" role="alert" id="todo-warning">
               This will create X new sessions. This action is not reversible.
@@ -184,7 +192,7 @@
           </div>
         </div>
         <div class="row confirm-todo">
-          <div class="col-sm-offset-1 col-sm-5">
+          <div class="col-sm-5" id="confirm-todo-btn">
             <div class="button-group" role="group">
               <button type="button" class="btn btn-primary btn-xs" onclick="todoPage();">Cancel</button>
               <button type="button" class="btn btn-danger btn-xs" onclick="submit_todos();">Confirm</button>
@@ -192,6 +200,11 @@
           </div>
         </div>
 
+        <div class="row">
+          <div class="col-sm-5" id="todo-again">
+            <button class="btn btn-xs btn-primary" onclick="todoPage();">More</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -261,7 +274,7 @@
                         <li class="list-group-item">
                           <div class="input-group">
                             Date: <input id="seshdate" name="date" class="non-editable">
-                            <div class="input-group-apend">
+                            <div class="input-group-append">
                                 <input type="checkbox" name="to-do" id="to-do">
                                 <span class="input-group-text">TODO</span>
                             </div>
@@ -722,7 +735,7 @@
         new_session_flag = true;
 
         $.getJSON('/bill?type=pdf&email=true&mark=true&end='+date, function(data){
-          console.log(data)
+          //console.log(data)
           $('.confirm-email').hide()
           $('.ack-email').show()
           status = data.status
@@ -778,14 +791,10 @@
         load_sessions();
       }
 
-      function todoPage(){
-        $('#patientPage').hide()
-        $('#historyPage').hide()
-        $('#billingPage').hide()
-        $('#todoPage').show()
-        $('#eligible, #eligible-panel').hide()
-        $('#todo-patients-list, #todo-patients-submit').hide()
-        $('.confirm-todo').hide()
+      function addTodos(){
+
+        $('#todo-what').hide();
+        $('#todo-add').show();
 
         $('#todo-date').val('');
         $('#todo-date').datepicker({
@@ -800,6 +809,66 @@
         $('#todo-date').change(function(){
           get_patients_for_todo($(this).val())
         })
+      }
+
+      function remove_todo_patient(el){
+        $(el).next().remove();
+        $(el).remove();
+
+        items = $('#todo-patients-list li').length;
+        if (items == 0){
+          todoPage();
+        }
+
+      }
+
+      function finishTodos(){
+
+        $('#todo-what').hide();
+
+        $('#todo-patients-list > div').remove()
+        $('#eligible').unbind('click')
+
+        $.getJSON('/sessions?order=fifo', function(data){
+
+          todos = data.filter((item) => item.notes == "TODO")
+
+          if (todos.length == 0){
+            $('#eligible, #eligible-panel').show();
+            $('#eligible').text("Congratulations! No to-do's")
+            $('#eligible').click(todoPage);
+
+            $('#todo-patients-list, #todo-patients-submit').hide();
+            return;
+          }
+
+          $('#eligible, #eligible-panel').hide()
+          $('#todo-patients-list, #todo-patients-submit').show()
+
+          todos.forEach(add_tmpl_for_patient);
+
+          // on click will remove the patient
+          $('#todo-patients-list li').click(function(){
+            remove_todo_patient(this);
+          })
+        })
+      }
+
+      function todoPage(){
+        $('#patientPage').hide()
+        $('#historyPage').hide()
+        $('#billingPage').hide()
+        $('#todoPage').show()
+
+        $('#todo-what').show()
+        $('#todo-add').hide()
+        $('#todo-finish').hide()
+        $('#todo-again').hide()
+
+        $('#eligible, #eligible-panel').hide()
+        $('#todo-patients-list, #todo-patients-submit').hide()
+        $('.confirm-todo').hide()
+
       }
 
       function eligible(date) {
@@ -822,6 +891,36 @@
         }
       }
 
+      function add_tmpl_for_patient(item) {
+        tmp  = $( $('#todo-patient-list-tmpl').html() );
+        tmp.attr('id',item.id);
+        li = tmp.find('li').first();
+
+        // only schedule items have pid
+        if (item.pid){
+          li.attr('pid', item.pid);
+        }
+        // hack. if item.date is defined, it means it is a session reecord
+        // else, it is a shcedule record
+        if (item.date){
+          li.attr('sid', item.id);
+        }
+        title = item.name
+        if (item.date){
+          title += ' on ' + item.date;
+        }
+        li.prepend(title);
+        span = li.find('span').first();
+        span_id = item.id+'-span'
+        span.attr('id', span_id);
+
+        notes = item.id+'-notes'
+        tmp.find('div').first().attr('id', notes)
+
+        tmp.clone().appendTo('#todo-patients-list')
+        $('#'+span_id).click(collapse_notes(notes))
+      }
+
       function get_patients_for_todo(date){
 
         $('#todo-patients-list > div').remove()
@@ -833,6 +932,7 @@
             eligible_items = schedule.filter(eligible(date));
             if (eligible_items.length == 0){
               $('#eligible, #eligible-panel').show();
+              $('#eligible').text('No eligible patients on this date')
               $('#todo-patients-list, #todo-patients-submit').hide();
               return;
             }
@@ -840,48 +940,11 @@
             $('#eligible, #eligible-panel').hide()
             $('#todo-patients-list, #todo-patients-submit').show()
 
-            eligible_items.forEach(function(item){
-
-              tmp  = $( $('#todo-patient-list-tmpl').html() );
-              tmp.attr('id',item.pid);
-              li = tmp.find('li').first();
-              li.attr('pid',item.pid);
-              li.prepend(item.name);
-              span = li.find('span').first();
-              span_id = item.pid+'-span'
-              span.attr('id', span_id);
-
-              notes = item.pid+'-notes'
-              tmp.find('div').first().attr('id', notes)
-
-              tmp.clone().appendTo('#todo-patients-list')
-              $('#'+span_id).click(collapse_notes(notes))
-            })
-
-            /*
-            selection = d3.select('#todo-patients-list').selectAll('li')
-              .data(eligible_items)
-
-            selection.text((item) => item.name)
-              .attr('pid', (item) => item.pid)
-              .classed('list-group-item', true)
-              .classed('lead list-group-item-info', true)
-
-            selection.enter()
-              .append('li')
-              .text((item) => item.name)
-              .attr('pid', (item) => item.pid)
-              .classed('list-group-item', true)
-              .classed('lead list-group-item-info', true)
-
-            selection.exit()
-              .remove()
-              */
+            eligible_items.forEach(add_tmpl_for_patient);
 
             // on click will remove the patient
             $('#todo-patients-list li').click(function(){
-              $(this).next().remove();
-              $(this).remove();
+              remove_todo_patient(this);
             })
           })
         }
@@ -889,10 +952,22 @@
 
       function validate_submit_todos(){
 
-        no_patients = $('#todo-patients-list li').length;
-
         $('#todo-patients-submit').hide()
         $('.confirm-todo').show()
+        $('#confirm-todo-btn').show();
+        $('#todo-warning').unbind('click');
+
+        no_patients = $('#todo-patients-list li').length;
+
+        if (no_patients == 0) {
+
+          $('#todo-warning').text("No eligible items");
+          $('#todo-warning').click(function(){todoPage();});
+          $('#confirm-todo-btn').hide();
+          //$('.confirm-todo').hide()
+          return;
+        }
+
         $('.notes-area').collapse('hide')
 
         $('#todo-warning').text(`This will create ${no_patients} new sessions. This action is not reversible.`)
@@ -907,7 +982,12 @@
               span.attr('data-toggle','popover');
               span.attr('title','Latest');
               span.attr('data-placement','auto bottom');
-              span.attr('data-content',`Latest session was on ${r.latest.date}. New seesion is number ${r.no_session}.`);
+              if (r.latest){
+                span.attr('data-content',`Latest session was on ${r.latest.date}. New session is number ${r.no_session}.`);
+              }
+              else {
+                span.attr('data-content',`Updated session from ${r.session.date}.`);
+              }
               span.popover();
               el.append(span);
 
@@ -925,6 +1005,7 @@
           }
         }
 
+        $('#todo-add').hide()
         $('.confirm-todo').hide()
         $('.add-note').hide()
         $('#todo-patients-list li').unbind('click');
@@ -934,9 +1015,17 @@
           el = $(this);
 
           pid = el.attr('pid');
-          notes = $('#'+pid+'-notes textarea').first().val()
+          sid = el.attr('sid');
 
-          if (notes == ''){
+          notes = '';
+          if (pid){
+            notes = $('#'+pid+'-notes textarea').first().val()
+          }
+          if (sid){
+            notes = $('#'+sid+'-notes textarea').first().val()
+          }
+
+          if (!notes || notes == ''){
             notes = 'TODO';
           }
           else {
@@ -946,8 +1035,10 @@
           //console.log(date)
           //console.log(el.text())
 
-          $.post('/new', {'pid':pid, 'date':date, 'notes': notes}, post_success(el), 'json')
+          $.post('/new', {'sid': sid, 'pid':pid, 'date':date, 'notes': notes}, post_success(el), 'json')
         })
+
+        $('#todo-again').show();
       }
 
       // utility functions to handle different forms
@@ -1488,8 +1579,8 @@
           }
         });
 
-        //todoPage();
-        patientPage();
+        todoPage();
+        //patientPage();
       })
 
       /*

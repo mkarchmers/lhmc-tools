@@ -254,7 +254,12 @@ class SessionsHandler(webapp2.RequestHandler):
 
         query = models.Session.query(ancestor=models.UserKey.get(uid))
 
-        query = query.order(-models.Session.date_object)
+        order = self.request.get('order', 'lifo')
+        if order == 'lifo':
+            query = query.order(-models.Session.date_object)
+        else:
+            query = query.order(models.Session.date_object)
+
 
         pid = self.request.get('pid')
 
@@ -337,11 +342,40 @@ class NewHandler(webapp2.RequestHandler):
         parms = {}
         for (k,v) in self.request.POST.items():
             parms[k] = v
-        #print parms
+        print parms
 
         date = parms.get('date',None)
         pid = parms.get('pid',None)
+        sid = parms.get('sid',None)
         notes = parms.get('notes', 'TODO')
+
+        # update TODO session
+        if sid is not None:
+            if notes == 'TODO':
+                self.response.write(json.dumps({
+                    'status':'error',
+                    'message':'Nothing to change.'}))
+                return
+
+            key = ndb.Key(urlsafe=sid)
+            session = key.get()
+
+            if session.notes != "TODO":
+                self.response.write(json.dumps({
+                    'status':'error',
+                    'message':'ERROR: trying to change notes of finished session'}))
+                return
+
+            session.notes = notes
+            session.put()
+
+            self.response.write(json.dumps({
+                'status':'ok',
+                'no_session': session.session_number,
+                'session':session.to_dict(),
+                }, cls=models.ModelEncoder))
+            return
+
 
         if date is None or pid is None:
             self.response.write(json.dumps({
@@ -362,7 +396,7 @@ class NewHandler(webapp2.RequestHandler):
         if date_object <= latest_date_object:
             self.response.write(json.dumps({
                 'status':'error',
-                'message':'Latest session is dated %s which is after given date'%latest.date}))
+                'message':'Latest session is dated %s which is on or after %s'%(latest.date, date)}))
             return
 
         key = ndb.Key(urlsafe=pid)

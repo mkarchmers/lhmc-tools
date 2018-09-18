@@ -14,6 +14,11 @@ indexes:
   ancestor: yes
   properties:
   - name: date_object
+
+- kind: Session
+  ancestor: yes
+  properties:
+  - name: date_object
     direction: desc
 
 - kind: Session
