@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>LMHC-tool</title>
+    <title>MyTherapyNotes</title>
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -30,7 +30,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">LMHC tools</a>
+          <a class="navbar-brand" href="#">MyTherapyNotes</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -150,13 +150,25 @@
           <div class="col-sm-offset-1 col-sm-5" >
             <div class="panel panel-default" id="eligible-panel">
               <div class="panel-heading">
-                <p class="mylead" id="eligible"></p>
+                <p class="mylead" id="eligible">No eligible patients on this date</p>
               </div>
             </div>
+            <!--<div id='XXX'><p>ppp</p><p>qqq</p></div>-->
             <ul class="list-group" id="todo-patients-list">
+              <template id="todo-patient-list-tmpl">
+                <div id="PID">
+                  <li class="list-group-item lead list-group-item-info" pid="PID">
+                    <span role="button" class="add-note glyphicon glyphicon-align-justify badge-pill"></span>
+                  </li>
+                  <div class="notes-area collapse " id="PID-notes">
+                    <textarea class="form-control" rows=5></textarea>
+                  </div>
+                </div>
+              </template>
             </ul>
           </div>
         </div>
+
         <div class="row">
           <div class="col-sm-offset-1 col-sm-5" id="todo-patients-submit">
             <button class="btn btn-xs btn-primary" onclick="validate_submit_todos();">Submit</button>
@@ -781,6 +793,10 @@
               todayHighlight: true,
               endDate: new Date(),
           });
+
+        $('#todo-patients-list > div').remove()
+
+        $('#todo-date').unbind('change');
         $('#todo-date').change(function(){
           get_patients_for_todo($(this).val())
         })
@@ -798,23 +814,51 @@
         }
       }
 
+      function collapse_notes(id){
+
+        return function(e){
+          $('#'+id).collapse('toggle');
+          e.stopPropagation();
+        }
+      }
+
       function get_patients_for_todo(date){
+
+        $('#todo-patients-list > div').remove()
+
         if (date != ''){
 
           $.getJSON('/schedule',function(schedule){
 
-            eligible_items = schedule.filter(eligible(date))
+            eligible_items = schedule.filter(eligible(date));
             if (eligible_items.length == 0){
-              $('#eligible').text('No eligible patients on this date')
-              $('#eligible, #eligible-panel').show()
-              $('#todo-patients-list, #todo-patients-submit').hide()
+              $('#eligible, #eligible-panel').show();
+              $('#todo-patients-list, #todo-patients-submit').hide();
               return;
             }
 
-            $('#eligible').text('Eligible patients')
-            $('#eligible, #eligible-panel').show()
+            $('#eligible, #eligible-panel').hide()
             $('#todo-patients-list, #todo-patients-submit').show()
 
+            eligible_items.forEach(function(item){
+
+              tmp  = $( $('#todo-patient-list-tmpl').html() );
+              tmp.attr('id',item.pid);
+              li = tmp.find('li').first();
+              li.attr('pid',item.pid);
+              li.prepend(item.name);
+              span = li.find('span').first();
+              href = item.pid+'-href'
+              span.attr('id', href);
+
+              notes = item.pid+'-notes'
+              tmp.find('div').first().attr('id', notes)
+
+              tmp.clone().appendTo('#todo-patients-list')
+              $('#'+href).click(collapse_notes(notes))
+            })
+
+            /*
             selection = d3.select('#todo-patients-list').selectAll('li')
               .data(eligible_items)
 
@@ -832,8 +876,13 @@
 
             selection.exit()
               .remove()
+              */
 
-            $('#todo-patients-list li').click(function(){$(this).remove()})
+            // on click will remove the patient
+            $('#todo-patients-list li').click(function(){
+              $(this).next().remove();
+              $(this).remove();
+            })
           })
         }
       }
@@ -844,6 +893,7 @@
 
         $('#todo-patients-submit').hide()
         $('.confirm-todo').show()
+        $('.notes-area').collapse('hide')
 
         $('#todo-warning').text(`This will create ${no_patients} new sessions. This action is not reversible.`)
       }
@@ -876,19 +926,27 @@
         }
 
         $('.confirm-todo').hide()
+        $('.add-note').hide()
         $('#todo-patients-list li').unbind('click');
-        $('#eligible').text('Results');
 
+        date = $('#todo-date').val();
         $('#todo-patients-list li').each(function(){
           el = $(this);
 
           pid = el.attr('pid');
-          date = $('#todo-date').val();
+          notes = $('#'+pid+'-notes textarea').first().val()
 
-          console.log(date)
-          console.log(el.text())
+          if (notes == ''){
+            notes = 'TODO';
+          }
+          else {
+            notes = "Client reported: " + notes;
+          }
 
-          $.post('/new',{'pid':pid, 'date':date}, post_success(el), 'json')
+          //console.log(date)
+          //console.log(el.text())
+
+          $.post('/new', {'pid':pid, 'date':date, 'notes': notes}, post_success(el), 'json')
         })
       }
 
@@ -924,8 +982,6 @@
         $('#session_info').modal('show');
       }
 
-
-
       function display_patient_info(item){
 
         form = d3.select('#new_patient_form');
@@ -942,7 +998,6 @@
         form.select('#status').property('value',item['status']);
 
         $('#patientForm').modal('show')
-
       }
 
       function submit_patient(){
@@ -974,7 +1029,6 @@
         d3.select('#patientFormLabel').text('New patient');
 
         $('#patientForm').modal('show');
-
       }
 
       function processNotesData(data){
@@ -1006,9 +1060,7 @@
               
               eventClick: calendarEventClick,
           });
-
         })
-
       }
 
       function load_sessions(){
@@ -1122,7 +1174,6 @@
               display_notes(item);
               d3.event.stopPropagation();
             });
-
         })
       }
 
