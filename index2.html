@@ -30,7 +30,9 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">MyTherapyNotes</a>
+          <a class="navbar-brand" href="#">
+            <p>MyTherapyNotes</p>
+          </a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -42,11 +44,12 @@
               <a class="dropdown-toggle" data-toggle="dropdown" href="#">Other <span class="caret"></a>
               <ul class="dropdown-menu">
                 <li><a href="static/schedule.html">Schedule</a></li>
+                <li><a href="{{ url|safe }}">{{ url_linktext }}</a></li>
               </ul>
             </li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-            <li class="active"><a href="{{ url|safe }}">{{ url_linktext }}</a></li>
+            <!--<li class="active"><a href="{{ url|safe }}">{{ url_linktext }}</a></li>-->
             <li><a disabled>
               {% if user %}
                 {{user.email()}}
@@ -103,9 +106,11 @@
       </div>
       <div class="row billing-what">
         <div class="col-sm-offset-1 col-sm-5">
-          <button type="button" class="btn btn-primary btn-xs" onclick="getCSV();">CSV</button>
-          <button type="button" class="btn btn-primary btn-xs" onclick="getPDF();">PDF</button>
-          <button type="button" class="btn btn-danger btn-xs" onclick="confirmEmail();">Mail</button>
+          <div class="button-group" role="group">
+            <button type="button" class="btn btn-primary btn-xs" onclick="getCSV();">CSV</button>
+            <button type="button" class="btn btn-primary btn-xs" onclick="getPDF();">PDF</button>
+            <button type="button" class="btn btn-danger btn-xs" onclick="confirmEmail();">Mail</button>
+          </div>
         </div>
       </div>
 
@@ -140,6 +145,7 @@
       <div class="container">
         <div class="row" id="todo-what">
           <div class="col-sm-5">
+            <button type="button" class="btn btn-default btn-lg btn-block" onclick="patientPage();">Add session</button>
             <button type="button" class="btn btn-default btn-lg btn-block" onclick="addTodos();">Add to-do's</button>
             <button type="button" class="btn btn-default btn-lg btn-block" onclick="finishTodos();">Finish to-do's</button>
           </div>
@@ -855,11 +861,9 @@
           todos.forEach(add_tmpl_for_patient);
 
           // on click will remove the patient
-          $('#todo-patients-list li').tooltip();
-          $('#todo-patients-list span').tooltip();
           $('#todo-patients-list li').click(function(){
             remove_todo_patient(this);
-          })
+          }).tooltip();
         })
       }
 
@@ -918,7 +922,7 @@
         if (item.date){
           title += ' on ' + item.date;
         }
-        li.prepend(title);
+        li.prepend($(`<a>${title}</a>`));
         span = li.find('span').first();
         span_id = item.id+'-span'
         span.attr('id', span_id);
@@ -928,6 +932,7 @@
 
         tmp.clone().appendTo('#todo-patients-list')
         $('#'+span_id).click(collapse_notes(notes))
+          .tooltip()
       }
 
       function get_patients_for_todo(date){
@@ -952,11 +957,9 @@
             eligible_items.forEach(add_tmpl_for_patient);
 
             // on click will remove the patient
-            $('#todo-patients-list li').tooltip()
-            $('#todo-patients-list span').tooltip()
             $('#todo-patients-list li').click(function(){
               remove_todo_patient(this);
-            })
+            }).tooltip()
           })
         }
       }
@@ -1265,6 +1268,7 @@
             .attr('data-toggle','tooltip')
             .attr('title','click to add session')
             .on('click',function(item){
+              $('#patientTable .glyphicon-plus').tooltip('hide')
               new_session(item);
               d3.event.stopPropagation();
             });
@@ -1277,6 +1281,7 @@
             .attr('data-toggle','tooltip')
             .attr('title','click to see notes')
             .on('click',function(item){
+              $('#patientTable .glyphicon-align-justify').tooltip('hide')
               display_notes(item);
               d3.event.stopPropagation();
             });
