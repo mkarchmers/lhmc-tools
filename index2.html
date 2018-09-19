@@ -22,7 +22,7 @@
 
   <body>
 {% if permission %}
-    <nav class="navbar navbar-default navbar-fixed-top">
+    <nav class="navbar navbar-default navbar-static-top">
       <div class="container">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="true" aria-controls="navbar">
@@ -34,6 +34,7 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
+            <li><a onclick="todoPage();">Workflows</a></li>
             <li><a onclick="patientPage()">Patients</a></li>
             <li><a onclick="historyPage();">History</a></li>
             <li><a onclick="billingPage();">Billing</a></li>
@@ -41,7 +42,6 @@
               <a class="dropdown-toggle" data-toggle="dropdown" href="#">Other <span class="caret"></a>
               <ul class="dropdown-menu">
                 <li><a href="static/schedule.html">Schedule</a></li>
-                <li><a onclick="todoPage();">Workflows</a></li>
               </ul>
             </li>
           </ul>
@@ -60,7 +60,7 @@
     <div class="contaier" id="patientPage">
 
       <div class="row">
-        <div class="col-sm-offset-1 col-sm-10">
+        <div class="col-sm-offset-1 col-sm-5">
           <div id="patient_display"> 
             <div class="input-group">
               <input class="form-control" id="patientSearchInput" type="text" placeholder="Search..">
@@ -85,19 +85,24 @@
 
     <div class="container" id="historyPage">
       <div class="row">
-        <div class="col-sm-offset-1 col-sm-10">
+        <div class="col-sm-10">
           <div id="calendar"> </div>
         </div>
       </div>
     </div>
 
     <div class="container" id="billingPage">
-      <div class="row">
-        <div class="col-sm-offset-1 col-sm-4">
-          Billing period up to:
+      <div class="row billing-what">
+        <div class="col-sm-offset-1 col-sm-5">
+          <label for="#billing-date">Date:</label>
           <input type="text" id="billing-date" name="billing-date"/>
         </div>
-        <div class="col-sm-4">
+      </div>
+      <div class="row billing-what">
+        <div class="spacer20"></div>
+      </div>
+      <div class="row billing-what">
+        <div class="col-sm-offset-1 col-sm-5">
           <button type="button" class="btn btn-primary btn-xs" onclick="getCSV();">CSV</button>
           <button type="button" class="btn btn-primary btn-xs" onclick="getPDF();">PDF</button>
           <button type="button" class="btn btn-danger btn-xs" onclick="confirmEmail();">Mail</button>
@@ -105,7 +110,7 @@
       </div>
 
       <div class="row confirm-email">
-        <div class="col-sm-offset-1 col-sm-8">
+        <div class="col-sm-offset-1 col-sm-5">
           <br/>
           <div class="alert alert-danger" role="alert">
             Sending a final email is not reversible. The action marks sessions as billed.
@@ -113,7 +118,7 @@
         </div>
       </div>
       <div class="row confirm-email">
-        <div class="col-sm-offset-7 col-sm-9">
+        <div class="col-sm-offset-1 col-sm-5">
           <div class="button-group" role="group">
             <button type="button" class="btn btn-primary btn-xs" onclick="billingPage();">Cancel</button>
             <button type="button" class="btn btn-danger btn-xs" onclick="sendBillingEmail();">Confirm</button>
@@ -122,7 +127,7 @@
       </div>
 
       <div class="row ack-email">
-        <div class="col-sm-offset-1 col-sm-8">
+        <div class="col-sm-offset-1 col-sm-5">
           <br/>
           <div id="ack-message" class="alert" role="alert">
           </div>
@@ -738,6 +743,7 @@
 
         $.getJSON('/bill?type=pdf&email=true&mark=true&end='+date, function(data){
           //console.log(data)
+          $('.billing-what').hide()
           $('.confirm-email').hide()
           $('.ack-email').show()
           status = data.status
@@ -752,9 +758,7 @@
             _class = "alert-warning"
           }
           $('#ack-message').text(msg).addClass(_class)
-
         })
-
       }
 
       function billingPage(){
@@ -763,6 +767,7 @@
         $('#billingPage').show()
         $('#todoPage').hide()
 
+        $('.billing-what').show()
         $('.confirm-email').hide()
         $('.ack-email').hide()
 
