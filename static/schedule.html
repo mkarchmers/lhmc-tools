@@ -269,6 +269,13 @@
               data: {freq: 7, pid: item.id},
             })
           })
+
+          $('.weekly').attr('data-toggle','tooltip')
+            .attr('title','drag to calendar to add weekly patient')
+            .tooltip();
+          $('.bi-weekly').attr('data-toggle','tooltip')
+            .attr('title','drag to calendar to add bi-weekly patient')
+            .tooltip();
         })
       }
 
