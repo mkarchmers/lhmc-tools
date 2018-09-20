@@ -806,6 +806,9 @@
 
       function addTodos(){
 
+        finish_todo_flag = false;
+        add_todo_flag = true;
+
         $('#todo-what').hide();
         $('#todo-add').show();
 
@@ -837,6 +840,9 @@
 
       function finishTodos(){
 
+        finish_todo_flag = true;
+        add_todo_flag = false;
+
         $('#todo-what').hide();
 
         $('#todo-patients-list > div').remove()
@@ -863,7 +869,7 @@
           // on click will remove the patient
           $('#todo-patients-list li').click(function(){
             remove_todo_patient(this);
-          }).tooltip();
+          })
         })
       }
 
@@ -882,6 +888,8 @@
         $('#todo-patients-list, #todo-patients-submit').hide()
         $('.confirm-todo').hide()
 
+        var add_todo_flag = false;
+        var finish_todo_flag = false;
       }
 
       function eligible(date) {
@@ -931,8 +939,12 @@
         tmp.find('div').first().attr('id', notes)
 
         tmp.clone().appendTo('#todo-patients-list')
-        $('#'+span_id).click(collapse_notes(notes))
-          .tooltip()
+        if (item.date){
+          $('#'+span_id).click(collapse_notes(notes))
+        }
+        else {
+          $('#'+span_id).remove();
+        }
       }
 
       function get_patients_for_todo(date){
@@ -959,7 +971,7 @@
             // on click will remove the patient
             $('#todo-patients-list li').click(function(){
               remove_todo_patient(this);
-            }).tooltip()
+            })
           })
         }
       }
@@ -972,6 +984,20 @@
         $('#todo-warning').unbind('click');
 
         no_patients = $('#todo-patients-list li').length;
+
+        if (finish_todo_flag){
+          // only valid sessions are sessions with non-trivial notes
+          no_patients = 0
+          $('#todo-patients-list li').each(function(){
+            notes = $(this).next().find('textarea').first().val()
+            if (notes != ''){
+              no_patients += 1;
+            }
+            else {
+              $(this).addClass('alert-danger')
+            }
+          });
+        }
 
         if (no_patients == 0) {
 
@@ -1022,7 +1048,8 @@
         $('#todo-add').hide()
         $('.confirm-todo').hide()
         $('.add-note').hide()
-        $('#todo-patients-list li').unbind('click');
+        $('#todo-patients-list li').unbind('click')
+        $('#todo-patients-list li').tooltip('hide');
 
         date = $('#todo-date').val();
         $('#todo-patients-list li').each(function(){
@@ -1039,17 +1066,9 @@
             notes = $('#'+sid+'-notes textarea').first().val()
           }
 
-          if (!notes || notes == ''){
-            notes = 'TODO';
+          if (pid || (notes && notes != '')){
+            $.post('/new', {'sid': sid, 'pid':pid, 'date':date, 'notes': notes}, post_success(el), 'json')
           }
-          else {
-            notes = "Client reported: " + notes;
-          }
-
-          //console.log(date)
-          //console.log(el.text())
-
-          $.post('/new', {'sid': sid, 'pid':pid, 'date':date, 'notes': notes}, post_success(el), 'json')
         })
 
         $('#todo-again').show();
