@@ -944,16 +944,12 @@
           title += ' on ' + item.date;
         }
         li.find('a').first().text(title);
-        //span = li.find('span.add-note').first();
-        //span_id = item.id+'-span'
-        //span.attr('id', span_id);
 
         notes = item.id+'-notes'
         tmp.find('div').first().attr('id', notes)
 
         tmp.clone().appendTo('#todo-patients-list')
         if (item.date){
-          //$('#'+span_id).click(collapse_notes(notes))
           $(`#${item.id} span.add-note`).click(collapse_notes(notes))
         }
         else {
@@ -1003,6 +999,7 @@
         $('#confirm-todo-btn').show();
         $('#todo-warning').unbind('click');
         $('.add-note,.delete-session').remove();
+        $('.notes-area').collapse('hide')
 
         no_patients = $('#todo-patients-list li').length;
 
@@ -1022,10 +1019,9 @@
 
         if (no_patients == 0) {
 
-          $('#todo-warning').text("No eligible items");
-          $('#todo-warning').click(function(){todoPage();});
+          $('#todo-warning').text("No eligible items")
+            .click(function(){todoPage();});
           $('#confirm-todo-btn').hide();
-          //$('.confirm-todo').hide()
           return;
         }
 
@@ -1062,11 +1058,10 @@
           }
         }
 
-        $('#todo-add').hide()
+        $('#todo-add, .add-note').hide()
         $('.confirm-todo').hide()
-        $('.add-note').hide()
         $('#todo-patients-list li').unbind('click')
-        $('#todo-patients-list li').tooltip('hide');
+          .tooltip('hide');
 
         date = $('#todo-date').val();
         $('#todo-patients-list li').each(function(){
