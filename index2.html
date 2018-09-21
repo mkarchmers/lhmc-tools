@@ -177,6 +177,7 @@
               <template id="todo-patient-list-tmpl">
                 <div id="PID">
                   <li class="list-group-item lead list-group-item-info">
+                    <a>title</a>
                     <span role="button"
                     class="add-note glyphicon glyphicon-align-justify badge-pill"
                     data-toggle="tooltip" title="Click to add note"></span>
@@ -876,6 +877,15 @@
         })
       }
 
+      function display_todo_session(el){
+
+        // mimic calendar event
+        calendarEventClick({'data': $(el).data()})
+        d3.select('#sessionEdit')
+          .classed('visible',null)
+          .classed('invisible',true)
+      }
+
       function todoPage(){
         $('#patientPage').hide()
         $('#historyPage').hide()
@@ -933,21 +943,24 @@
         if (item.date){
           title += ' on ' + item.date;
         }
-        li.prepend($(`<a>${title}</a>`));
-        span = li.find('span').first();
-        span_id = item.id+'-span'
-        span.attr('id', span_id);
+        li.find('a').first().text(title);
+        //span = li.find('span.add-note').first();
+        //span_id = item.id+'-span'
+        //span.attr('id', span_id);
 
         notes = item.id+'-notes'
         tmp.find('div').first().attr('id', notes)
 
         tmp.clone().appendTo('#todo-patients-list')
         if (item.date){
-          $('#'+span_id).click(collapse_notes(notes))
+          //$('#'+span_id).click(collapse_notes(notes))
+          $(`#${item.id} span.add-note`).click(collapse_notes(notes))
         }
         else {
-          $('#'+span_id).remove();
+          $(`#${item.id} span.add-note`).remove();
         }
+        $(`#${item.id} a`).first().data(item)
+          .click(function(){display_todo_session(this)});
       }
 
       function get_patients_for_todo(date){
@@ -970,6 +983,10 @@
             $('#todo-patients-list, #todo-patients-submit').show()
 
             eligible_items.forEach(add_tmpl_for_patient);
+
+            // unbind click for <a>. Nothing to display
+            $('#todo-patients-list a').unbind('click')
+              .click(function(e){e.stopPropagation();})
 
             // on click will remove the patient
             $('.delete-session').click(function(){
@@ -1064,10 +1081,10 @@
 
           notes = '';
           if (pid){
-            notes = $('#'+pid+'-notes textarea').first().val()
+            notes = $(`#${pid}-notes textarea`).first().val()
           }
           if (sid){
-            notes = $('#'+sid+'-notes textarea').first().val()
+            notes = $(`#${sid}-notes textarea`).first().val()
           }
 
           if (pid || (notes && notes != '')){
