@@ -144,7 +144,7 @@
     <div id="todoPage">
       <div class="container">
         <div class="row" id="todo-what">
-          <div class="col-sm-5">
+          <div class="col-sm-6">
             <button type="button" class="btn btn-default btn-lg btn-block" onclick="patientPage();">Add session</button>
             <button type="button" class="btn btn-default btn-lg btn-block" onclick="addTodos();">Add to-do's</button>
             <button type="button" class="btn btn-default btn-lg btn-block" onclick="finishTodos();">Finish to-do's</button>
@@ -152,7 +152,7 @@
         </div>
 
         <div class="row" id="todo-add">
-          <div class="col-sm-5">
+          <div class="col-sm-6">
             <div id="todo">
               <label for="#todo-date">Date:</label>
               <input type="text" id="todo-date"/>
@@ -166,7 +166,7 @@
             <div class="spacer20"></div>
         </div>
         <div class="row">
-          <div class="col-sm-5" >
+          <div class="col-sm-6" >
             <div class="panel panel-default" id="eligible-panel">
               <div class="panel-heading">
                 <p class="mylead" id="eligible">No eligible patients on this date</p>
@@ -176,10 +176,13 @@
             <ul class="list-group" id="todo-patients-list">
               <template id="todo-patient-list-tmpl">
                 <div id="PID">
-                  <li class="list-group-item lead list-group-item-info" data-toggle="tooltip" title="Click to delete">
+                  <li class="list-group-item lead list-group-item-info">
                     <span role="button"
                     class="add-note glyphicon glyphicon-align-justify badge-pill"
                     data-toggle="tooltip" title="Click to add note"></span>
+                    <span role="button"
+                    class="delete-session glyphicon glyphicon-minus-sign badge-pill"
+                    data-toggle="tooltip" title="Click to delete session"></span>
                   </li>
                   <div class="notes-area collapse " id="PID-notes">
                     <textarea class="form-control" rows=5></textarea>
@@ -191,13 +194,13 @@
         </div>
 
         <div class="row">
-          <div class="col-sm-5" id="todo-patients-submit">
+          <div class="col-sm-6" id="todo-patients-submit">
             <button class="btn btn-xs btn-primary" onclick="validate_submit_todos();">Submit</button>
           </div>
         </div>
 
         <div class="row confirm-todo">
-          <div class="col-sm-5">
+          <div class="col-sm-6">
             <br/>
             <div class="alert alert-danger" role="alert" id="todo-warning">
               This will create X new sessions. This action is not reversible.
@@ -205,7 +208,7 @@
           </div>
         </div>
         <div class="row confirm-todo">
-          <div class="col-sm-5" id="confirm-todo-btn">
+          <div class="col-sm-6" id="confirm-todo-btn">
             <div class="button-group" role="group">
               <button type="button" class="btn btn-primary btn-xs" onclick="todoPage();">Cancel</button>
               <button type="button" class="btn btn-danger btn-xs" onclick="submit_todos();">Confirm</button>
@@ -214,7 +217,7 @@
         </div>
 
         <div class="row">
-          <div class="col-sm-5" id="todo-again">
+          <div class="col-sm-6" id="todo-again">
             <button class="btn btn-xs btn-primary" onclick="todoPage();">More</button>
           </div>
         </div>
@@ -828,14 +831,14 @@
       }
 
       function remove_todo_patient(el){
-        $(el).next().remove();
-        $(el).remove();
+        li = $(el).parent();
+        $(li).next().remove();
+        $(li).remove();
 
         items = $('#todo-patients-list li').length;
         if (items == 0){
           todoPage();
         }
-
       }
 
       function finishTodos(){
@@ -867,7 +870,7 @@
           todos.forEach(add_tmpl_for_patient);
 
           // on click will remove the patient
-          $('#todo-patients-list li').click(function(){
+          $('.delete-session').click(function(){
             remove_todo_patient(this);
           })
         })
@@ -969,7 +972,7 @@
             eligible_items.forEach(add_tmpl_for_patient);
 
             // on click will remove the patient
-            $('#todo-patients-list li').click(function(){
+            $('.delete-session').click(function(){
               remove_todo_patient(this);
             })
           })
@@ -982,6 +985,7 @@
         $('.confirm-todo').show()
         $('#confirm-todo-btn').show();
         $('#todo-warning').unbind('click');
+        $('.add-note,.delete-session').remove();
 
         no_patients = $('#todo-patients-list li').length;
 
