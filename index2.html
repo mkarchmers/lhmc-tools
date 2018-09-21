@@ -1040,27 +1040,23 @@
           return function(r){
             if (r.status == 'ok'){
               let span = $('<span class="glyphicon glyphicon-ok"></span>');
-              span.attr('data-toggle','popover');
-              span.attr('title','Latest');
-              span.attr('data-placement','auto bottom');
+              span.attr('data-toggle','tootlip');
               if (r.latest){
-                span.attr('data-content',`Latest session was on ${r.latest.date}. New session is number ${r.no_session}.`);
+                span.attr('title',`Latest session was on ${r.latest.date}. New session is number ${r.no_session}.`);
               }
               else {
-                span.attr('data-content',`Updated session from ${r.session.date}.`);
+                span.attr('title',`Updated session from ${r.session.date}.`);
               }
-              span.popover();
+              span.tooltip();
               el.append(span);
 
               new_session_flag = true;
             }
             else {
               let span = $('<span class="glyphicon glyphicon-remove"></span>');
-              span.attr('data-toggle','popover');
-              span.attr('title','Error');
-              span.attr('data-placement','auto bottom');
-              span.attr('data-content',r.message);
-              span.popover();
+              span.attr('data-toggle','tooltip');
+              span.attr('title',r.message);
+              span.tooltip();
               el.append(span);
             }
           }
