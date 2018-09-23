@@ -366,13 +366,12 @@ class NewHandler(webapp2.RequestHandler):
                     'message':'ERROR: trying to change notes of finished session'}))
                 return
 
-            session.notes = notes
+            session.notes = "Client reported: " + notes
             session.put()
 
             self.response.write(json.dumps({
                 'status':'ok',
-                'no_session': session.session_number,
-                'session':session.to_dict(),
+                'new_session':session.to_dict(),
                 }, cls=models.ModelEncoder))
             return
 
@@ -415,7 +414,7 @@ class NewHandler(webapp2.RequestHandler):
 
         self.response.write(json.dumps({
             'status':'ok',
-            'no_session': new_session.session_number,
+            'new_session': new_session,
             'latest':latest.to_dict(),
             }, cls=models.ModelEncoder))
 

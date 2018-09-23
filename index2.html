@@ -1038,13 +1038,14 @@
               let span = $('<span class="glyphicon glyphicon-ok"></span>');
               span.attr('data-toggle','tootlip');
               if (r.latest){
-                span.attr('title',`Latest session was on ${r.latest.date}. New session is number ${r.no_session}.`);
+                span.attr('title',`Latest session was on ${r.latest.date}. New session is number ${r.new_session.no_session}.`);
               }
               else {
-                span.attr('title',`Updated session from ${r.session.date}.`);
+                span.attr('title',`Updated session from ${r.new_session.date}.`);
               }
               span.tooltip();
               el.append(span);
+              el.find('a').first().data(r.new_session);
 
               new_session_flag = true;
             }
