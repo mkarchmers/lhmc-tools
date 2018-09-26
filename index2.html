@@ -146,6 +146,7 @@
         <div class="row" id="todo-what">
           <div class="col-sm-6">
             <button type="button" class="btn btn-default btn-lg btn-block" onclick="patientPage();">Add session</button>
+            <button type="button" class="btn btn-default btn-lg btn-block" onclick="historyPage();">Edit session</button>
             <button type="button" class="btn btn-default btn-lg btn-block" onclick="addTodos();">Add to-do's</button>
             <button type="button" class="btn btn-default btn-lg btn-block" onclick="finishTodos();">Finish to-do's</button>
           </div>
@@ -939,11 +940,11 @@
         if (item.date){
           li.attr('sid', item.id);
         }
-        title = item.name
+        title = `<small>${item.name}</small>`
         if (item.date){
-          title += ' on ' + item.date;
+          title = `<small>${item.name}: ${item.date}</small>`
         }
-        li.find('a').first().text(title);
+        li.find('a').first().html(title);
 
         notes = item.id+'-notes'
         tmp.find('div').first().attr('id', notes)
@@ -1019,7 +1020,7 @@
 
         if (no_patients == 0) {
 
-          $('#todo-warning').text("No eligible items")
+          $('#todo-warning').text("No sessions were finished")
           $('#todo-again').show();
           $('#confirm-todo-btn').hide();
           return;
