@@ -999,7 +999,8 @@
         $('.confirm-todo').show()
         $('#confirm-todo-btn').show();
         $('#todo-warning').unbind('click');
-        $('.add-note,.delete-session').remove();
+        //$('.add-note,.delete-session').remove();
+        $('.delete-session').remove();
         $('.notes-area').collapse('hide')
 
         no_patients = $('#todo-patients-list li').length;
@@ -1013,7 +1014,8 @@
               no_patients += 1;
             }
             else {
-              $(this).addClass('alert-danger')
+              //$(this).addClass('alert-danger')
+              $(this).remove()
             }
           });
         }
@@ -1062,6 +1064,8 @@
 
         $('#todo-add, .add-note').hide()
         $('.confirm-todo').hide()
+        $('.notes-area').collapse('hide')
+
         $('#todo-patients-list li').unbind('click')
           .tooltip('hide');
 
