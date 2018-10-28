@@ -62,9 +62,10 @@ class EmailHandler(webapp2.RequestHandler):
             return
 
         hash.uid = str(user.user_id())
+        hash.bill = False
         hash.put()
 
-        self.response.write("<p>%s</p><p>%s</p>"%(user.email(), user.user_id()))
+        self.response.write("<p>%s</p><p>%s</p><p>%s</p>"%(user.email(), user.user_id(), hash.bill))
 
 
 class Permissions_init(webapp2.RequestHandler):

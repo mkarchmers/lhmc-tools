@@ -224,7 +224,10 @@ class BillingHandler2(webapp2.RequestHandler):
                 if no_sessions <= 0:
                     status = "empty"
                 else:
-                    to = [WESTSIDE_EMAIL, user.email()]
+                    to = [user.email()]
+                    if models.EmailHash.billing(user.email()):
+                        to.append(WESTSIDE_EMAIL)
+
                     body = self.getEmailBody(data)
 
                     self.mail(to, date, body, pdfFile.getvalue())

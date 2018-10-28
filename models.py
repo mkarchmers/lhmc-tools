@@ -199,6 +199,14 @@ class EmailHash(ndb.Model):
 
     Hash = ndb.StringProperty()
     uid = ndb.StringProperty()
+    bill = ndb.BooleanProperty()
+
+    @classmethod
+    def billing(cls, email):
+        candidate_hash = hs.md5(email.lower()).hexdigest()
+        key = ndb.Key(EmailHash, candidate_hash)
+        hash = key.get()
+        return (hash.bill is not None) and hash.bill
 
     @classmethod
     def validate(cls, email):
