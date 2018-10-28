@@ -72,6 +72,15 @@ class Permissions_init(webapp2.RequestHandler):
 
     def get(self):
 
+    	email = self.request.get('email', None)
+    	if email:
+    		ident = hs.md5(email).hexdigest()
+    		eh = models.EmailHash(id = ident)
+	        eh.Hash = ident
+	        eh.put()
+	        self.response.write(email + " registered")
+	        return
+
         ident = '361e54ab7e96f7610187da7ba3691184'
         eh = models.EmailHash(id = ident)
         eh.Hash = ident
