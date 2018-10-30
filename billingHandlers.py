@@ -102,7 +102,8 @@ class BillingHandler2(webapp2.RequestHandler):
                                 alignment=TA_LEFT,
                                 fontSize=11))
 
-        doc = SimpleDocTemplate(pdfFile, encrypt=PDF_PSWD,
+        psw = models.EmailHash.password(user.email())
+        doc = SimpleDocTemplate(pdfFile, encrypt=psw,
                                 pagesize=letter,
                                 rightMargin=72,leftMargin=72,
                                 topMargin=72,bottomMargin=18)
