@@ -104,31 +104,34 @@ class Insurance_init(webapp2.RequestHandler):
 
     def get(self):
 
-        i = models.Insurance()
-        i.name = "BlueCrossBlueShield"
-        i.mod_code = "90846"
-        i.modality_of_session = "Family without patient"
-        i.put()
-        i = models.Insurance()
-        i.name = "BlueCrossBlueShield"
-        i.mod_code = "90834"
-        i.modality_of_session = "Individual"
-        i.put()
-        i = models.Insurance()
-        i.name = "BlueCrossBlueShield"
-        i.mod_code = "90847"
-        i.modality_of_session = "Family with patient"
-        i.put()
-        i = models.Insurance()
-        i.name = "BlueCrossBlueShield"
-        i.mod_code = "90853"
-        i.modality_of_session = "Group"
-        i.put()
-        i = models.Insurance()
-        i.name = "BlueCrossBlueShield"
-        i.mod_code = "90791"
-        i.modality_of_session = "Evaluation"
-        i.put()
+    	for carrier in ['BlueCrossBlueShield', 'Tufts', 'HarvardPilgrim', 'Optum']:
+
+	        i = models.Insurance()
+	        i.name = carrier
+	        i.mod_code = "90846"
+	        i.modality_of_session = "Family without patient"
+	        i.put()
+	        i = models.Insurance()
+	        i.name = carrier
+	        i.mod_code = "90834"
+	        i.modality_of_session = "Individual"
+	        i.put()
+	        i = models.Insurance()
+	        i.name = carrier
+	        i.mod_code = "90847"
+	        i.modality_of_session = "Family with patient"
+	        i.put()
+	        i = models.Insurance()
+	        i.name = carrier
+	        i.mod_code = "90853"
+	        i.modality_of_session = "Group"
+	        i.put()
+	        i = models.Insurance()
+	        i.name = carrier
+	        i.mod_code = "90791"
+	        i.modality_of_session = "Evaluation"
+	        i.put()
+
         self.response.write("done!")
 
         
