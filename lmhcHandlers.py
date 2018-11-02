@@ -74,30 +74,34 @@ class Permissions_init(webapp2.RequestHandler):
 
     	email = self.request.get('email', None)
     	if email:
-    		ident = hs.md5(email).hexdigest()
-    		eh = models.EmailHash(id = ident)
-	        eh.Hash = ident
-	        eh.put()
-	        self.response.write(email + " registered")
-	        return
+			ident = hs.md5(email).hexdigest()
+			eh = models.EmailHash(id = ident)
+			eh.Hash = ident
+			eh.put()
+			self.response.write(email + " registered")
+			return
+        else:
+			self.response.write("nothing to do")
 
-        ident = '361e54ab7e96f7610187da7ba3691184'
-        eh = models.EmailHash(id = ident)
-        eh.Hash = ident
-        eh.put()
-        ident = 'bdb63475a053e834d0fd1a1d93d5034e'
-        eh = models.EmailHash(id = ident)
-        eh.Hash = ident
-        eh.put()
-        ident = '6215d7ccc7413110ea60829fb1284565'
-        eh = models.EmailHash(id = ident)
-        eh.Hash = ident
-        eh.put()
-        ident = 'd980f0ec1b5d23bd04ed702536e4b90f'
-        eh = models.EmailHash(id = ident)
-        eh.Hash = ident
-        eh.put()
-        self.response.write("done!")
+		# if False:
+		#     ident = '361e54ab7e96f7610187da7ba3691184'
+		#     eh = models.EmailHash(id = ident)
+		#     eh.Hash = ident
+		#     eh.put()
+		#     ident = 'bdb63475a053e834d0fd1a1d93d5034e'
+		#     eh = models.EmailHash(id = ident)
+		#     eh.Hash = ident
+		#     eh.put()
+		#     ident = '6215d7ccc7413110ea60829fb1284565'
+		#     eh = models.EmailHash(id = ident)
+		#     eh.Hash = ident
+		#     eh.put()
+		#     ident = 'd980f0ec1b5d23bd04ed702536e4b90f'
+		#     eh = models.EmailHash(id = ident)
+		#     eh.Hash = ident
+		#     eh.put()
+		#     self.response.write("done!")
+		#     return
 
 
 class Insurance_init(webapp2.RequestHandler):
