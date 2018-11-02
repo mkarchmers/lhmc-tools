@@ -143,10 +143,21 @@ class PatientHandler(webapp2.RequestHandler):
         parms = {}
         for (k,v) in self.request.POST.items():
             parms[k] = v
+
+        patient_id = parms.get('patient_id')
+        del parms['patient_id']
         parms['session_number'] = int(parms['session_number'] or "0")
-        parms['parent'] = models.UserKey.get(user.user_id())
-        p = models.Patient(**parms)
-        p.put()
+
+        if patient_id is None or patient_id == "":
+		    parms['parent'] = models.UserKey.get(user.user_id())
+		    p = models.Patient(**parms)
+		    p.put()
+        else:
+			key = ndb.Key(urlsafe=patient_id)
+			p = key.get()
+			for k,v in parms.items():
+				setattr(p, k, v)
+				p.put()
 
         self.redirect('/')
 

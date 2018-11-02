@@ -625,13 +625,14 @@
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="patient_display modal-title" id="patientDisplayLabel">Patients</h4>
             <h4 class="patient_form modal-title" id="patientFormLabel">New patient</h4>
           </div>
           <div class="modal-body">
   
               <div class="patient_form">
                 <form id="new_patient_form" action="/patient" method="post">
+                  <input id="patientFormPID" name="patient_id" hidden>
+
                   <div class="form-group">
                     <input name="name" type="text" class="form-control" id="nameInput" placeholder="name">
                   </div>
@@ -1130,12 +1131,15 @@
       function display_patient_info(item){
 
         form = d3.select('#new_patient_form');
+        /*
         form.selectAll('.form-control')
           .attr('disabled',true);
         d3.select('#submit-patient')
           .attr('disabled',true);
+          */
         d3.select('#patientFormLabel').text('Patient info');
 
+        form.select('#patientFormPID').property('value',item['id']);
         form.select('#nameInput').property('value',item['name']);
         form.select('#dob-date').property('value',item['dob']);
         form.select('#insurance').property('value',item['insurance']);
