@@ -591,6 +591,9 @@
                             <option value="Weekly">weekly</option>
                             <option value="Bi-weekly">bi-weekly</option>
                             <option value="Monthly">monthly</option>
+                            <option value="TwoX">twoX-weekly</option>
+                            <option value="ThreeX">threeX-weekly</option>
+                            <option value="FourX">fourX-weekly</option>
                           </select>
                           basis to work through and develop coping skills to address problem areas.
                         </li>
@@ -1687,7 +1690,10 @@
 
               function adjust_pln_nxt(){
                 freq = $('select[name=PLN_FREQ').val();
-                weeks = 1;
+                weeks = 0;
+                if (freq == "Weekly"){
+                  weeks = 1
+                }
                 if (freq == "Bi-weekly") {
                   weeks = 2
                 }
@@ -1695,7 +1701,7 @@
                   weeks = 4
                 }
                 nxt = moment($('input[name=date]').val()).add(weeks,'week').format('MM/DD/YYYY');
-                $('input[name=PLN_NXT]').val(nxt);          
+                $('input[name=PLN_NXT]').val(nxt);
               }
               // PLN_FREQ
               $('input[name=date]').change(adjust_pln_nxt);
