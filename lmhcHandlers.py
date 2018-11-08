@@ -269,7 +269,6 @@ class SessionsHandler(webapp2.RequestHandler):
 
             # set new attributes
             for k,v in parms.iteritems():
-                print k
                 setattr(session, k, v)
 
             session.put()
@@ -371,7 +370,6 @@ class NewHandler(webapp2.RequestHandler):
         parms = {}
         for (k,v) in self.request.POST.items():
             parms[k] = v
-        print parms
 
         date = parms.get('date',None)
         pid = parms.get('pid',None)
