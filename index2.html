@@ -21,7 +21,6 @@
   </head>
 
   <body>
-{% if permission %}
     <nav class="navbar navbar-default navbar-static-top">
       <div class="container">
         <div class="navbar-header">
@@ -59,6 +58,33 @@
         </div><!--/.nav-collapse -->
       </div>
     </nav>
+{% if waiver %}
+<div class="container " id="waiverPage">
+  <div class="row">
+    <div class="col-sm-offset-1 col-sm-10">
+      <h1>
+        Waiver
+      </h1>
+      <p class="lead">
+        In no event, unless required by applicable law or agreed to in writing, shall the makers of mytherapynotes.com, or any person associated with mytherapynotes.com be liable for any loss, expense or damage, of any type or nature arising out of the use of, or inability to use this software or program, including, but not limited to, claims, suits or causes of action involving alleged infringement of copyrights, patents, trademarks, trade secrets, or unfair competition.
+      </p>
+      <p class="lead">
+        The makers of mytherapynotes.com make no warranty that
+      </p>
+      <p>
+      <ul class="lead">
+        <li>The software will meet your requirements.</li>
+        <li>The software will be uninterrupted, timely, secure or error-free.</li>
+        <li>The results that may be obtained from the use of the software will be effective, accurate or reliable.</li>
+        <li>The quality of the software will meet your expectations.</li>
+        <li>Any errors in the software will be corrected.</li>
+      </ul>
+    </p>
+      <a href="/email">Accept</a>
+    </div>
+  </div>
+</div>
+{% elif permission %}
     
     <div class="contaier" id="patientPage">
 
@@ -686,7 +712,7 @@
         </div>
       </div>
     </div>
-    
+
 {% else %}
 <div class="container">
   <div class="row">

@@ -26,6 +26,7 @@ class MainPage(webapp2.RequestHandler):
         user = users.get_current_user()
 
         permitted = models.EmailHash.validate(user.email())
+    	waiver = models.EmailHash.has_waiver(user.email())
 
         if user:
             url = users.create_logout_url(self.request.uri)
@@ -39,7 +40,8 @@ class MainPage(webapp2.RequestHandler):
             'user': user,
             'url': url,
             'url_linktext': url_linktext,
-            'permission': permitted
+            'permission': permitted and waiver,
+            'waiver': permitted and not waiver,
         }
         
         template = JINJA_ENVIRONMENT.get_template('index2.html')
@@ -62,10 +64,10 @@ class EmailHandler(webapp2.RequestHandler):
             return
 
         hash.uid = str(user.user_id())
-        hash.bill = False
+        hash.waiver = True
         hash.put()
 
-        self.response.write("<p>%s</p><p>%s</p><p>%s</p>"%(user.email(), user.user_id(), hash.bill))
+        self.redirect('/')
 
 
 class Permissions_init(webapp2.RequestHandler):
@@ -77,6 +79,7 @@ class Permissions_init(webapp2.RequestHandler):
 			ident = hs.md5(email).hexdigest()
 			eh = models.EmailHash(id = ident)
 			eh.Hash = ident
+			eh.waiver = False
 			eh.put()
 			self.response.write(email + " registered")
 			return

@@ -201,6 +201,7 @@ class EmailHash(ndb.Model):
     uid = ndb.StringProperty()
     bill = ndb.BooleanProperty()
     pwd = ndb.StringProperty()
+    waiver = ndb.BooleanProperty()
 
     @classmethod
     def password(cls, email):
@@ -221,6 +222,13 @@ class EmailHash(ndb.Model):
         candidate_hash = hs.md5(email.lower()).hexdigest()
         key = ndb.Key(EmailHash, candidate_hash)
         return key.get() is not None
+
+    @classmethod
+    def has_waiver(cls, email):
+        candidate_hash = hs.md5(email.lower()).hexdigest()
+        key = ndb.Key(EmailHash, candidate_hash)
+        hash = key.get()
+        return (hash is not None) and (hash.waiver is not None) and hash.waiver
 
 
 class Insurance(ndb.Model):
