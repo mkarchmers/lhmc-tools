@@ -49,12 +49,12 @@ def abbr(p):
 
 class FormGenerator:
 
-	def __init__(self, session):
-		self.session = session
+	def __init__(self, provider):
+		self.provider = provider
 
-	def getPDF(self, provider):
+	def getPDF(self, session):
 
-		s = self.session
+		s = session
 
 		pdfFile = StringIO()
 
@@ -199,7 +199,7 @@ class FormGenerator:
 		Story.append(Table(row, style=[MID]))
 		row = []
 		row.append([Paragraph("<b>Next Session date:</b> %s"%s.PLN_NXT, styles['LeftXs']),
-					Paragraph("<b>Provider:</b> %s"%provider, styles['LeftXs'])])
+					Paragraph("<b>Provider:</b> %s"%self.provider, styles['LeftXs'])])
 
 
 		Story.append(Table(row, style=[MID]))
