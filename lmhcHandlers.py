@@ -114,17 +114,18 @@ class Insurance_init(webapp2.RequestHandler):
     	for carrier in ['BlueCrossBlueShield', 'Tufts', 'HarvardPilgrim', 'Optum', 'Cypress']:
     	#for carrier in ['Cypress']:
 
-	        i = models.Insurance()
-	        i.name = carrier
-	        i.mod_code = "90846"
-	        i.modality_of_session = "Family without patient"
-	        i.put()
-	        # for backward compatibility
-	        i = models.Insurance()
-	        i.name = carrier
-	        i.mod_code = "90834"
-	        i.modality_of_session = "Individual"
-	        i.put()
+    		if False:
+		        i = models.Insurance()
+		        i.name = carrier
+		        i.mod_code = "90846"
+		        i.modality_of_session = "Family without patient"
+		        i.put()
+		        # for backward compatibility
+		        i = models.Insurance()
+		        i.name = carrier
+		        i.mod_code = "90834"
+		        i.modality_of_session = "Individual"
+		        i.put()
 	        i = models.Insurance()
 	        i.name = carrier
 	        i.mod_code = "90834"
@@ -140,21 +141,22 @@ class Insurance_init(webapp2.RequestHandler):
 	        i.mod_code = "90837"
 	        i.modality_of_session = "Individual-60min"
 	        i.put()
-	        i = models.Insurance()
-	        i.name = carrier
-	        i.mod_code = "90847"
-	        i.modality_of_session = "Family with patient"
-	        i.put()
-	        i = models.Insurance()
-	        i.name = carrier
-	        i.mod_code = "90853"
-	        i.modality_of_session = "Group"
-	        i.put()
-	        i = models.Insurance()
-	        i.name = carrier
-	        i.mod_code = "90791"
-	        i.modality_of_session = "Evaluation"
-	        i.put()
+	        if False:
+		        i = models.Insurance()
+		        i.name = carrier
+		        i.mod_code = "90847"
+		        i.modality_of_session = "Family with patient"
+		        i.put()
+		        i = models.Insurance()
+		        i.name = carrier
+		        i.mod_code = "90853"
+		        i.modality_of_session = "Group"
+		        i.put()
+		        i = models.Insurance()
+		        i.name = carrier
+		        i.mod_code = "90791"
+		        i.modality_of_session = "Evaluation"
+		        i.put()
 
         self.response.write("done!")
 
