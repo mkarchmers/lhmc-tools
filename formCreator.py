@@ -81,7 +81,7 @@ class FormGenerator:
 		pDiag = Paragraph("<b>Diagnosis: </b> %s" % s.diag_code, styles['LeftSm'])
 		pMod = Paragraph("<b>Modality: </b> %s" % s.modality, styles['LeftSm'])
 		pSes = Paragraph("<b>Session No: </b> %s" % s.session_number, styles['LeftSm'])
-		pDate = Paragraph("<b>Date of srvc: </b> %s" % s.date, styles['LeftSm'])
+		pDate = Paragraph("<b>Date of service: </b> %s" % s.date, styles['LeftSm'])
 		row = [[pName, pDOB, pDiag],
 				[pMod, pSes, pDate]]
 		Story.append(Table(row, rowHeights=[4.3*mm]*len(row), style=[BOX, MID]))
