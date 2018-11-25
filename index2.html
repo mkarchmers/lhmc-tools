@@ -329,8 +329,10 @@
                         </li>
                         <li class="list-group-item">
                           Modality:
-                          <select id="modality" name="modality" >
-                            <option id="ind" value="Individual">Individual</option>
+                          <select id="modality" name="modality">
+                            <option id="ind45" value="Individual-45min">Individual-45min</option>
+                            <option id="ind30" value="Individual-30min">Individual-30min</option>
+                            <option id="ind60" value="Individual-60min">Individual-60min</option>
                             <option id="fam" value="Family with patient">Family with patient</option>
                             <option id="fwo" value="Family without patient">Family without patient</option>
                             <option id="grp" value="Group">Group</option>
@@ -1375,9 +1377,16 @@
 
       function populateSessionData(data){
 
-        ['diag', 'diag_code', 'modality', 'new_issue'].forEach(function(w){
+        ['diag', 'diag_code', 'new_issue'].forEach(function(w){
           document.getElementById(w).value = data[w];
         })
+        // special logic for 'modality', to deal with old codes.
+        m = data['modality'];
+        if (m == "Individual"){
+          m = "Individual-45min";
+        }
+        document.getElementById('modality').value = m;
+
         write_checbox('no_new_issue', data['no_new_issue']);
 
         // risk assessment
@@ -1469,11 +1478,6 @@
         f = $('#seshdate').val();
         if (f == ""){
           alert("date cannot be empty");
-          return false;
-        }
-        place = $('#seshdate').attr('placeholder')
-        if (place && place.endsWith(f) && $('#modality').val() == 'Individual'){
-          alert("Individual session cannot be dated on same day as latest session");
           return false;
         }
         f = $('#notes').val();
@@ -1576,7 +1580,7 @@
             $('#seshdate').datepicker({
                 autoclose: true,
                 todayBtn: "linked",
-                startDate: latest.toDate(),
+                startDate: latest.add(1,'day').toDate(),
             });
 
             populateSessionData(latest_data);
