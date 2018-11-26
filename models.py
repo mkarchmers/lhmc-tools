@@ -202,6 +202,8 @@ class EmailHash(ndb.Model):
     bill = ndb.BooleanProperty()
     pwd = ndb.StringProperty()
     waiver = ndb.BooleanProperty()
+    email = ndb.StringProperty()
+    name = ndb.StringProperty()
 
     @classmethod
     def password(cls, email):

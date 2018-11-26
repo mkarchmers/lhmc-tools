@@ -64,6 +64,7 @@ class EmailHandler(webapp2.RequestHandler):
             return
 
         hash.uid = str(user.user_id())
+        hash.email = email
         hash.waiver = True
         hash.put()
 
@@ -80,6 +81,7 @@ class Permissions_init(webapp2.RequestHandler):
 			eh = models.EmailHash(id = ident)
 			eh.Hash = ident
 			eh.waiver = False
+			eh.email = email
 			eh.put()
 			self.response.write(email + " registered")
 			return
