@@ -383,6 +383,42 @@ class PrintHandler(webapp2.RequestHandler):
         self.response.headers['Content-Disposition'] = 'attachment; filename=form.pdf'
         self.response.out.write(pdfFile.getvalue())
 
+class DeleteHandler(webapp2.RequestHandler):
+
+	def post(self):
+		user = users.get_current_user()
+		uid = user.user_id()
+
+		parms = {}
+		for (k,v) in self.request.POST.items():
+			parms[k] = v
+
+		sid = parms.get('sid',None)
+
+		if sid is None:
+			self.response.write(json.dumps({
+				'status':'error',
+				'message':'Nothing to delete.'}))
+			return
+
+		key = ndb.Key(urlsafe=sid)
+		session = key.get()
+		key.delete()
+
+		pid = getattr(session, 'patient_id')
+
+		key = ndb.Key(urlsafe=pid)
+		patient = key.get()
+		ndb.transaction(patient.decrement)
+
+		self.response.write(json.dumps({
+			'status':'success',
+			'message': 'Session deleted',
+			'patient': patient.to_dict(),
+			'session': session.to_dict()}, cls=models.ModelEncoder))
+		return
+
+
 class NewHandler(webapp2.RequestHandler):
 
     def post(self):

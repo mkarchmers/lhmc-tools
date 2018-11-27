@@ -1238,6 +1238,27 @@
           })
       }
 
+      function delete_last_note(patient){
+        //console.log(patient);
+
+        $.getJSON('/sessions?pid='+patient.id, function(data){
+          s = data[0]
+          if (!s){
+            alert(`Patient ${patient.name} does not have any sessions to delete`);
+          }
+          else {
+            if (confirm(`delete session for ${s.name} on ${s.date}`)){
+              $.post('/delete',{'sid': s.id}, function(res){
+                del_s = res.session;
+                //console.log(res.patient);
+                alert(`Session for ${del_s.name} deleted. Number of sessions went from ${patient.session_number} to ${res.patient.session_number}.`);
+                window.location.href = '/'
+              }, 'json')
+            }
+          }
+        })
+      }
+
       function display_notes(patient){
         d3.select('#notesListLabel')
           .text('Notes for ' + patient.name );
@@ -1370,6 +1391,20 @@
           tbody.selectAll('a')
             .data(data.patient_list)
             .append('span')
+            .classed('invisible', (d) => ((d.status == "Inactive") || (d.session_number == 0)))
+            .classed('glyphicon',true)
+            .classed('glyphicon-minus',true)
+            .classed('badge-pill',true)
+            .attr('data-toggle','tooltip')
+            .attr('title','click to delete last note')
+            .on('click',function(item){
+              $('#patientTable .glyphicon-minus').tooltip('hide')
+              delete_last_note(item);
+              d3.event.stopPropagation();
+            });
+          tbody.selectAll('a')
+            .data(data.patient_list)
+            .append('span')
             .classed('glyphicon',true)
             .classed('glyphicon-align-justify',true)
             .classed('badge-pill',true)
@@ -1382,6 +1417,7 @@
             });
 
           $('#patientTable .glyphicon-plus').tooltip()
+          $('#patientTable .glyphicon-minus').tooltip()
           $('#patientTable .glyphicon-align-justify').tooltip()
 
           toggle_inactive();

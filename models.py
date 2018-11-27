@@ -41,6 +41,9 @@ class Patient(ndb.Model):
     def increment(self, amount=1):
         self.session_number += amount
         self.put()
+    def decrement(self, amount=1):
+        self.session_number -= amount
+        self.put()
 
 
 class Session(ndb.Model):
