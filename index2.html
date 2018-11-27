@@ -96,6 +96,9 @@
               <span class="input-group-addon" aria-hidden="true">
                 <a onclick="$('#patientSearchInput').val('');$('#patientSearchInput').keyup();">&times;</a>
               </span>
+              <span class="input-group-addon" aria-hidden="true">
+                <a id="inactive" onclick="$('#patientSearchInput').val('');toggle_inactive();">active</a>
+              </span>
             </div>
             <br/>
             <table id="patientTable" class="table table-bordered table-striped">
@@ -744,7 +747,22 @@
     <script>
 
       var new_patient_flag = true;
-      var new_session_flag = true;     
+      var new_session_flag = true;
+
+      function toggle_inactive(){
+        // if #inactive text == active, then we are displaying both, and vice versa
+        inactive = $('#inactive');
+        if (inactive.text()=='active'){
+          $("#patientTable tr").filter(function() {
+            $(this).toggle(!$(this).hasClass('inactive'));
+          });
+          $('#inactive').text('inactive');
+        }
+        else{
+          $("#patientTable tr").show();
+          $('#inactive').text('active');
+        }
+      }
 
       function printSession(){
         window.open('/print?sid='+$('#session_id').val())
@@ -832,7 +850,7 @@
         $('#billingPage').hide()
         $('#todoPage').hide()
 
-        load_patients()
+        load_patients();
       }
 
       function historyPage(){
@@ -1318,13 +1336,14 @@
           console.log('patient info loaded')
           table = d3.select('#patientTable');
           tbody = table.select('tbody');
-          selection = tbody.selectAll('a')
+          selection = tbody.selectAll('tr')
             .data(data.patient_list);
             
           selection.text(row)
 
           selection.enter()
             .append('tr')
+            .classed('inactive',(d) => (d.status == "Inactive"))
             .append('td')
             .append('a')
             .text(row)
@@ -1364,6 +1383,8 @@
 
           $('#patientTable .glyphicon-plus').tooltip()
           $('#patientTable .glyphicon-align-justify').tooltip()
+
+          toggle_inactive();
         })
       }
 
@@ -1670,7 +1691,8 @@
           value = $(this).val().toLowerCase();
           $("#patientTable tr").filter(function() {
             $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-          });          
+          });
+          $('#inactive').text('active');
         });
 
         // close navbar dropdown after choice
