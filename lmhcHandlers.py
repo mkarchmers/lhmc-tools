@@ -401,14 +401,27 @@ class DeleteHandler(webapp2.RequestHandler):
 				'message':'Nothing to delete.'}))
 			return
 
-		key = ndb.Key(urlsafe=sid)
-		session = key.get()
-		key.delete()
+		s_key = ndb.Key(urlsafe=sid)
+		session = s_key.get()
 
 		pid = getattr(session, 'patient_id')
 
-		key = ndb.Key(urlsafe=pid)
-		patient = key.get()
+		p_key = ndb.Key(urlsafe=pid)
+		patient = p_key.get()
+
+		# is it OK to delete?
+		if patient.session_number > session.session_number:
+			self.response.write(json.dumps({
+				'status':'error',
+				'message':'Attempting to delete a session previous to last. Nothing done.'}))
+			return
+		if session.is_billed:
+			self.response.write(json.dumps({
+				'status':'error',
+				'message':'Attempting to delete a billed session. Nothing done.'}))
+			return
+
+		s_key.delete()
 		ndb.transaction(patient.decrement)
 
 		self.response.write(json.dumps({

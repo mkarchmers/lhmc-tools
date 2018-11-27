@@ -1234,12 +1234,12 @@
         return data.map(function(d){
           return {title: d.notes,
                   date: d.date,
+                  color: (d.is_billed? '#A52A2A': '#5F9EA0'),
                   data: d}
           })
       }
 
       function delete_last_note(patient){
-        //console.log(patient);
 
         $.getJSON('/sessions?pid='+patient.id, function(data){
           s = data[0]
@@ -1247,12 +1247,16 @@
             alert(`Patient ${patient.name} does not have any sessions to delete`);
           }
           else {
-            if (confirm(`delete session for ${s.name} on ${s.date}`)){
+            if (confirm(`Delete session for ${s.name} on ${s.date}`)){
               $.post('/delete',{'sid': s.id}, function(res){
-                del_s = res.session;
-                //console.log(res.patient);
-                alert(`Session for ${del_s.name} deleted. Number of sessions went from ${patient.session_number} to ${res.patient.session_number}.`);
-                window.location.href = '/'
+                if (res.status = 'error'){
+                  alert(res.message)
+                }
+                else {
+                  del_s = res.session;
+                  alert(`Session for ${del_s.name} deleted. Number of sessions went from ${patient.session_number} to ${res.patient.session_number}.`);
+                  window.location.href = '/'
+                }
               }, 'json')
             }
           }
