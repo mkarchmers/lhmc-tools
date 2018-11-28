@@ -253,10 +253,14 @@ class SessionsHandler(webapp2.RequestHandler):
         if 'to-do' in parms:
             del parms['to-do']
 
-        if parms['insurance'] != 'None':
-            parms['mod_code'] = models.Insurance.get_code(parms['insurance'], parms['modality'])
+        if parms['modality'] == 'Other':
+			if parms['mod_code'] == '':
+				parms['mod_code'] = 'Invalid'
         else:
-            parms['mod_code'] = 'None'
+	        if parms['insurance'] != 'None':
+	            parms['mod_code'] = models.Insurance.get_code(parms['insurance'], parms['modality'])
+	        else:
+	            parms['mod_code'] = 'None'
 
         user_date_lst = parms['date'].split('/')
         parms['date_object'] = datetime.date(int(user_date_lst[2]), int(user_date_lst[0]), int(user_date_lst[1]))

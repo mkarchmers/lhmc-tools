@@ -340,7 +340,9 @@
                             <option id="fwo" value="Family without patient">Family without patient</option>
                             <option id="grp" value="Group">Group</option>
                             <option id="eval" value="Evaluation">Evaluation</option>
+                            <option id="oth" value="Other">Other</option>
                           </select>
+                          <input id="mod_code_input" type="text" name="mod_code" placeholder="Procedure code" hidden>
                         </li>
                         <li class="list-group-item">
                           <p class="help-block">New issue</p>
@@ -1469,6 +1471,10 @@
           m = "Individual-45min";
         }
         document.getElementById('modality').value = m;
+        if (m == 'Other'){
+          document.getElementById('mod_code_input').value = data['mod_code'];
+          $('#mod_code_input').show()
+        }
 
         write_checbox('no_new_issue', data['no_new_issue']);
 
@@ -1586,6 +1592,11 @@
             alert("new issue cannot be filled when 'None Reported' checkbox is checked");
             return false;
           }
+        }
+
+        if (($('select[name=modality]').val()=='Other') && ($('input[name=mod_code]').val()=='')){
+            alert("If Modality is 'Other', Insurance code must be filled");
+            return false;
         }
    
         return true;
@@ -1822,6 +1833,18 @@
               // PLN_FREQ
               $('input[name=date]').change(adjust_pln_nxt);
               $('select[name=PLN_FREQ]').change(adjust_pln_nxt);
+
+              // MODALITY
+              $('select[name=modality]').change(function(){
+                modality = $('select[name=modality]');
+                if (modality.val() == 'Other'){
+                  $('input[name=mod_code').show();
+                }
+                else{
+                  $('input[name=mod_code').val('');
+                  $('input[name=mod_code').hide();
+                }
+              });
             });
 
         },
