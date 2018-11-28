@@ -1816,7 +1816,7 @@
 
 
               function adjust_pln_nxt(){
-                freq = $('select[name=PLN_FREQ').val();
+                freq = $('select[name="PLN_FREQ"]').val();
                 weeks = 0;
                 if (freq == "Weekly"){
                   weeks = 1
@@ -1827,22 +1827,23 @@
                 if (freq == "Monthly") {
                   weeks = 4
                 }
-                nxt = moment($('input[name=date]').val()).add(weeks,'week').format('MM/DD/YYYY');
+                nxt = moment($('input[name="date"]').val()).add(weeks,'week').format('MM/DD/YYYY');
                 $('input[name=PLN_NXT]').val(nxt);
               }
               // PLN_FREQ
-              $('input[name=date]').change(adjust_pln_nxt);
-              $('select[name=PLN_FREQ]').change(adjust_pln_nxt);
+              $('input[name="date"]').change(adjust_pln_nxt);
+              $('select[name="PLN_FREQ"]').change(adjust_pln_nxt);
 
               // MODALITY
-              $('select[name=modality]').change(function(){
-                modality = $('select[name=modality]');
+              $('select[name="modality"]').change(function(){
+                modality = $('select[name="modality"]');
+                proc_code = $('#mod_code_input');
                 if (modality.val() == 'Other'){
-                  $('input[name=mod_code').show();
+                  proc_code.show();
                 }
                 else{
-                  $('input[name=mod_code').val('');
-                  $('input[name=mod_code').hide();
+                  proc_code.val('');
+                  proc_code.hide();
                 }
               });
             });
