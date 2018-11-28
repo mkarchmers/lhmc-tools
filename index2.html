@@ -478,6 +478,26 @@
                                   </div>
                                 </td>
                               </tr>
+                              <tr>
+                                <td>
+                                  <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <input type="checkbox" name="G_3_impr" id="G_3_impr">
+                                        <span class="input-group-text">Improve</span>
+                                    </div>
+                                    <input type="text" name="G_3_impr_txt" id="G_3_impr_txt" class="form-control" >
+                                  </div>
+                                </td>
+                                <td>
+                                  <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <input type="checkbox" name="G_3_decr" id="G_3_decr">
+                                        <span class="input-group-text">Decrease</span>
+                                    </div>
+                                    <input type="text" name="G_3_decr_txt" id="G_3_decr_txt" class="form-control" >
+                                  </div>
+                                </td>
+                              </tr>
                             </tbody>
                           </table>
                         </li>
@@ -1249,12 +1269,14 @@
           else {
             if (confirm(`Delete session for ${s.name} on ${s.date}`)){
               $.post('/delete',{'sid': s.id}, function(res){
-                if (res.status = 'error'){
+                if (res.status == 'error'){
                   alert(res.message)
                 }
                 else {
                   del_s = res.session;
                   alert(`Session for ${del_s.name} deleted. Number of sessions went from ${patient.session_number} to ${res.patient.session_number}.`);
+                  new_session_flag = true;
+                  new_patient_flag = true;
                   window.location.href = '/'
                 }
               }, 'json')
@@ -1778,6 +1800,8 @@
               linkTextCheck("G_1_decr", "G_1_decr_txt")
               linkTextCheck("G_2_impr", "G_2_impr_txt")
               linkTextCheck("G_2_decr", "G_2_decr_txt")
+              linkTextCheck("G_3_impr", "G_3_impr_txt")
+              linkTextCheck("G_3_decr", "G_3_decr_txt")
 
 
               function adjust_pln_nxt(){

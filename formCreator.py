@@ -140,11 +140,14 @@ class FormGenerator:
 		row = [[p]]
 		Story.append(Table(row))
 		ps = []
-		ps.append(Paragraph('%s improve %s'%(qCheck(s.G_1_impr),s.G_1_impr_txt), styles['LeftXs']))
-		ps.append(Paragraph('%s decrease %s'%(qCheck(s.G_1_decr),s.G_1_decr_txt), styles['LeftXs']))
+		ps.append(Paragraph('%s improve <i>%s</i>'%(qCheck(s.G_1_impr),s.G_1_impr_txt), styles['LeftXs']))
+		ps.append(Paragraph('%s decrease <i>%s</i>'%(qCheck(s.G_1_decr),s.G_1_decr_txt), styles['LeftXs']))
 		if (s.G_2_impr == "on" or s.G_2_decr == "on"):
-			ps.append(Paragraph('%s improve %s'%(qCheck(s.G_2_impr),s.G_2_impr_txt), styles['LeftXs']))
-			ps.append(Paragraph('%s decrease %s'%(qCheck(s.G_2_decr),s.G_2_decr_txt), styles['LeftXs']))
+			ps.append(Paragraph('%s improve <i>%s</i>'%(qCheck(s.G_2_impr),s.G_2_impr_txt), styles['LeftXs']))
+			ps.append(Paragraph('%s decrease <i>%s</i>'%(qCheck(s.G_2_decr),s.G_2_decr_txt), styles['LeftXs']))
+		if (s.G_3_impr == "on" or s.G_3_decr == "on"):
+			ps.append(Paragraph('%s improve <i>%s</i>'%(qCheck(s.G_3_impr),s.G_3_impr_txt), styles['LeftXs']))
+			ps.append(Paragraph('%s decrease <i>%s</i>'%(qCheck(s.G_3_decr),s.G_3_decr_txt), styles['LeftXs']))
 		gs = map(list, zip(*[iter(ps)]*2))
 		Story.append(Table(gs, rowHeights=[4.3*mm]*len(gs), style=[MID]))
 		ps = [[Paragraph('%s %s'%(qCheck(getattr(s,e[0])),e[1]), styles['LeftXs'])] for e in GoalsCheckArr]

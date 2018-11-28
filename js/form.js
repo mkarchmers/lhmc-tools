@@ -45,6 +45,8 @@ var GCheckArray = [
 	"G_1_decr",
 	"G_2_impr",
 	"G_2_decr",
+	"G_3_impr",
+	"G_3_decr",
 	"G_cop_skills",
 	"G_sc_skills",
 	"G_id_res",
@@ -57,6 +59,8 @@ var GTextArray = [
 	"G_1_decr_txt",
 	"G_2_impr_txt",
 	"G_2_decr_txt",
+	"G_3_impr_txt",
+	"G_3_decr_txt",
 	"G_other_txt",
 ]; // 5
 
