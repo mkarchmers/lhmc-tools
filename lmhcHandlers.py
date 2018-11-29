@@ -395,13 +395,13 @@ class PrintHandler(webapp2.RequestHandler):
 			query = query.filter(models.Session.patient_id==pid)
 			query = query.order(models.Session.date_object)
 			obj = [r for r in query.fetch(limit=200)]
-			print "length= ", len(obj)
+			#print "length= ", len(obj)
 
 			merger = fc.FormMerger()
 			for s in obj:
-				print s.date, s.date_object
+				#print s.date, s.date_object
 				if start_date <= s.date_object <= end_date:
-					print "generating"
+					#print "generating"
 					p = generator.getPDF(s)
 					merger.addPdf(p)
 				#break
