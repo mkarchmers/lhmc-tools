@@ -39,4 +39,10 @@ indexes:
   properties:
   - name: patient_id
   - name: date_object
+
+- kind: Session
+  ancestor: yes
+  properties:
+  - name: patient_id
+  - name: date_object
     direction: desc

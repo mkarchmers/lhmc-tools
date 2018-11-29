@@ -2,10 +2,9 @@ import json
 import jinja2
 import webapp2
 import os
-import urllib
-import urllib2
 import datetime
 import hashlib as hs
+import time
 from google.appengine.api import users
 from google.appengine.ext import ndb
 
@@ -376,16 +375,46 @@ class PrintHandler(webapp2.RequestHandler):
 
         user = users.get_current_user()
         uid = user.user_id()
+        generator = fc.FormGenerator(user.nickname())
 
         sid = self.request.get('sid')
-        key = ndb.Key(urlsafe=sid)
-        session = key.get()
+        if sid != '':
+        	key = ndb.Key(urlsafe=sid)
+        	session = key.get()
+        	pdfFile = generator.getPDF(session)
+        else:
+			pid = self.request.get('pid')
+			name = self.request.get('name')
+			start_date = self.request.get('start')
+			end_date = self.request.get('end')
 
-        pdfFile = fc.FormGenerator(user.nickname()).getPDF(session)
+			start_date = datetime.datetime.strptime(start_date, '%m/%d/%Y').date()
+			end_date = datetime.datetime.strptime(end_date, '%m/%d/%Y').date()
+
+			query = models.Session.query(ancestor=models.UserKey.get(uid))
+			query = query.filter(models.Session.patient_id==pid)
+			query = query.order(models.Session.date_object)
+			obj = [r for r in query.fetch(limit=200)]
+			print "length= ", len(obj)
+
+			merger = fc.FormMerger()
+			for s in obj:
+				print s.date, s.date_object
+				if start_date <= s.date_object <= end_date:
+					print "generating"
+					p = generator.getPDF(s)
+					merger.addPdf(p)
+				#break
+
+			pdfFile = merger.getPdf()
+
+
+        #pdfFile = fc.FormGenerator.emptyPDF()
 
         self.response.headers['content-type'] = 'application/pdf'
         self.response.headers['Content-Disposition'] = 'attachment; filename=form.pdf'
         self.response.out.write(pdfFile.getvalue())
+
 
 class DeleteHandler(webapp2.RequestHandler):
 

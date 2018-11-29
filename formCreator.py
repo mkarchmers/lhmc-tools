@@ -2,6 +2,7 @@ import os
 from cStringIO import StringIO
 import json
 import re
+import PyPDF2 as pp2
 
 
 from reportlab.lib import colors
@@ -21,8 +22,6 @@ CHECK_OFF = '<img src="%s" height="3mm" width="3mm" valign="bottom"/>'%path
 GRID = ('GRID',(0,0),(-1,-1),0.3*mm,colors.grey)
 BOX = ('BOX',(0,0),(-1,-1),0.3*mm,colors.grey)
 MID = ('VALIGN',(0,0),(-1,-1),"MIDDLE")
-
-
 
 form = {}
 with open('static/form.json') as json_data:
@@ -44,13 +43,26 @@ def abbr(p):
 		return p
 	l = p.split(' ')
 	p_new = ' '.join([(x if len(x) < 6 else anti_vowel(x)) for x in l])
-	print p, ' => ', p_new
 	return p_new[:15]
+
 
 class FormGenerator:
 
 	def __init__(self, provider):
 		self.provider = provider
+
+	@classmethod
+	def emptyPDF(cls):
+		pdfFile = StringIO()
+		doc = SimpleDocTemplate(pdfFile,
+			pagesize=letter,
+			rightMargin=72,leftMargin=72,
+			topMargin=36,bottomMargin=18)
+		Story=[]
+		doc.build(Story)
+
+
+		return pdfFile
 
 	def getPDF(self, session):
 
@@ -211,3 +223,20 @@ class FormGenerator:
 		doc.build(Story)
 
 		return pdfFile
+
+
+class FormMerger:
+
+	def __init__(self):
+		self.pw = pp2.PdfFileWriter()
+
+	def addPdf(self, pdfFile):
+		pr = pp2.PdfFileReader(pdfFile)
+		self.pw.appendPagesFromReader(pr)
+
+	def getPdf(self):
+		pdfFile = StringIO()
+		self.pw.write(pdfFile)
+		return pdfFile
+
+

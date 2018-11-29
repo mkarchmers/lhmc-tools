@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>MyTherapyNotes</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">  
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker.css" />    
+
+    <link rel="stylesheet" href="../js/lmhc.css"/>
+    <style type="text/css">
+
+      html, body {
+        margin: 10px;
+        padding: 0;
+      }
+
+      #container-main {
+        margin: 50px 10px;
+      }
+
+    </style>
+
+  </head>
+
+  <body>
+
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="true" aria-controls="navbar">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">MyTherapyNotes</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <!--<li class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#">File <span class="caret"></a>
+              <ul class="dropdown-menu">
+                <li><a onClick="saveSchedule();">Save</a></li>
+                <li><a onClick="clearSchedule();">Clear</a></li>
+                <li><a onClick="loadSchedule();">Load</a></li>
+              </ul>
+            </li>
+          </ul>-->
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    
+    <div class="container" id="container-main">
+      <div class="row">
+        <div class="col-sm-offset-1 col-sm-5">
+            <label for="#input-range">Dates:</label>
+            <div class="input-daterange input-group" id="input-range">
+                <input type="text" class="input-sm form-control" name="start" />
+                <span class="input-group-addon">to</span>
+                <input type="text" class="input-sm form-control" name="end" />
+            </div>
+          </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-offset-1 col-sm-5">
+          <div id="patient_display"> 
+            <br/>
+            <label for="#input-patient">Patient:</label>
+            <div class="input-group" id="input-patient">
+              <input class="form-control" id="patientSearchInput" type="text" placeholder="Search..">
+              <span class="input-group-addon" aria-hidden="true">
+                <a onclick="$('#patientSearchInput').val('');$('#patientSearchInput').keyup();">&times;</a>
+              </span>
+              <span class="input-group-addon" aria-hidden="true">
+                <a id="inactive" onclick="$('#patientSearchInput').val('');toggle_inactive();">active</a>
+              </span>
+            </div>
+            <br/>
+            <table id="patientTable" class="table table-bordered table-striped">
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.min.js"
+      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+      crossorigin="anonymous"></script>
+    <script
+      src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+      integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+      crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.min.js' type='text/javascript'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.1.1/d3.min.js"></script>
+
+
+    <script>
+
+      function request_pdf(patient, el){
+
+        start = $('input[name="start"]').val()
+        end = $('input[name="end"]').val()
+
+        if (start == '' || end == ''){
+          alert("Please fill in dates.")
+          return;
+        }
+
+        //$(el).remove();
+        window.open(`/print?name=${patient.name}&pid=${patient.id}&start=${start}&end=${end}`)
+      }
+
+      function toggle_inactive(){
+        // if #inactive text == active, then we are displaying both, and vice versa
+        inactive = $('#inactive');
+        if (inactive.text()=='active'){
+          $("#patientTable tr").filter(function() {
+            $(this).toggle(!$(this).hasClass('inactive'));
+          });
+          $('#inactive').text('inactive');
+        }
+        else{
+          $("#patientTable tr").show();
+          $('#inactive').text('active');
+        }
+      }
+
+      function load_patients(){
+
+        row = (item) => item.name;
+
+        $.getJSON('/patient', function(data){
+
+          console.log('patient info loaded')
+          table = d3.select('#patientTable');
+          tbody = table.select('tbody');
+          selection = tbody.selectAll('tr')
+            .data(data.patient_list);
+            
+          selection.enter()
+            .append('tr')
+            .classed('inactive',(d) => (d.status == "Inactive"))
+            .append('td')
+            //.append('a')
+            //.attr('title','click to get session forms')
+            .text(row)
+            //.on('click',function(item){
+            //  request_pdf(item, this);
+              
+            //})
+            
+
+          selection.exit().remove();
+
+          tbody.selectAll('td')
+            .data(data.patient_list)
+            .append('span')
+            .classed('glyphicon',true)
+            .classed('glyphicon-print',true)
+            .classed('badge-pill',true)
+            .attr('data-toggle','tooltip')
+            .attr('title','click to get session forms')
+            .on('click',function(item){
+              $('#patientTable .glyphicon-print').tooltip('hide')
+              request_pdf(item, this);
+            });          
+
+          $('#patientTable .glyphicon-print').tooltip()
+
+          toggle_inactive();
+        })
+      }
+
+      $( document ).ready(function() {
+
+        $('#input-range').datepicker({
+          autoclose: true,
+        });
+
+        // patient search
+        $("#patientSearchInput").keyup(function(){
+          value = $(this).val().toLowerCase();
+          $("#patientTable tr").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+          });
+          $('#inactive').text('active');
+        });
+
+
+        load_patients();
+      })
+
+
+    </script>
+
+  </body>
+</html>

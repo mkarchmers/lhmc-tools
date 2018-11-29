@@ -102,12 +102,12 @@ if check, text is clear
 if text != "", uncheck
 */
 function associateCheckText(chk, txt){
-	$('input[name='+chk+']').change(function(){
+	$('input[name="'+chk+'"]').change(function(){
 		if (this.checked){
 			$('input[name='+txt+']').val("")
 		}
 	})
-	$('input[name='+txt+']').change(function(){
+	$('input[name="'+txt+'"]').change(function(){
 		if (this.value==""){
 			document.getElementsByName(chk)[0].checked = true;
 		}
@@ -121,7 +121,7 @@ function associateCheckText(chk, txt){
 if text != "", check
 */
 function linkTextCheck(chk, txt){
-	$('input[name='+txt+']').change(function(){
+	$('input[name="'+txt+'"]').change(function(){
 		document.getElementsByName(chk)[0].checked = (this.value != "");
 	})	
 }
