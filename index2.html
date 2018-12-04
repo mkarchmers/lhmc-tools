@@ -298,8 +298,14 @@
                         </li>
                         <li class="list-group-item">
                           <div class="input-group">
-                            Diagnosis: <input type="text" id="diag" name="diag" >
-                            Diagnosis code: <input type="text" id="diag_code" name="diag_code" >
+                            Primary diagnosis: <input type="text" id="diag" name="diag" >
+                            Primary diagnosis code: <input type="text" id="diag_code" name="diag_code" >
+                          </div>
+                        </li>
+                        <li class="list-group-item">
+                          <div class="input-group">
+                            Secondary diagnosis: <input type="text" id="diag_2" name="diag_2" >
+                            Secondary diagnosis code: <input type="text" id="diag_2_code" name="diag_2_code" >
                           </div>
                         </li>                        
                       </ul>
@@ -703,7 +709,9 @@
                       <option>HarvardPilgrim</option>
                       <option>Optum</option>
                       <option>Cypress</option>
+                      <option>Cigna</option>
                       <option>None</option>
+                      <option>SelfPay</option>
                     </select>
                   </div>
                   <div class="form-group">
@@ -1463,7 +1471,7 @@
 
       function populateSessionData(data){
 
-        ['diag', 'diag_code', 'new_issue'].forEach(function(w){
+        ['diag', 'diag_code', 'diag_2', 'diag_2_code', 'new_issue'].forEach(function(w){
           document.getElementById(w).value = data[w];
         })
         // special logic for 'modality', to deal with old codes.

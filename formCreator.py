@@ -91,12 +91,13 @@ class FormGenerator:
 		pName = Paragraph("<b>Client name: </b> %s" % s.name, styles['LeftSm'])
 		pDOB = Paragraph("<b>DoB: </b> %s" % s.dob, styles['LeftSm'])
 		pDiag = Paragraph("<b>Diagnosis: </b> %s" % s.diag_code, styles['LeftSm'])
+		sDiag = Paragraph("<b>2nd Dx: </b> %s" % s.diag_2_code, styles['LeftSm'])
 		pMod = Paragraph("<b>Modality: </b> %s" % s.modality, styles['LeftSm'])
 		pSes = Paragraph("<b>Session No: </b> %s" % s.session_number, styles['LeftSm'])
 		pDate = Paragraph("<b>Date of service: </b> %s" % s.date, styles['LeftSm'])
-		row = [[pName, pDOB, pDiag],
+		row = [[pName, pDOB, pDiag, sDiag],
 				[pMod, pSes, pDate]]
-		Story.append(Table(row, rowHeights=[4.3*mm]*len(row), style=[BOX, MID]))
+		Story.append(Table(row, rowHeights=[4.3*mm]*len(row), style=[BOX, MID, ('SPAN', (-2,-1),(-1,-1))]))
 		Story.append(Spacer(1, 3))
 
 		# new issue

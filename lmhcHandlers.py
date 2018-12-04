@@ -112,21 +112,22 @@ class Insurance_init(webapp2.RequestHandler):
 
     def get(self):
 
-    	for carrier in ['BlueCrossBlueShield', 'Tufts', 'HarvardPilgrim', 'Optum', 'Cypress']:
-    	#for carrier in ['Cypress']:
+    	#for carrier in ['BlueCrossBlueShield', 'Tufts', 'HarvardPilgrim', 'Optum', 'Cypress', 'Cigna']:
+    	for carrier in ['Cigna']:
 
-    		if False:
+    		if True:
 		        i = models.Insurance()
 		        i.name = carrier
 		        i.mod_code = "90846"
 		        i.modality_of_session = "Family without patient"
 		        i.put()
-		        # for backward compatibility
-		        i = models.Insurance()
-		        i.name = carrier
-		        i.mod_code = "90834"
-		        i.modality_of_session = "Individual"
-		        i.put()
+			if False:
+				# for backward compatibility
+				i = models.Insurance()
+				i.name = carrier
+				i.mod_code = "90834"
+				i.modality_of_session = "Individual"
+				i.put()
 	        i = models.Insurance()
 	        i.name = carrier
 	        i.mod_code = "90834"
@@ -142,7 +143,7 @@ class Insurance_init(webapp2.RequestHandler):
 	        i.mod_code = "90837"
 	        i.modality_of_session = "Individual-60min"
 	        i.put()
-	        if False:
+	        if True:
 		        i = models.Insurance()
 		        i.name = carrier
 		        i.mod_code = "90847"
@@ -256,7 +257,7 @@ class SessionsHandler(webapp2.RequestHandler):
 			if parms['mod_code'] == '':
 				parms['mod_code'] = 'Invalid'
         else:
-	        if parms['insurance'] != 'None':
+	        if parms['insurance'] != 'None' and parms['insurance'] != 'SelfPay':
 	            parms['mod_code'] = models.Insurance.get_code(parms['insurance'], parms['modality'])
 	        else:
 	            parms['mod_code'] = 'None'

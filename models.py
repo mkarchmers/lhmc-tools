@@ -66,6 +66,8 @@ class Session(ndb.Model):
     dob = ndb.StringProperty(indexed=False)
     diag = ndb.StringProperty(indexed=False)
     diag_code = ndb.StringProperty(indexed=False)
+    diag_2 = ndb.StringProperty(indexed=False)
+    diag_2_code = ndb.StringProperty(indexed=False)
     modality = ndb.StringProperty(indexed=False)
     new_issue = ndb.StringProperty(indexed=False)
     no_new_issue = ndb.StringProperty(indexed=False)
