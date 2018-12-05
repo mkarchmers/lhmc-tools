@@ -45,6 +45,11 @@ def abbr(p):
 	p_new = ' '.join([(x if len(x) < 6 else anti_vowel(x)) for x in l])
 	return p_new[:15]
 
+def na_q(s):
+	if s == "na":
+		return "N/A"
+	return s
+
 
 class FormGenerator:
 
@@ -88,16 +93,16 @@ class FormGenerator:
 
 		Story=[]
 
-		pName = Paragraph("<b>Client name: </b> %s" % s.name, styles['LeftSm'])
+		pName = Paragraph("<b>Client: </b> %s" % s.name, styles['LeftSm'])
 		pDOB = Paragraph("<b>DoB: </b> %s" % s.dob, styles['LeftSm'])
 		pDiag = Paragraph("<b>Diagnosis: </b> %s" % s.diag_code, styles['LeftSm'])
 		sDiag = Paragraph("<b>2nd Dx: </b> %s" % s.diag_2_code, styles['LeftSm'])
 		pMod = Paragraph("<b>Modality: </b> %s" % s.modality, styles['LeftSm'])
 		pSes = Paragraph("<b>Session No: </b> %s" % s.session_number, styles['LeftSm'])
 		pDate = Paragraph("<b>Date of service: </b> %s" % s.date, styles['LeftSm'])
-		row = [[pName, pDOB, pDiag, sDiag],
-				[pMod, pSes, pDate]]
-		Story.append(Table(row, rowHeights=[4.3*mm]*len(row), style=[BOX, MID, ('SPAN', (-2,-1),(-1,-1))]))
+		Story.append(Table([[pName, pDOB], [pDiag, sDiag]], rowHeights=[4.3*mm]*2, style=[BOX, MID]))
+		Story.append(Spacer(1, 3))
+		Story.append(Table([[pMod, pSes, pDate]], rowHeights=[4.3*mm], style=[BOX, MID]))
 		Story.append(Spacer(1, 3))
 
 		# new issue
@@ -186,17 +191,17 @@ class FormGenerator:
 
 		p = Paragraph("<b>Assessment: </b>", styles['Left'])
 		row = [[p]]
-		row.append([Paragraph("Client <i>%s</i> use session constructively to address problem areas."%s.ASS_CONST.lower(), 
+		row.append([Paragraph("Client <i>%s</i> use session constructively to address problem areas."%na_q(s.ASS_CONST.lower()),
 			styles['LeftXs'])])
-		row.append([Paragraph("Client <i>%s</i> show insightfulness, <i>%s</i> show effort in addressing problem areas."%(s.ASS_INSIG.lower(), s.ASS_EFFRT.lower()),
+		row.append([Paragraph("Client <i>%s</i> show insightfulness, <i>%s</i> show effort in addressing problem areas."%(na_q(s.ASS_INSIG.lower()), na_q(s.ASS_EFFRT.lower())),
 			styles['LeftXs'])])
-		p = "Client <i>%s</i> oriented times 3."%s.ASS_OR.lower()
+		p = "Client <i>%s</i> oriented times 3."%na_q(s.ASS_OR.lower())
 		if s.ASS_present_txt != "":
 			p += " Client present with: <i>%s</i>"%s.ASS_present_txt
 		row.append([Paragraph(p, styles['LeftXs'])])
-		row.append([Paragraph("Client <i>%s</i> able to talk about stress factors and how to better manage them."%s.ASS_ABLE.lower(), 
+		row.append([Paragraph("Client <i>%s</i> able to talk about stress factors and how to better manage them."%na_q(s.ASS_ABLE.lower()), 
 			styles['LeftXs'])])
-		row.append([Paragraph("Client <i>%s</i> cooperative with therapist's efforts to assist him/her with problem areas."%s.ASS_COOP.lower(), 
+		row.append([Paragraph("Client <i>%s</i> cooperative with therapist's efforts to assist him/her with problem areas."%na_q(s.ASS_COOP.lower()), 
 			styles['LeftXs'])])
 		if s.ASS_other_txt != "":
 			row.append([Paragraph("Other: <i>%s</i>"%s.ASS_other_txt, 
