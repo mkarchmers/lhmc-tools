@@ -229,8 +229,8 @@ class FormGenerator:
 		Story.append(Table(row, style=[MID]))
 
 		prov = Paragraph("<b>Provider:</b> %s"%self.provider, styles['LeftXs'])
-		signature = Paragraph("<b>Signature:</b>                 ", styles['LeftXs'])
-		date = Paragraph("<b>Date:</b>                 ", styles['LeftXs'])
+		signature = Paragraph("<b>Signature:</b> ______________________", styles['LeftXs'])
+		date = Paragraph("<b>Date:</b> ______________________", styles['LeftXs'])
 		row = [[prov, signature, date]]
 		Story.append(Table(row, style=[MID]))
 
