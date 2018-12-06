@@ -93,12 +93,18 @@ class FormGenerator:
 
 		pName = Paragraph("<b>Client: </b> %s" % s.name, styles['LeftSm'])
 		pDOB = Paragraph("<b>DoB: </b> %s" % s.dob, styles['LeftSm'])
-		pDiag = Paragraph("<b>Diagnosis: </b> %s %s" % (s.diag_code, s.diag), styles['LeftSm'])
-		sDiag = Paragraph("<b>2nd Dx: </b> %s" % s.diag_2_code, styles['LeftSm'])
+		pDiagCode = Paragraph("<b>Primary Dx code: </b> %s" % s.diag_code, styles['LeftSm'])
+		pDiag = Paragraph("<b>Primary Dx: </b> %s" % s.diag, styles['LeftSm'])
 		pMod = Paragraph("<b>Modality: </b> %s" % s.modality, styles['LeftSm'])
 		pSes = Paragraph("<b>Session No: </b> %s" % s.session_number, styles['LeftSm'])
 		pDate = Paragraph("<b>Date of service: </b> %s" % s.date, styles['LeftSm'])
-		Story.append(Table([[pName, pDOB], [pDiag, sDiag]], rowHeights=[4.3*mm]*2, style=[BOX, MID]))
+		row = [[pName, pDOB]]
+		row.append([pDiag, pDiagCode])
+		if s.diag_2_code is not None and s.diag_2_code != "":
+			sDiagCode = Paragraph("<b>Secondary Dx code: </b> %s" % s.diag_2_code, styles['LeftSm'])
+			sDiag = Paragraph("<b>Secondary Dx: </b> %s" % s.diag_2, styles['LeftSm'])
+			row.append([sDiag, sDiagCode])
+		Story.append(Table(row, rowHeights=[4.3*mm]*len(row), style=[BOX, MID]))
 		Story.append(Spacer(1, 3))
 
 		# new issue
