@@ -106,7 +106,7 @@ if text != "", uncheck
 function associateCheckText(chk, txt){
 	$('input[name="'+chk+'"]').change(function(){
 		if (this.checked){
-			$('input[name='+txt+']').val("")
+			$('input[name="'+txt+'"]').val("")
 		}
 	})
 	$('input[name="'+txt+'"]').change(function(){

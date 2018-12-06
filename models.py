@@ -241,6 +241,13 @@ class EmailHash(ndb.Model):
         hash = key.get()
         return (hash is not None) and (hash.waiver is not None) and hash.waiver
 
+    @classmethod
+    def get_name(cls, email):
+        candidate_hash = hs.md5(email.lower()).hexdigest()
+        key = ndb.Key(EmailHash, candidate_hash)
+        hash = key.get()
+        return hash.name
+
 
 class Insurance(ndb.Model):
 

@@ -4,7 +4,6 @@ import json
 import re
 import PyPDF2 as pp2
 
-
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_RIGHT, TA_LEFT
 from reportlab.lib.pagesizes import letter
@@ -66,7 +65,6 @@ class FormGenerator:
 		Story=[]
 		doc.build(Story)
 
-
 		return pdfFile
 
 	def getPDF(self, session):
@@ -95,26 +93,22 @@ class FormGenerator:
 
 		pName = Paragraph("<b>Client: </b> %s" % s.name, styles['LeftSm'])
 		pDOB = Paragraph("<b>DoB: </b> %s" % s.dob, styles['LeftSm'])
-		pDiag = Paragraph("<b>Diagnosis: </b> %s" % s.diag_code, styles['LeftSm'])
+		pDiag = Paragraph("<b>Diagnosis: </b> %s %s" % (s.diag_code, s.diag), styles['LeftSm'])
 		sDiag = Paragraph("<b>2nd Dx: </b> %s" % s.diag_2_code, styles['LeftSm'])
 		pMod = Paragraph("<b>Modality: </b> %s" % s.modality, styles['LeftSm'])
 		pSes = Paragraph("<b>Session No: </b> %s" % s.session_number, styles['LeftSm'])
 		pDate = Paragraph("<b>Date of service: </b> %s" % s.date, styles['LeftSm'])
 		Story.append(Table([[pName, pDOB], [pDiag, sDiag]], rowHeights=[4.3*mm]*2, style=[BOX, MID]))
 		Story.append(Spacer(1, 3))
-		Story.append(Table([[pMod, pSes, pDate]], rowHeights=[4.3*mm], style=[BOX, MID]))
-		Story.append(Spacer(1, 3))
 
 		# new issue
-		p = "<b>New Issue: </b>"
+		pIssue = "<b>New Issue: </b>"
 		if s.no_new_issue == "on":
-			p += "None reported"
+			pIssue += "None reported"
 		else:
-			p += s.new_issue
-		p = Paragraph(p, styles['LeftSm'])
-		row = [[p]]
-		Story.append(Table(row, rowHeights=[4.3*mm]*len(row), style=[BOX, MID]))
-		#Story.append(Spacer(1, 5))
+			pIssue += s.new_issue
+		pIssue = Paragraph(pIssue, styles['LeftSm'])
+		Story.append(Table([[pMod, pSes, pDate],[pIssue]], rowHeights=[4.3*mm]*2, style=[BOX, MID,('SPAN',(0,-1),(-1,-1))]))
 
 		p = "<b>Risk Assessment: </b>"
 		if s.RA_none == "on":
@@ -168,10 +162,19 @@ class FormGenerator:
 			ps.append(Paragraph('%s decrease <i>%s</i>'%(qCheck(s.G_3_decr),s.G_3_decr_txt), styles['LeftXs']))
 		gs = map(list, zip(*[iter(ps)]*2))
 		Story.append(Table(gs, rowHeights=[4.3*mm]*len(gs), style=[MID]))
-		ps = [[Paragraph('%s %s'%(qCheck(getattr(s,e[0])),e[1]), styles['LeftXs'])] for e in GoalsCheckArr]
-		other = Paragraph('%s Other: %s'%(pCheck(s.G_other_txt != ""), s.G_other_txt), styles['LeftXs'])
-		ps.append([other])
+
+		ps = [[Paragraph('%s %s'%(qCheck(getattr(s,e[0])),e[1]), styles['LeftXs']) for e in GoalsCheckArr[:2]]]
 		Story.append(Table(ps, rowHeights=[4.3*mm]*len(ps), style=[MID]))
+		ps = []
+		ps = [[Paragraph('%s %s'%(qCheck(getattr(s,e[0])),e[1]), styles['LeftXs'])] for e in GoalsCheckArr[2:]]
+		other = Paragraph('%s Other: %s'%(pCheck(s.G_other_txt != ""), s.G_other_txt), styles['LeftXs'])
+		if s.G_other_txt == "":
+			ps.append([other])
+		Story.append(Table(ps, rowHeights=[4.3*mm]*len(ps), style=[MID]))
+		if s.G_other_txt != "":
+			ps = []
+			ps.append([other])
+			Story.append(Table(ps, style=[MID]))
 		#Story.append(Spacer(1, 5))
 
 		p = Paragraph("<b>Symptoms / Problem Areas: </b>", styles['Left'])
@@ -195,36 +198,35 @@ class FormGenerator:
 			styles['LeftXs'])])
 		row.append([Paragraph("Client <i>%s</i> show insightfulness, <i>%s</i> show effort in addressing problem areas."%(na_q(s.ASS_INSIG.lower()), na_q(s.ASS_EFFRT.lower())),
 			styles['LeftXs'])])
-		p = "Client <i>%s</i> oriented times 3."%na_q(s.ASS_OR.lower())
-		if s.ASS_present_txt != "":
-			p += " Client present with: <i>%s</i>"%s.ASS_present_txt
-		row.append([Paragraph(p, styles['LeftXs'])])
+		row.append([Paragraph("Client <i>%s</i> oriented times 3."%na_q(s.ASS_OR.lower()), styles['LeftXs'])])
 		row.append([Paragraph("Client <i>%s</i> able to talk about stress factors and how to better manage them."%na_q(s.ASS_ABLE.lower()), 
 			styles['LeftXs'])])
 		row.append([Paragraph("Client <i>%s</i> cooperative with therapist's efforts to assist him/her with problem areas."%na_q(s.ASS_COOP.lower()), 
 			styles['LeftXs'])])
-		if s.ASS_other_txt != "":
-			row.append([Paragraph("Other: <i>%s</i>"%s.ASS_other_txt, 
-				styles['LeftXs'])])
 		Story.append(Table(row, rowHeights=[4.3*mm]*len(row), style=[MID]))
+		if s.ASS_present_txt != "":
+			row = [[Paragraph("Client present with: <i>%s</i>"%s.ASS_present_txt, styles['LeftXs'])]]
+			Story.append(Table(row, style=[MID]))
+		if s.ASS_other_txt != "":
+			row = [[Paragraph("Other: <i>%s</i>"%s.ASS_other_txt, styles['LeftXs'])]]
+			Story.append(Table(row, style=[MID]))
 		#Story.append(Spacer(1, 5))
 
-		row = []
 		plan = """
 		<b><font size=10>Plan:</font></b> Continue <i>%s</i> counseling on a <i>%s</i> basis to work 
 		through and to develop coping skills and strategies
 		to address problem areas.
 		%s Continue psychiatric medications as directed by doctor.
-		""" % (s.PLN_CONT.lower(), s.PLN_FREQ.lower(), qCheck(s.PLN_PSY))
-		row.append([Paragraph(plan, styles['LeftXs'])])
+		<u>Next session date:</u> %s
+		""" % (s.PLN_CONT.lower(), s.PLN_FREQ.lower(), qCheck(s.PLN_PSY), s.PLN_NXT)
+		row = [[Paragraph(plan, styles['LeftXs'])]]
 		Story.append(Table(row, style=[MID]))
-		row = []
-		row.append([Paragraph("<b>Next Session date:</b> %s"%s.PLN_NXT, styles['LeftXs']),
-					Paragraph("<b>Provider:</b> %s"%self.provider, styles['LeftXs'])])
 
-
+		prov = Paragraph("<b>Provider:</b> %s"%self.provider, styles['LeftXs'])
+		signature = Paragraph("<b>Signature:</b>                 ", styles['LeftXs'])
+		date = Paragraph("<b>Date:</b>                 ", styles['LeftXs'])
+		row = [[prov, signature, date]]
 		Story.append(Table(row, style=[MID]))
-		#Story.append(Spacer(1, 5))
 
 		doc.build(Story)
 

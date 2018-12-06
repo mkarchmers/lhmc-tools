@@ -81,6 +81,7 @@ class Permissions_init(webapp2.RequestHandler):
 			eh.Hash = ident
 			eh.waiver = False
 			eh.email = email
+			#eh.name = "Mauricio Karchmer, LMHC"
 			eh.put()
 			self.response.write(email + " registered")
 			return
@@ -376,7 +377,7 @@ class PrintHandler(webapp2.RequestHandler):
 
         user = users.get_current_user()
         uid = user.user_id()
-        generator = fc.FormGenerator(user.nickname())
+        generator = fc.FormGenerator(models.EmailHash.get_name(user.email()))
 
         sid = self.request.get('sid')
         if sid != '':
