@@ -3,11 +3,12 @@ from cStringIO import StringIO
 import json
 import re
 import PyPDF2 as pp2
+from functools import partial
 
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_RIGHT, TA_LEFT
 from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.platypus import BaseDocTemplate, Paragraph, Spacer, Table, TableStyle, Frame, PageTemplate
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import mm
 
@@ -49,6 +50,23 @@ def na_q(s):
 		return "N/A"
 	return s
 
+def header(canvas, doc, name, date, styles):
+
+	page = canvas.getPageNumber()
+	if page == 1:
+		return
+
+	pName = Paragraph("<b>Client: </b> %s" % name, styles['LeftSm'])
+	pDate = Paragraph("<b>Date of service: </b> %s" % date, styles['LeftSm'])
+	pPage = Paragraph("<b>Page: </b> %i" % page, styles['LeftSm'])
+
+	content = Table([[pName, pDate, pPage]], rowHeights=[4.3*mm])
+
+	canvas.saveState()
+	w, h = content.wrap(doc.width, doc.topMargin)
+	content.drawOn(canvas, doc.leftMargin, doc.height + doc.topMargin - h)
+	canvas.restoreState()
+
 
 class FormGenerator:
 
@@ -84,12 +102,15 @@ class FormGenerator:
 		                        alignment=TA_LEFT,
 		                        fontSize=8))
 
-		doc = SimpleDocTemplate(pdfFile,
+		doc = BaseDocTemplate(pdfFile,
 		                        pagesize=letter,
 		                        rightMargin=72,leftMargin=72,
 		                        topMargin=36,bottomMargin=18)
 
-		Story=[]
+
+		frame = Frame(doc.leftMargin, doc.bottomMargin, doc.width, doc.height, id='normal')
+		template = PageTemplate(id='test', frames=frame, onPage=partial(header, name=s.name, date=s.date, styles=styles))
+		doc.addPageTemplates([template])
 
 		pName = Paragraph("<b>Client: </b> %s" % s.name, styles['LeftSm'])
 		pDOB = Paragraph("<b>DoB: </b> %s" % s.dob, styles['LeftSm'])
@@ -98,6 +119,9 @@ class FormGenerator:
 		pMod = Paragraph("<b>Modality: </b> %s" % s.modality, styles['LeftSm'])
 		pSes = Paragraph("<b>Session No: </b> %s" % s.session_number, styles['LeftSm'])
 		pDate = Paragraph("<b>Date of service: </b> %s" % s.date, styles['LeftSm'])
+
+		Story = []
+
 		row = [[pName, pDOB]]
 		row.append([pDiag, pDiagCode])
 		if s.diag_2_code is not None and s.diag_2_code != "":
@@ -142,6 +166,8 @@ class FormGenerator:
 			row.append([Paragraph(slf,styles['LeftSm']),Paragraph(oth,styles['LeftSm']),Paragraph(prp,styles['LeftSm'])])
 			Story.append(Table(row, spaceBefore=1*mm, rowHeights=[4.3*mm]*len(row), style=[BOX, MID]))
 		#Story.append(Spacer(1, 5))
+
+		#Story.append(PageBreak())
 
 		p = Paragraph("<b>Therapeutic Interventions: </b>", styles['Left'])
 		row = [[p]]
