@@ -113,8 +113,8 @@ class Insurance_init(webapp2.RequestHandler):
 
     def get(self):
 
-    	#for carrier in ['BlueCrossBlueShield', 'Tufts', 'HarvardPilgrim', 'Optum', 'Cypress', 'Cigna']:
-    	for carrier in ['Cigna']:
+		for carrier in ['BlueCrossBlueShield', 'Tufts', 'HarvardPilgrim', 'Optum', 'Cypress', 'Cigna']:
+		#for carrier in ['Cigna']:
 
     		if True:
 		        i = models.Insurance()
