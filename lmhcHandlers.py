@@ -113,22 +113,21 @@ class Insurance_init(webapp2.RequestHandler):
 
     def get(self):
 
-		for carrier in ['BlueCrossBlueShield', 'Tufts', 'HarvardPilgrim', 'Optum', 'Cypress', 'Cigna']:
-		#for carrier in ['Cigna']:
-
-    		if True:
-		        i = models.Insurance()
-		        i.name = carrier
-		        i.mod_code = "90846"
-		        i.modality_of_session = "Family without patient"
-		        i.put()
-			if False:
-				# for backward compatibility
-				i = models.Insurance()
-				i.name = carrier
-				i.mod_code = "90834"
-				i.modality_of_session = "Individual"
-				i.put()
+        for carrier in ['BlueCrossBlueShield', 'Tufts', 'HarvardPilgrim', 'Optum', 'Cypress', 'Cigna']:
+        #for carrier in ['Cigna']:
+        
+            i = models.Insurance()
+            i.name = carrier
+            i.mod_code = "90846"
+            i.modality_of_session = "Family without patient"
+            i.put()
+            if False:
+            	# for backward compatibility
+            	i = models.Insurance()
+            	i.name = carrier
+            	i.mod_code = "90834"
+            	i.modality_of_session = "Individual"
+            	i.put()
 	        i = models.Insurance()
 	        i.name = carrier
 	        i.mod_code = "90834"
