@@ -321,7 +321,7 @@ class SessionsHandler(webapp2.RequestHandler):
         if pid !=  "" or pid:
             query = query.filter(models.Session.patient_id == pid)
 
-        obj = list(query.fetch(limit=200))
+        obj = list(query.fetch(limit=400))
 
         self.response.headers['Content-Type'] = 'application/json;charset=UTF-8'
         self.response.headers['Access-Control-Allow-Origin'] = '*'
