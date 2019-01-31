@@ -312,11 +312,6 @@ class SessionsHandler(webapp2.RequestHandler):
         order = self.request.get('order', 'lifo')
         if order == 'lifo':
             query = query.order(-models.Session.date_object)
-        else:
-            query = query.order(models.Session.date_object)
-        # todo:  needs to fix fifo order. Fetch limit is 400. Breaks when there are more than 400 sessions.
-        # needs to do lifo and order on python side.
-
 
         pid = self.request.get('pid')
 
@@ -324,6 +319,10 @@ class SessionsHandler(webapp2.RequestHandler):
             query = query.filter(models.Session.patient_id == pid)
 
         obj = list(query.fetch(limit=400))
+
+        if order == 'fifo':
+            obj.sort(key=lambda x: x.date_object, reverse=True)
+
 
         self.response.headers['Content-Type'] = 'application/json;charset=UTF-8'
         self.response.headers['Access-Control-Allow-Origin'] = '*'
