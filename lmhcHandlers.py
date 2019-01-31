@@ -314,6 +314,8 @@ class SessionsHandler(webapp2.RequestHandler):
             query = query.order(-models.Session.date_object)
         else:
             query = query.order(models.Session.date_object)
+        # todo:  needs to fix fifo order. Fetch limit is 400. Breaks when there are more than 400 sessions.
+        # needs to do lifo and order on python side.
 
 
         pid = self.request.get('pid')
