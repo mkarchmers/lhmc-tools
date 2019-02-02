@@ -321,7 +321,7 @@ class SessionsHandler(webapp2.RequestHandler):
         obj = list(query.fetch(limit=400))
 
         if order == 'fifo':
-            obj.sort(key=lambda x: x.date_object, reverse=True)
+            obj.sort(key=lambda x: x.date_object, reverse=False)
 
 
         self.response.headers['Content-Type'] = 'application/json;charset=UTF-8'
