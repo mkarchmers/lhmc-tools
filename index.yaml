@@ -46,3 +46,9 @@ indexes:
   - name: patient_id
   - name: date_object
     direction: desc
+
+- kind: Session
+  properties:
+  - name: name
+  - name: date_object
+    direction: desc
