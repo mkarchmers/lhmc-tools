@@ -320,7 +320,8 @@ class SessionsHandler(webapp2.RequestHandler):
         if pid !=  "" or pid:
             query = query.filter(models.Session.patient_id == pid)
 
-        obj = list(query.fetch(limit=400))
+        limit = int(self.request.get('limit', '600'))
+        obj = list(query.fetch(limit=limit))
 
         if order == 'fifo':
             obj.sort(key=lambda x: x.date_object, reverse=False)

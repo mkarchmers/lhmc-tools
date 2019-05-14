@@ -947,7 +947,9 @@
 
         $.getJSON('/sessions?order=fifo', function(data){
 
+          console.log('date # records = ' + data.length);
           todos = data.filter((item) => item.notes == "TODO")
+          console.log(todos);
 
           if (todos.length == 0){
             $('#eligible, #eligible-panel').show();
