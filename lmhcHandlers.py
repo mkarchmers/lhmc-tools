@@ -312,6 +312,8 @@ class SessionsHandler(webapp2.RequestHandler):
         order = self.request.get('order', 'lifo')
         if order == 'lifo':
             query = query.order(-models.Session.date_object)
+        else:
+            query = query.order(models.Session.date_object)
 
         pid = self.request.get('pid')
 

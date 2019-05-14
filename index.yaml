@@ -11,6 +11,12 @@ indexes:
 # your application using appcfg.py.
 
 - kind: Session
+  properties:
+  - name: name
+  - name: date_object
+    direction: desc
+
+- kind: Session
   ancestor: yes
   properties:
   - name: date_object
@@ -44,11 +50,5 @@ indexes:
   ancestor: yes
   properties:
   - name: patient_id
-  - name: date_object
-    direction: desc
-
-- kind: Session
-  properties:
-  - name: name
   - name: date_object
     direction: desc
