@@ -5,8 +5,11 @@ import os
 import datetime
 import hashlib as hs
 import time
+import re
 from google.appengine.api import users
 from google.appengine.ext import ndb
+from google.appengine.api import images
+
 
 import models
 import sessions
@@ -25,7 +28,7 @@ class MainPage(webapp2.RequestHandler):
         user = users.get_current_user()
 
         permitted = models.EmailHash.validate(user.email())
-    	waiver = models.EmailHash.has_waiver(user.email())
+        waiver = models.EmailHash.has_waiver(user.email())
 
         if user:
             url = users.create_logout_url(self.request.uri)
@@ -74,39 +77,39 @@ class Permissions_init(webapp2.RequestHandler):
 
     def get(self):
 
-    	email = self.request.get('email', None)
-    	if email:
-			ident = hs.md5(email).hexdigest()
-			eh = models.EmailHash(id = ident)
-			eh.Hash = ident
-			eh.waiver = False
-			eh.email = email
-			#eh.name = "Mauricio Karchmer, LMHC"
-			eh.put()
-			self.response.write(email + " registered")
-			return
+        email = self.request.get('email', None)
+        if email:
+            ident = hs.md5(email).hexdigest()
+            eh = models.EmailHash(id = ident)
+            eh.Hash = ident
+            eh.waiver = False
+            eh.email = email
+            #eh.name = "Mauricio Karchmer, LMHC"
+            eh.put()
+            self.response.write(email + " registered")
+            return
         else:
-			self.response.write("nothing to do")
+            self.response.write("nothing to do")
 
-		# if False:
-		#     ident = '361e54ab7e96f7610187da7ba3691184'
-		#     eh = models.EmailHash(id = ident)
-		#     eh.Hash = ident
-		#     eh.put()
-		#     ident = 'bdb63475a053e834d0fd1a1d93d5034e'
-		#     eh = models.EmailHash(id = ident)
-		#     eh.Hash = ident
-		#     eh.put()
-		#     ident = '6215d7ccc7413110ea60829fb1284565'
-		#     eh = models.EmailHash(id = ident)
-		#     eh.Hash = ident
-		#     eh.put()
-		#     ident = 'd980f0ec1b5d23bd04ed702536e4b90f'
-		#     eh = models.EmailHash(id = ident)
-		#     eh.Hash = ident
-		#     eh.put()
-		#     self.response.write("done!")
-		#     return
+        # if False:
+        #     ident = '361e54ab7e96f7610187da7ba3691184'
+        #     eh = models.EmailHash(id = ident)
+        #     eh.Hash = ident
+        #     eh.put()
+        #     ident = 'bdb63475a053e834d0fd1a1d93d5034e'
+        #     eh = models.EmailHash(id = ident)
+        #     eh.Hash = ident
+        #     eh.put()
+        #     ident = '6215d7ccc7413110ea60829fb1284565'
+        #     eh = models.EmailHash(id = ident)
+        #     eh.Hash = ident
+        #     eh.put()
+        #     ident = 'd980f0ec1b5d23bd04ed702536e4b90f'
+        #     eh = models.EmailHash(id = ident)
+        #     eh.Hash = ident
+        #     eh.put()
+        #     self.response.write("done!")
+        #     return
 
 
 class Insurance_init(webapp2.RequestHandler):
@@ -122,43 +125,43 @@ class Insurance_init(webapp2.RequestHandler):
             i.modality_of_session = "Family without patient"
             i.put()
             if False:
-            	# for backward compatibility
-            	i = models.Insurance()
-            	i.name = carrier
-            	i.mod_code = "90834"
-            	i.modality_of_session = "Individual"
-            	i.put()
-	        i = models.Insurance()
-	        i.name = carrier
-	        i.mod_code = "90834"
-	        i.modality_of_session = "Individual-45min"
-	        i.put()
-	        i = models.Insurance()
-	        i.name = carrier
-	        i.mod_code = "90832"
-	        i.modality_of_session = "Individual-30min"
-	        i.put()
-	        i = models.Insurance()
-	        i.name = carrier
-	        i.mod_code = "90837"
-	        i.modality_of_session = "Individual-60min"
-	        i.put()
-	        if True:
-		        i = models.Insurance()
-		        i.name = carrier
-		        i.mod_code = "90847"
-		        i.modality_of_session = "Family with patient"
-		        i.put()
-		        i = models.Insurance()
-		        i.name = carrier
-		        i.mod_code = "90853"
-		        i.modality_of_session = "Group"
-		        i.put()
-		        i = models.Insurance()
-		        i.name = carrier
-		        i.mod_code = "90791"
-		        i.modality_of_session = "Evaluation"
-		        i.put()
+                # for backward compatibility
+                i = models.Insurance()
+                i.name = carrier
+                i.mod_code = "90834"
+                i.modality_of_session = "Individual"
+                i.put()
+            i = models.Insurance()
+            i.name = carrier
+            i.mod_code = "90834"
+            i.modality_of_session = "Individual-45min"
+            i.put()
+            i = models.Insurance()
+            i.name = carrier
+            i.mod_code = "90832"
+            i.modality_of_session = "Individual-30min"
+            i.put()
+            i = models.Insurance()
+            i.name = carrier
+            i.mod_code = "90837"
+            i.modality_of_session = "Individual-60min"
+            i.put()
+            if True:
+                i = models.Insurance()
+                i.name = carrier
+                i.mod_code = "90847"
+                i.modality_of_session = "Family with patient"
+                i.put()
+                i = models.Insurance()
+                i.name = carrier
+                i.mod_code = "90853"
+                i.modality_of_session = "Group"
+                i.put()
+                i = models.Insurance()
+                i.name = carrier
+                i.mod_code = "90791"
+                i.modality_of_session = "Evaluation"
+                i.put()
 
         self.response.write("done!")
 
@@ -177,15 +180,15 @@ class PatientHandler(webapp2.RequestHandler):
         parms['session_number'] = int(parms['session_number'] or "0")
 
         if patient_id is None or patient_id == "":
-		    parms['parent'] = models.UserKey.get(user.user_id())
-		    p = models.Patient(**parms)
-		    p.put()
+            parms['parent'] = models.UserKey.get(user.user_id())
+            p = models.Patient(**parms)
+            p.put()
         else:
-			key = ndb.Key(urlsafe=patient_id)
-			p = key.get()
-			for k,v in parms.items():
-				setattr(p, k, v)
-				p.put()
+            key = ndb.Key(urlsafe=patient_id)
+            p = key.get()
+            for k,v in parms.items():
+                setattr(p, k, v)
+                p.put()
 
         self.redirect('/')
 
@@ -210,7 +213,7 @@ class BillingHandler(webapp2.RequestHandler):
 
     def get(self):
 
-    	user = users.get_current_user()
+        user = users.get_current_user()
         uid = user.user_id()
 
         query = models.Session.query(ancestor=models.UserKey.get(uid))
@@ -242,6 +245,8 @@ class SessionsHandler(webapp2.RequestHandler):
         user = users.get_current_user()
         uid = user.user_id()
 
+        img = self.request.get('img-file')
+
         parms = {}
         for (k,v) in self.request.POST.items():
             parms[k] = v
@@ -250,17 +255,30 @@ class SessionsHandler(webapp2.RequestHandler):
 
         del parms['session_id']
         del parms['seshNo']
+
+        if 'notes-attached' in parms and parms['notes-attached'] == 'on':
+            k = models.NoteImage.create(parms, img)
+            parms['notes_img_id'] = k
+            parms['notes'] = '<img class="img-responsive" src="/img?img_id=%s"></img>' % k
+        else:
+            parms['notes_img_id'] = None
+
+        if 'notes-attached' in parms:
+            del parms['notes-attached']
+        if 'img-file' in parms:
+            del parms['img-file']
+
         if 'to-do' in parms:
             del parms['to-do']
 
         if parms['modality'] == 'Other':
-			if parms['mod_code'] == '':
-				parms['mod_code'] = 'Invalid'
+            if parms['mod_code'] == '':
+                parms['mod_code'] = 'Invalid'
         else:
-	        if parms['insurance'] != 'None' and parms['insurance'] != 'SelfPay':
-	            parms['mod_code'] = models.Insurance.get_code(parms['insurance'], parms['modality'])
-	        else:
-	            parms['mod_code'] = 'None'
+            if parms['insurance'] != 'None' and parms['insurance'] != 'SelfPay':
+                parms['mod_code'] = models.Insurance.get_code(parms['insurance'], parms['modality'])
+            else:
+                parms['mod_code'] = 'None'
 
         user_date_lst = parms['date'].split('/')
         parms['date_object'] = datetime.date(int(user_date_lst[2]), int(user_date_lst[0]), int(user_date_lst[1]))
@@ -297,6 +315,12 @@ class SessionsHandler(webapp2.RequestHandler):
             # set new attributes
             for k,v in parms.iteritems():
                 setattr(session, k, v)
+
+            if (not session.notes.startswith('<img')) and (session.notes_img_id != "") and (session.notes_img_id):
+
+                n_key = ndb.Key(urlsafe=session.notes_img_id)
+                n_key.delete()
+                session.notes_img_id = None
 
             session.put()
 
@@ -384,34 +408,34 @@ class PrintHandler(webapp2.RequestHandler):
 
         sid = self.request.get('sid')
         if sid != '':
-        	key = ndb.Key(urlsafe=sid)
-        	session = key.get()
-        	pdfFile = generator.getPDF(session)
+            key = ndb.Key(urlsafe=sid)
+            session = key.get()
+            pdfFile = generator.getPDF(session)
         else:
-			pid = self.request.get('pid')
-			name = self.request.get('name')
-			start_date = self.request.get('start')
-			end_date = self.request.get('end')
+            pid = self.request.get('pid')
+            name = self.request.get('name')
+            start_date = self.request.get('start')
+            end_date = self.request.get('end')
 
-			start_date = datetime.datetime.strptime(start_date, '%m/%d/%Y').date()
-			end_date = datetime.datetime.strptime(end_date, '%m/%d/%Y').date()
+            start_date = datetime.datetime.strptime(start_date, '%m/%d/%Y').date()
+            end_date = datetime.datetime.strptime(end_date, '%m/%d/%Y').date()
 
-			query = models.Session.query(ancestor=models.UserKey.get(uid))
-			query = query.filter(models.Session.patient_id==pid)
-			query = query.order(models.Session.date_object)
-			obj = [r for r in query.fetch(limit=200)]
-			#print "length= ", len(obj)
+            query = models.Session.query(ancestor=models.UserKey.get(uid))
+            query = query.filter(models.Session.patient_id==pid)
+            query = query.order(models.Session.date_object)
+            obj = [r for r in query.fetch(limit=200)]
+            #print "length= ", len(obj)
 
-			merger = fc.FormMerger()
-			for s in obj:
-				#print s.date, s.date_object
-				if start_date <= s.date_object <= end_date:
-					#print "generating"
-					p = generator.getPDF(s)
-					merger.addPdf(p)
-				#break
+            merger = fc.FormMerger()
+            for s in obj:
+                #print s.date, s.date_object
+                if start_date <= s.date_object <= end_date:
+                    #print "generating"
+                    p = generator.getPDF(s)
+                    merger.addPdf(p)
+                #break
 
-			pdfFile = merger.getPdf()
+            pdfFile = merger.getPdf()
 
 
         #pdfFile = fc.FormGenerator.emptyPDF()
@@ -423,51 +447,74 @@ class PrintHandler(webapp2.RequestHandler):
 
 class DeleteHandler(webapp2.RequestHandler):
 
-	def post(self):
-		user = users.get_current_user()
-		uid = user.user_id()
+    def post(self):
+        user = users.get_current_user()
+        uid = user.user_id()
 
-		parms = {}
-		for (k,v) in self.request.POST.items():
-			parms[k] = v
+        parms = {}
+        for (k,v) in self.request.POST.items():
+            parms[k] = v
 
-		sid = parms.get('sid',None)
+        sid = parms.get('sid',None)
 
-		if sid is None:
-			self.response.write(json.dumps({
-				'status':'error',
-				'message':'Nothing to delete.'}))
-			return
+        if sid is None:
+            self.response.write(json.dumps({
+                'status':'error',
+                'message':'Nothing to delete.'}))
+            return
 
-		s_key = ndb.Key(urlsafe=sid)
-		session = s_key.get()
+        s_key = ndb.Key(urlsafe=sid)
+        session = s_key.get()
 
-		pid = getattr(session, 'patient_id')
+        pid = getattr(session, 'patient_id')
 
-		p_key = ndb.Key(urlsafe=pid)
-		patient = p_key.get()
+        p_key = ndb.Key(urlsafe=pid)
+        patient = p_key.get()
 
-		# is it OK to delete?
-		if patient.session_number > session.session_number:
-			self.response.write(json.dumps({
-				'status':'error',
-				'message':'Attempting to delete a session previous to last. Nothing done.'}))
-			return
-		if session.is_billed:
-			self.response.write(json.dumps({
-				'status':'error',
-				'message':'Attempting to delete a billed session. Nothing done.'}))
-			return
+        notes_img_id = getattr(session, 'notes_img_id')
+        if notes_img_id is not None and notes_img_id != "":
+            n_key = ndb.Key(urlsafe=notes_img_id)
+            n_key.delete()  
 
-		s_key.delete()
-		ndb.transaction(patient.decrement)
+        # is it OK to delete?
+        if patient.session_number > session.session_number:
+            self.response.write(json.dumps({
+                'status':'error',
+                'message':'Attempting to delete a session previous to last. Nothing done.'}))
+            return
+        if session.is_billed:
+            self.response.write(json.dumps({
+                'status':'error',
+                'message':'Attempting to delete a billed session. Nothing done.'}))
+            return
 
-		self.response.write(json.dumps({
-			'status':'success',
-			'message': 'Session deleted',
-			'patient': patient.to_dict(),
-			'session': session.to_dict()}, cls=models.ModelEncoder))
-		return
+        s_key.delete()
+        ndb.transaction(patient.decrement)
+
+        self.response.write(json.dumps({
+            'status':'success',
+            'message': 'Session deleted',
+            'patient': patient.to_dict(),
+            'session': session.to_dict()}, cls=models.ModelEncoder))
+        return
+
+
+class NewHandler2(webapp2.RequestHandler):
+
+    def post(self):
+        for (k,v) in self.request.POST.items():
+            pass
+            #print k, v
+
+        img = self.request.get('img-file-todo')
+        if img and img!="":
+            k = models.NoteImage.create({'name':'mk','date':'today'}, img)
+            self.response.write('<img class="img-responsive" src="/img?img_id=%s"></img>' % k) 
+            return
+
+        self.response.write(json.dumps({
+                    'status':'error',
+                    'message':'ERROR'}))
 
 
 class NewHandler(webapp2.RequestHandler):
@@ -477,6 +524,8 @@ class NewHandler(webapp2.RequestHandler):
         user = users.get_current_user()
         uid = user.user_id()
 
+        self.response.headers['Content-Type'] = 'application/json'
+
         parms = {}
         for (k,v) in self.request.POST.items():
             parms[k] = v
@@ -484,11 +533,12 @@ class NewHandler(webapp2.RequestHandler):
         date = parms.get('date',None)
         pid = parms.get('pid',None)
         sid = parms.get('sid',None)
-        notes = parms.get('notes', 'TODO')
+        notes = parms.get('notes-todo', 'TODO')
+        img = self.request.get('img-file-todo')
 
         # update TODO session
         if sid is not None:
-            if notes == 'TODO':
+            if notes == 'TODO' and img == "":
                 self.response.write(json.dumps({
                     'status':'error',
                     'message':'Nothing to change.'}))
@@ -503,7 +553,13 @@ class NewHandler(webapp2.RequestHandler):
                     'message':'ERROR: trying to change notes of finished session'}))
                 return
 
-            session.notes = "Client reported: " + notes
+            if img and img != "":
+                k = models.NoteImage.create({'name':session.name,'date':session.date}, img)
+                session.notes_img_id = k
+                session.notes = '<img class="img-responsive" src="/img?img_id=%s"></img>' % k
+            else:
+                session.notes = "Client reported: " + notes
+
             session.put()
 
             self.response.write(json.dumps({
@@ -555,3 +611,11 @@ class NewHandler(webapp2.RequestHandler):
             'latest':latest.to_dict(),
             }, cls=models.ModelEncoder))
 
+
+class ImageHandler(webapp2.RequestHandler):
+
+    def get(self):
+        key = ndb.Key(urlsafe=self.request.get('img_id'))
+        img = key.get()
+        self.response.headers['Content-Type'] = 'image/png'
+        self.response.out.write(img.blob)

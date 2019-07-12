@@ -16,6 +16,8 @@ app = webapp2.WSGIApplication([
     ('/bill', bh.BillingHandler2),
     ('/print', hh.PrintHandler),
     ('/new', hh.NewHandler),
+    #('/new2', hh.NewHandler2),
     ('/delete', hh.DeleteHandler),
+    ('/img', hh.ImageHandler),
 
 ], debug=False)

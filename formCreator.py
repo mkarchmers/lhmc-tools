@@ -8,10 +8,13 @@ from functools import partial
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_RIGHT, TA_LEFT
 from reportlab.lib.pagesizes import letter
-from reportlab.platypus import BaseDocTemplate, Paragraph, Spacer, Table, TableStyle, Frame, PageTemplate
+from reportlab.platypus import Image, BaseDocTemplate, Paragraph, Spacer, Table, TableStyle, Frame, PageTemplate
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import mm
 from reportlab.pdfgen import canvas
+
+from google.appengine.ext import ndb
+from google.appengine.api import images
 
 import models
 
@@ -26,7 +29,7 @@ MID = ('VALIGN',(0,0),(-1,-1),"MIDDLE")
 
 form = {}
 with open('static/form.json') as json_data:
-    form = json.load(json_data)
+	form = json.load(json_data)
 TICheckArr = form['TICheckArr']
 GoalsCheckArr = form['GoalsCheckArr']
 SPACheckArr = form['SPACheckArr']
@@ -37,8 +40,8 @@ def pCheck(p):
 	return CHECK_ON if p else CHECK_OFF
 
 def anti_vowel(s):
-    result = re.sub(r'[AEIOU]', '', s[3:], flags=re.IGNORECASE)
-    return s[:3]+result
+	result = re.sub(r'[AEIOU]', '', s[3:], flags=re.IGNORECASE)
+	return s[:3]+result
 def abbr(p):
 	if len(p) < 15:
 		return p
@@ -71,27 +74,27 @@ def header(canvas, doc, name, date, styles):
 
 class NumberedCanvas(canvas.Canvas):
 	# from http://code.activestate.com/recipes/576832/
-    def __init__(self, *args, **kwargs):
-        canvas.Canvas.__init__(self, *args, **kwargs)
-        self._saved_page_states = []
+	def __init__(self, *args, **kwargs):
+		canvas.Canvas.__init__(self, *args, **kwargs)
+		self._saved_page_states = []
 
-    def showPage(self):
-        self._saved_page_states.append(dict(self.__dict__))
-        self._startPage()
+	def showPage(self):
+		self._saved_page_states.append(dict(self.__dict__))
+		self._startPage()
 
-    def save(self):
-        """add page info to each page (page x of y)"""
-        num_pages = len(self._saved_page_states)
-        for state in self._saved_page_states:
-            self.__dict__.update(state)
-            self.draw_page_number(num_pages)
-            canvas.Canvas.showPage(self)
-        canvas.Canvas.save(self)
+	def save(self):
+		"""add page info to each page (page x of y)"""
+		num_pages = len(self._saved_page_states)
+		for state in self._saved_page_states:
+			self.__dict__.update(state)
+			self.draw_page_number(num_pages)
+			canvas.Canvas.showPage(self)
+		canvas.Canvas.save(self)
 
-    def draw_page_number(self, page_count):
-        self.setFont("Helvetica", 7)
-        self.drawRightString(200*mm, 20*mm,
-            "Page %d of %d" % (self._pageNumber, page_count))
+	def draw_page_number(self, page_count):
+		self.setFont("Helvetica", 7)
+		self.drawRightString(200*mm, 20*mm,
+			"Page %d of %d" % (self._pageNumber, page_count))
 
 
 class FormGenerator:
@@ -119,19 +122,19 @@ class FormGenerator:
 
 		styles=getSampleStyleSheet() 
 		styles.add(ParagraphStyle(name='Left', 
-		                        alignment=TA_LEFT,
-		                        fontSize=10))
+								alignment=TA_LEFT,
+								fontSize=10))
 		styles.add(ParagraphStyle(name='LeftSm', 
-		                        alignment=TA_LEFT,
-		                        fontSize=9))
+								alignment=TA_LEFT,
+								fontSize=9))
 		styles.add(ParagraphStyle(name='LeftXs', 
-		                        alignment=TA_LEFT,
-		                        fontSize=8))
+								alignment=TA_LEFT,
+								fontSize=8))
 
 		doc = BaseDocTemplate(pdfFile,
-		                        pagesize=letter,
-		                        rightMargin=72,leftMargin=72,
-		                        topMargin=36,bottomMargin=18)
+								pagesize=letter,
+								rightMargin=72,leftMargin=72,
+								topMargin=36,bottomMargin=18)
 
 
 		frame = Frame(doc.leftMargin, doc.bottomMargin, doc.width, doc.height, id='normal')
@@ -246,7 +249,20 @@ class FormGenerator:
 		#Story.append(Spacer(1, 5))
 
 		Story.append(Spacer(1, 3))
-		row = [[Paragraph(s.notes, styles['LeftSm'])]]
+		notes_img_id = s.notes_img_id
+		notes = s.notes
+		if notes_img_id is not None and notes_img_id != "":
+
+			n_key = ndb.Key(urlsafe=notes_img_id)
+			img = n_key.get()
+			img = images.resize(img.blob, width=800, height=800)
+			file = StringIO()
+			file.write(img)
+
+			row = [[Image(file, 400, 400)]]
+		else:
+			row = [[Paragraph(notes, styles['LeftSm'])]]
+
 		Story.append(Table(row, style=[BOX,MID]))
 		#Story.append(Spacer(1, 5))
 

@@ -1,8 +1,9 @@
 import json
 import datetime
 import hashlib as hs
+from google.appengine.api import users
 from google.appengine.ext import ndb
-
+from google.appengine.api import images
 
 class UserKey(object):
 
@@ -191,6 +192,7 @@ class Session(ndb.Model):
     TI_valid= ndb.StringProperty(indexed=False)
 
     notes = ndb.TextProperty(indexed=False)
+    notes_img_id = ndb.StringProperty(indexed=False)
 
 
 class Schedule(ndb.Model):
@@ -264,3 +266,28 @@ class Insurance(ndb.Model):
         res = list(query.fetch(limit=1))
         
         return None if len(res) == 0 else res[0].mod_code
+
+
+class NoteImage(ndb.Model):
+
+    name = ndb.StringProperty()
+    date = ndb.StringProperty()
+
+    blob = ndb.BlobProperty(indexed=False)
+
+    @classmethod
+    def create(cls, parms, img):
+
+        user = users.get_current_user()
+        uid = user.user_id()
+
+        note = NoteImage(parent=UserKey.get(uid))
+        
+        note.name = parms['name']
+        note.date = parms['date']
+
+        note.blob = images.resize(img,800,800)
+        note.put()
+
+        return note.key.urlsafe()
+

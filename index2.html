@@ -211,14 +211,35 @@
                     <a>title</a>
                     <span role="button"
                     class="add-note glyphicon glyphicon-align-justify badge-pill"
-                    data-toggle="tooltip" title="Click to add note"></span>
+                    data-toggle="tooltip" title="Click to add notes"></span>
+                    <span role="button"
+                    class="add-note-img glyphicon glyphicon-picture badge-pill"
+                    data-toggle="tooltip" title="Click to add notes img"></span>
                     <span role="button"
                     class="delete-session glyphicon glyphicon-minus-sign badge-pill"
                     data-toggle="tooltip" title="Click to delete session"></span>
                   </li>
-                  <div class="notes-area collapse " id="PID-notes">
+                  <form action="/" 
+                    enctype="multipart/form-data"
+                    method='post'>
+                      <input name="pid" class="data-ro" hidden >
+                      <input name="sid" class="data-ro" hidden >
+                      <input name="date" class="data-ro" hidden >
+                        <div class="notes-area collapse ">
+                          <textarea class="form-control" rows=5 name="notes-todo"></textarea>
+                        </div>
+                        <div class="notes-area notes-area-img collapse ">
+                          <input type="file" name="img-file-todo">
+                        </div>
+                  </form>
+                  <!--
+                  <div class="notes-area collapse ">
                     <textarea class="form-control" rows=5></textarea>
                   </div>
+                  <div class="notes-area collapse " id="PID-notes">
+                    <input type="file" name="add-img-file" id="add-img-file">
+                  </div>
+                -->
                 </div>
               </template>
             </ul>
@@ -264,11 +285,15 @@
           <div class="modal-header">
             <button type="button" id="session-info-close" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             <span class="glyphicon glyphicon-print badge-pill" id="session-print" onclick="printSession();"></span>
+            <span class="glyphicon glyphicon-upload badge-pill" id="sessionSubmit" onclick="submit_session();"></span>
+            <span class="glyphicon glyphicon-edit badge-pill" id="sessionEdit" onclick="edit_session();"></span>
 
             <h4 class="modal-title" id="sessionInfoLabel">Session</h4>
           </div>
           <div class="modal-body">   
-            <form id="new_session_form" action="/sessions" method='post'>
+            <form id="new_session_form" action="/sessions" 
+                  enctype="multipart/form-data"
+                  method='post'>
               <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 
                 <!-- PI -->
@@ -331,6 +356,13 @@
                             <div class="input-group-append">
                                 <input type="checkbox" name="to-do" id="to-do">
                                 <span class="input-group-text">TODO</span>
+
+
+                                <input type="checkbox" name="notes-attached" id="notes-attached">
+                                <span class="input-group-text">Attached</span>
+                                <input type="file" name="img-file" id="img-file">
+
+
                             </div>
                           </div>
                         </li>
@@ -547,7 +579,13 @@
                   <div id="collapseNO" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingNO">
                     <div class="panel-body">
                       <div class="form-group">
+                        <!--<div class="input-group-prepend">
+                          <input type="checkbox" name="notes-attached" id="notes-attached">
+                          <span class="input-group-text">Attached</span>
+                          <input type="file" name="img-file" id="img-file">
+                        </div>-->
                         <textarea class="form-control" rows="5" id="notes" name="notes"></textarea>
+                        <div class="pre-scrollable" id="img-notes"></div>
                       </div>                      
                     </div>
                   </div>
@@ -680,10 +718,11 @@
             </form>
           </div>
 
+          <!--
           <div class="modal-footer">
             <button id="sessionSubmit" type="button" class="btn btn-default" onclick="submit_session()">Submit</button>
             <button id="sessionEdit" type="button" class="btn btn-default" onclick="edit_session()">Edit</button>
-          </div>
+          </div>-->
 
         </div>
       </div>
@@ -815,7 +854,7 @@
       }
 
       function getCSV(){
-        date = $('#billing-date').val()
+        var date = $('#billing-date').val()
         if (!validateBillingDate(date)){
           return
         }
@@ -823,7 +862,7 @@
       }
 
       function getPDF(){
-        date = $('#billing-date').val()
+        var date = $('#billing-date').val()
         if (!validateBillingDate(date)){
           return
         }
@@ -831,7 +870,7 @@
       }
 
       function confirmEmail(){
-        date = $('#billing-date').val()
+        var date = $('#billing-date').val()
         if (!validateBillingDate(date)){
           return
         }
@@ -839,7 +878,7 @@
       }
 
       function sendBillingEmail(){
-        date = $('#billing-date').val()
+        var date = $('#billing-date').val()
 
         // refresh to display billed sessions
         new_session_flag = true;
@@ -849,9 +888,9 @@
           $('.billing-what').hide()
           $('.confirm-email').hide()
           $('.ack-email').show()
-          status = data.status
-          msg = ''
-          _class = ''
+          var status = data.status
+          var msg = ''
+          var _class = ''
           if (status == 'success'){
             msg = 'Email was sent succesfully.  Bill contains ' + data.no_sessions + ' billable sessions.'
             _class = "alert-success"
@@ -925,11 +964,11 @@
       }
 
       function remove_todo_patient(el){
-        li = $(el).parent();
+        var li = $(el).parent();
         $(li).next().remove();
         $(li).remove();
 
-        items = $('#todo-patients-list li').length;
+        var items = $('#todo-patients-list li').length;
         if (items == 0){
           todoPage();
         }
@@ -949,7 +988,7 @@
 
           console.log('date # records = ' + data.length);
           todos = data.filter((item) => item.notes == "TODO")
-          console.log(todos);
+          //console.log(todos);
 
           if (todos.length == 0){
             $('#eligible, #eligible-panel').show();
@@ -1003,11 +1042,11 @@
       function eligible(date) {
 
         return function(item){
-          mom_schedule = moment(item.moment);
+          var mom_schedule = moment(item.moment);
           mom_schedule.set('hour',0);
           mom_schedule.set('minute',0);
           mom_schedule.set('second',0);
-          d = moment(date).diff(mom_schedule,'day');
+          var d = moment(date).diff(mom_schedule,'day');
           return d % item.freq == 0;
         }
       }
@@ -1020,10 +1059,19 @@
         }
       }
 
+      function collapse_image(id){
+
+        return function(e){
+          $('#'+id).collapse('toggle');
+          e.stopPropagation();
+        }
+      }
+
       function add_tmpl_for_patient(item) {
-        tmp  = $( $('#todo-patient-list-tmpl').html() );
+        //console.log(item)
+        var tmp  = $( $('#todo-patient-list-tmpl').html() );
         tmp.attr('id',item.id);
-        li = tmp.find('li').first();
+        var li = tmp.find('li').first();
 
         // only schedule items have pid
         if (item.pid){
@@ -1034,21 +1082,34 @@
         if (item.date){
           li.attr('sid', item.id);
         }
-        title = `<small>${item.name}</small>`
+        var title = `<small>${item.name}</small>`
         if (item.date){
           title = `<small>${item.name}: ${item.date}</small>`
         }
         li.find('a').first().html(title);
 
-        notes = item.id+'-notes'
-        tmp.find('div').first().attr('id', notes)
+        tmp.find('form').first().attr('id', item.id+'-form')
+
+        var form = tmp.find('form').first()
+        form.attr('sid',item.id)
+        form.find('input[name="pid"]').first().val(item.patient_id)
+        form.find('input[name="sid"]').first().val(item.id)
+        form.find('input[name="date"]').first().val(item.date)
+
+        var notes = item.id+'-notes'
+        tmp.find('.notes-area').first().attr('id', notes)
+
+        var img = item.id+'-img'
+        tmp.find('.notes-area-img').attr('id', img)
 
         tmp.clone().appendTo('#todo-patients-list')
         if (item.date){
           $(`#${item.id} span.add-note`).click(collapse_notes(notes))
+          $(`#${item.id} span.add-note-img`).click(collapse_notes(img))
         }
         else {
           $(`#${item.id} span.add-note`).remove();
+          $(`#${item.id} span.add-note-img`).remove();
         }
         $(`#${item.id} a`).first().data(item)
           .click(function(){display_todo_session(this)});
@@ -1062,7 +1123,7 @@
 
           $.getJSON('/schedule',function(schedule){
 
-            eligible_items = schedule.filter(eligible(date));
+            var eligible_items = schedule.filter(eligible(date));
             if (eligible_items.length == 0){
               $('#eligible, #eligible-panel').show();
               $('#eligible').text('No eligible patients on this date')
@@ -1097,18 +1158,22 @@
         $('.delete-session').remove();
         $('.notes-area').collapse('hide')
 
-        no_patients = $('#todo-patients-list li').length;
+        var no_patients = $('#todo-patients-list li').length;
 
         if (finish_todo_flag){
           // only valid sessions are sessions with non-trivial notes
           no_patients = 0
           $('#todo-patients-list li').each(function(){
-            notes = $(this).next().find('textarea').first().val()
-            if (notes != ''){
+            var form = $(this).next()
+            var sid = form.attr('sid')
+
+            var img = $(`#${sid}-img > input`).val()
+            var notes = $(`#${sid}-notes > textarea`).val()
+
+            if (notes != '' || img != ''){
               no_patients += 1;
             }
             else {
-              //$(this).addClass('alert-danger')
               $(this).remove()
             }
           });
@@ -1131,6 +1196,8 @@
 
         function post_success(el){
           return function(r){
+            r = $.parseJSON(r);
+            //console.log(r)
             if (r.status == 'ok'){
               let span = $('<span class="glyphicon glyphicon-ok"></span>');
               span.attr('data-toggle','tootlip');
@@ -1156,30 +1223,61 @@
           }
         }
 
-        $('#todo-add, .add-note').hide()
+        $('#todo-add, .add-note, .add-note-img').hide()
         $('.confirm-todo').hide()
         $('.notes-area').collapse('hide')
 
         $('#todo-patients-list li').unbind('click')
           .tooltip('hide');
 
-        date = $('#todo-date').val();
+        var date = $('#todo-date').val();
         $('#todo-patients-list li').each(function(){
-          el = $(this);
+          var el = $(this);
 
-          pid = el.attr('pid');
-          sid = el.attr('sid');
+          var pid = el.attr('pid');
+          var sid = el.attr('sid');
 
-          notes = '';
+          var notes = '';
+          var img = null;
+
+          var form_data = new FormData(); 
+
           if (pid){
             notes = $(`#${pid}-notes textarea`).first().val()
+            form_data.append("pid", pid)
+            form_data.append("date", date)
           }
-          if (sid){
-            notes = $(`#${sid}-notes textarea`).first().val()
+          if (sid){ 
+            notes = $(`#${sid}-notes > textarea`).val()
+            img = $(`#${sid}-img > input`).val()
+
+            pid = $(`#${sid}-form > input[name="pid"]`).val()
+            sid = $(`#${sid}-form > input[name="sid"]`).val()
+            date = $(`#${sid}-form > input[name="date"]`).val()
+            //console.log('posting todo', notes, img, name, date)
+
+            if (img != ""){
+              file_data = $(`#${sid}-img > input`).prop("files")[0]
+              form_data.append("img-file-todo", file_data) 
+            }
+            form_data.append("pid", pid)
+            form_data.append("sid", sid)
+            form_data.append("date", date)
+            form_data.append("notes-todo", notes)
           }
 
-          if (pid || (notes && notes != '')){
-            $.post('/new', {'sid': sid, 'pid':pid, 'date':date, 'notes': notes}, post_success(el), 'json')
+
+          if (pid || (notes && notes != '' || (img != ''))){
+              $.ajax({
+                url: '/new', 
+                dataType: 'script',
+                cache: false,
+                contentType: false,
+                processData: false,
+                data: form_data, 
+                type: 'post',
+                success: post_success(el),
+              })
           }
         })
 
@@ -1220,7 +1318,7 @@
 
       function display_patient_info(item){
 
-        form = d3.select('#new_patient_form');
+        var form = d3.select('#new_patient_form');
         /*
         form.selectAll('.form-control')
           .attr('disabled',true);
@@ -1282,7 +1380,7 @@
       function delete_last_note(patient){
 
         $.getJSON('/sessions?pid='+patient.id, function(data){
-          s = data[0]
+          var s = data[0]
           if (!s){
             alert(`Patient ${patient.name} does not have any sessions to delete`);
           }
@@ -1325,6 +1423,18 @@
               events: processNotesData(data),
               
               eventClick: calendarEventClick,
+
+              eventRender: function(event, eventElement) {
+                var img_id = event.data.notes_img_id
+                console.log(event.title + img_id)
+                console.log(event.data.notes)
+                if (img_id){
+                  img_el = `<img class="img-responsive" src="/img?img_id=${img_id}"></img>`
+                  eventElement.find("td.fc-list-item-title").html(img_el);
+                } else{
+                  eventElement.find("td.fc-list-item-title").html(event.title);
+                }
+              },
           });
         })
       }
@@ -1401,9 +1511,9 @@
         $.getJSON('/patient', function(data){
 
           console.log('patient info loaded')
-          table = d3.select('#patientTable');
-          tbody = table.select('tbody');
-          selection = tbody.selectAll('tr')
+          var table = d3.select('#patientTable');
+          var tbody = table.select('tbody');
+          var selection = tbody.selectAll('tr')
             .data(data.patient_list);
             
           selection.text(row)
@@ -1484,7 +1594,7 @@
           document.getElementById(w).value = data[w];
         })
         // special logic for 'modality', to deal with old codes.
-        m = data['modality'];
+        var m = data['modality'];
         if (m == "Individual"){
           m = "Individual-45min";
         }
@@ -1558,7 +1668,24 @@
 
         if (data['notes'] == 'TODO'){
           write_checbox('to-do','on');
-          //console.log("No show")
+        }
+
+        var img_id = data['notes_img_id']
+        console.log("img id = "+img_id)
+
+        //if (data['notes'].startsWith('<img')){
+        $("#img-file").hide()
+        if (img_id){
+          write_checbox('notes-attached','on');
+          //$("#img-notes").append(data['notes']).show()
+          img_el = `<img class="img-responsive" src="/img?img_id=${img_id}"></img>`
+          $("#img-notes").append(img_el).show()
+          
+          $("#notes").hide()
+        }
+        else{
+          $("#notes").show()
+          $("#img-notes > img").remove()
         }
 
         document.getElementById('insurance').value = data['insurance'];
@@ -1587,10 +1714,18 @@
           alert("date cannot be empty");
           return false;
         }
-        f = $('#notes').val();
-        if ((f == "") || (f == "Client reported:") ){
-          alert("notes must be entered");
-          return false;
+        if (document.getElementById('notes-attached').checked){
+          f = $('#img-file').val();
+          if (f ==""){
+            alert("Notes image must be uploaded");
+            return false;
+          }
+        } else{
+          f = $('#notes').val();
+          if ((f == "") || (f == "Client reported:") ){
+            alert("notes must be entered");
+            return false;
+          }          
         }
         f = $('#diag_code').val();
         if (f == ""){
@@ -1663,9 +1798,13 @@
           .classed('visible',null)
           .classed('invisible',true)
 
+        //console.log("file: "+$('#img-file').val())
+
         $('#session_info').modal('show');
         $("#new_session_form")[0].reset();
-        $('#notes').val('Client reported:')
+        $('#notes').val('Client reported:').show()
+        $('#img-file').hide()
+        $("#img-notes > img").remove()        
 
 
         $.getJSON('/sessions?pid=' + patient.id, function (data) {
@@ -1764,16 +1903,27 @@
           }
         })
 
-        // no_show listeners
+        // to-do listeners
         $('input[name="to-do"]').change(function(){
-          //console.log("no show")
           if (this.checked){
-            //console.log('checked')
             $("#notes").val("TODO")
+            $("#img-notes").hide()
           }
           else {
-            //console.log('unchecked')
             $("#notes").val("Client reported:")
+          }
+        })
+
+        // notes-attached listeners
+        $('input[name="notes-attached"]').change(function(){
+          if (this.checked){
+            $("#notes").hide()
+            $("#img-file").show()
+            $("#img-notes").show()
+          }
+          else {
+            $("#notes").show()
+            $("#img-file").hide()
           }
         })
 
