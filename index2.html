@@ -1426,8 +1426,8 @@
 
               eventRender: function(event, eventElement) {
                 var img_id = event.data.notes_img_id
-                console.log(event.title + img_id)
-                console.log(event.data.notes)
+                //console.log(event.title + img_id)
+                //console.log(event.data.notes)
                 if (img_id){
                   img_el = `<img class="img-responsive" src="/img?img_id=${img_id}"></img>`
                   eventElement.find("td.fc-list-item-title").html(img_el);
@@ -1671,13 +1671,13 @@
         }
 
         var img_id = data['notes_img_id']
-        console.log("img id = "+img_id)
+        $('#new_session_form').attr('img_id', img_id)
+        console.log("img id = "+$('#new_session_form').attr('img_id'))
 
-        //if (data['notes'].startsWith('<img')){
+
         $("#img-file").hide()
         if (img_id){
           write_checbox('notes-attached','on');
-          //$("#img-notes").append(data['notes']).show()
           img_el = `<img class="img-responsive" src="/img?img_id=${img_id}"></img>`
           $("#img-notes").append(img_el).show()
           
@@ -1715,17 +1715,31 @@
           return false;
         }
         if (document.getElementById('notes-attached').checked){
-          f = $('#img-file').val();
-          if (f ==""){
-            alert("Notes image must be uploaded");
-            return false;
+          // if it is visible, then it is in edit mode
+          // problem: once it is unclicked, it will forget the image.
+          // solution: add attribute img_id to element to remember.
+          if ($('#new_session_form').attr('img_id')){
+            console.log('img-file exists')
+            f = $('#notes').val();
+            if (!f.startsWith('<img')){
+              if (!confirm('Session note old image will be removed. Are you sure?')){
+                alert('Correct and re-submit')
+                return false;
+              }
+            }
+          } else {
+            f = $('#img-file').val();
+            if (f ==""){
+              alert("Notes image must be uploaded");
+              return false;
+            }
           }
-        } else{
+        } else {
           f = $('#notes').val();
           if ((f == "") || (f == "Client reported:") ){
             alert("notes must be entered");
             return false;
-          }          
+          }      
         }
         f = $('#diag_code').val();
         if (f == ""){

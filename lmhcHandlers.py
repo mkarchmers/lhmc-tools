@@ -256,12 +256,15 @@ class SessionsHandler(webapp2.RequestHandler):
         del parms['session_id']
         del parms['seshNo']
 
-        if 'notes-attached' in parms and parms['notes-attached'] == 'on':
+        new_image = None
+
+        if 'notes-attached' in parms and parms['notes-attached'] == 'on' and img:
             k = models.NoteImage.create(parms, img)
             parms['notes_img_id'] = k
             parms['notes'] = '<img class="img-responsive" src="/img?img_id=%s"></img>' % k
-        else:
-            parms['notes_img_id'] = None
+            new_image = k
+        #else:
+        #    parms['notes_img_id'] = None
 
         if 'notes-attached' in parms:
             del parms['notes-attached']
@@ -302,6 +305,10 @@ class SessionsHandler(webapp2.RequestHandler):
             # edit session
             key = ndb.Key(urlsafe=session_id)
             session = key.get()
+            if (session.notes_img_id and new_image):
+                n_key = ndb.Key(urlsafe=session.notes_img_id)
+                n_key.delete()
+            
 
             # reset attributes that are not in parms
             # these have values of "on"
