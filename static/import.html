@@ -299,6 +299,8 @@
 
       function uploadSessions(){
 
+        $('#upload .glyphicon-upload').hide();
+
         items = [];
         items = $('#upload .upload-item').map(function(){
           var d = $(this).data();
