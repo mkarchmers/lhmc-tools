@@ -42,9 +42,10 @@
             <li class="dropdown">
               <a class="dropdown-toggle" data-toggle="dropdown" href="#">Other <span class="caret"></a>
               <ul class="dropdown-menu">
-                <li><a href="static/schedule.html">Schedule</a></li>
-                <li><a href="static/printing.html">Printing</a></li>
-                <li><a href="{{ url|safe }}">{{ url_linktext }}</a></li>
+                <li class="dropdown-item"><a href="static/schedule.html">Schedule</a></li>
+                <li class="dropdown-item"><a href="static/printing.html">Printing</a></li>
+                <li class="dropdown-item"><a id="import" href="static/import.html">Import</a></li>
+                <li class="dropdown-item"><a href="{{ url|safe }}">{{ url_linktext }}</a></li>
               </ul>
             </li>
           </ul>
@@ -1199,7 +1200,7 @@
             r = $.parseJSON(r);
             //console.log(r)
             if (r.status == 'ok'){
-              let span = $('<span class="glyphicon glyphicon-ok"></span>');
+              let span = $('<span class="glyphicon glyphicon-ok my-glyphicon-ok"></span>');
               span.attr('data-toggle','tootlip');
               if (r.latest){
                 span.attr('title',`Latest session was on ${r.latest.date}. New session is number ${r.new_session.no_session}.`);
@@ -1214,7 +1215,7 @@
               new_session_flag = true;
             }
             else {
-              let span = $('<span class="glyphicon glyphicon-remove"></span>');
+              let span = $('<span class="glyphicon glyphicon-remove my-glyphicon-remove"></span>');
               span.attr('data-toggle','tooltip');
               span.attr('title',r.message);
               span.tooltip();
@@ -1909,6 +1910,16 @@
       $( document ).ready(function() {
 
         console.log('document ready')
+
+        if (navigator.userAgent.indexOf('Mobi')>-1){
+          console.log(navigator.userAgent)
+          $('#import').parent().addClass('disabled');
+          $('#import').on('click',function(e){
+            //alert('Functionality not available on mobile devices')
+            e.preventDefault();
+            e.stopPropagation();
+          })
+        }
 
         // confirms closing of SI modal
         $('#session-info-close').on('click', function(event){

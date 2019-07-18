@@ -28,21 +28,24 @@ body {
 
 .glyphicon-align-justify{ padding-right: 10px;}
 .glyphicon-upload{ padding-right: 10px; color:grey;}
+.glyphicon-download{ padding-right: 10px; color:grey;}
 .glyphicon-edit{ color:grey;}
 .glyphicon-picture{ padding-right: 10px;}
+.glyphicon-refresh{ padding: 10px; color:grey;}
 .glyphicon-minus{ padding-right: 10px;}
 .glyphicon-minus-sign{ padding-right: 10px; color: DarkRed;}
 .glyphicon-print{ margin-right: 10px; color: grey;}
-.glyphicon-ok{ margin-right: 10px; color:green; float:right;}
-.glyphicon-remove{ margin-right: : 10px; color:red; float:right;}
+.my-glyphicon-ok{ margin-right: 10px; color:green; float:right;}
+.my-glyphicon-remove{ margin-right: : 10px; color:red; float:right;}
 
 #calendar {
   max-width: 900px;
   margin: 10px 10px;
 }
 
-#patientPage, #billingPage, #todoPage, #waiverPage {
+#patientPage, #billingPage, #todoPage, #waiverPage, #dropPage {
   margin: 20px 10px;
+  padding: 20px;
 }
 
 /*

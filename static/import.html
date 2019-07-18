@@ -23,10 +23,6 @@
         padding: 0;
       }
 
-      #container-main {
-        margin: 50px 10px;
-      }
-
       #drop-area {
         border: 2px dashed #ccc;
         border-radius: 20px;
@@ -127,7 +123,7 @@
               <input type="text" class="form-control input-sm" id="date">
               <span id="date-ok" class="input-group-addon glyphicon"></span>
             </div>
-            <input type="text" id="pid">
+            <input type="text" id="pid" hidden>
           </div>
         </div>
         <div class="panel-body">
@@ -180,6 +176,7 @@
             <p>
             <span role="button" 
             class="glyphicon glyphicon-refresh badge-pill"
+            data-toggle="tooltip" title="Click to start again" 
             onclick="refresh()"></span>
             </p>
           </div>
@@ -189,6 +186,7 @@
             <p>Staging area:
             <span role="button" 
             class="glyphicon glyphicon-upload badge-pill"
+            data-toggle="tooltip" title="Click to upload sessions" 
             onclick="uploadSessions();"></span>
             </p>
           </div>
@@ -260,7 +258,7 @@
               let span = $('<span class="glyphicon glyphicon-ok my-glyphicon-ok"></span>');
               span.attr('data-toggle','tootlip');
               if (r.latest){
-                span.attr('title',`Latest session was on ${r.latest.date}. New session is number ${r.new_session.no_session}.`);
+                span.attr('title',`Latest session was on ${r.latest.date}. New session is number ${r.new_session.session_number}.`);
               }
               span.tooltip();
               el.find('li').append(span);
@@ -329,7 +327,6 @@
           return
         }
         if (confirm(`This will create ${n_sessions} new sessions. Proceed?`)){
-        //console.log(items)
           $('#gallery').hide()
           uploadItems(items);
         }
@@ -393,13 +390,14 @@
       function handleFiles(files) {
 
         $('.gallery-item').remove()
+        $('#gallery,#refresh,#upload').show()
+
 
         files = ([...files])
         files.map(parseFilename)
           .forEach(previewFile)
 
         $('#drop-area').hide()
-        $('#gallery,#refresh,#upload').show()
       }
 
       function get_pid(p_name){
@@ -431,7 +429,13 @@
         var date;
         var pid;
         if (date_match){
-          date = new Date(date_match[0])
+          //console.log(date_match[0].split('-'))
+          var l = date_match[0].split('-').map(function(x){return parseInt(x,10)})
+          if (l[2]<2000){
+            l[2] += 2000
+          }
+          //console.log(l)
+          date = new Date(Date.UTC(l[2],l[0]-1,l[1]+1))
           //date = date.toLocaleDateString("en-US")
           p_name = name.substring(0,date_match.index)
         } else {
@@ -573,6 +577,13 @@
       }
 
       $( document ).ready(function() {
+
+        $('#gallery,#refresh,#upload').hide()
+
+        if (navigator.userAgent.indexOf('Mobi')>-1){
+          alert('Functionality not available on mobile devices');
+          window.location = '/';
+        }
 
         let dropArea = document.getElementById('drop-area')
 

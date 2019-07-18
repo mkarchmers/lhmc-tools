@@ -510,14 +510,9 @@ class NewHandler2(webapp2.RequestHandler):
 
     def post(self):
         for (k,v) in self.request.POST.items():
-            pass
-            #print k, v
+            
+            print k, v
 
-        img = self.request.get('img-file-todo')
-        if img and img!="":
-            k = models.NoteImage.create({'name':'mk','date':'today'}, img)
-            self.response.write('<img class="img-responsive" src="/img?img_id=%s"></img>' % k) 
-            return
 
         self.response.write(json.dumps({
                     'status':'error',
@@ -575,7 +570,6 @@ class NewHandler(webapp2.RequestHandler):
                 }, cls=models.ModelEncoder))
             return
 
-
         if date is None or pid is None:
             self.response.write(json.dumps({
                 'status':'error',
@@ -603,13 +597,20 @@ class NewHandler(webapp2.RequestHandler):
 
         new_session = sessions.new_session(uid, patient, latest, date)
 
+        if img and img != "":
+            k = models.NoteImage.create({'name':new_session.name,'date':new_session.date}, img)
+            new_session.notes_img_id = k
+            new_session.notes = '<img class="img-responsive" src="/img?img_id=%s"></img>' % k
+        else:
+            new_session.notes = notes
+
+
         if new_session is None:
             self.response.write(json.dumps({
                 'status':'error',
                 'message':'Unknown error creating new session'}))
             return
 
-        new_session.notes = notes
         new_session.put()
 
         self.response.write(json.dumps({
