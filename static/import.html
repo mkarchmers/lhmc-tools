@@ -40,8 +40,8 @@
       .my-form {
         margin-bottom: 10px;
       }
-      #gallery {
-        margin-top: 10px;
+      #gallery,#upload {
+        margin-top: 15px;
       }
       .panel-body img {
         width: 10%;
@@ -51,14 +51,14 @@
         vertical-align: middle;
       }
       .gallery-item #file-name {
-        margin: 8px;
+        /*margin: 8px;*/
         width: 95%;
 
       }
 
       .gallery-item #file {
-        font-size: 10px;
-        padding-bottom: 10px;
+        font-size: 12px;
+        padding-bottom: 5px;
       }
 
       .button {
@@ -78,12 +78,11 @@
 
 
       .gallery-item {
-        
         border: 5px solid #ccc;
         border-color: #5F9EA0;
         border-radius: 20px;
 
-        margin: 2px;
+        margin: 5px;
       }
 
       #name-ok.glyphicon-ok, #date-ok.glyphicon-ok{
@@ -92,8 +91,6 @@
       #name-ok.glyphicon-remove, #date-ok.glyphicon-remove{
         color: red;
       }
-
-
 
     </style>
 
@@ -104,26 +101,22 @@
     <template id="img-tmpl">
       <div class="gallery-item panel">
         <div class="panel-heading">
-          <div id="file-name" class="input-group input-group-sm well">
+          <div id="file-name" class="input-group input-group-sm text-primary">
             <span role="button"
                       class="delete-session glyphicon glyphicon-minus-sign badge-pill"
                       data-toggle="tooltip" title="Click to delete"></span>
             <span role="button"
                       class="upload-session glyphicon glyphicon-upload badge-pill"
                       data-toggle="tooltip" title="Click to load"></span>
-            <div class="input-group-prepend">
-              <!--<span class="input-group-text" id="">Name and Date</span>-->
-              <div id="file"></div>
-            </div>
-            <div class="input-group input-group-sm">
-              <input type="text" class="form-control input-sm" id="name">
-              <span id="name-ok" class="input-group-addon glyphicon"></span>
-            </div>
-            <div class="input-group input-group-sm">
-              <input type="text" class="form-control input-sm" id="date">
-              <span id="date-ok" class="input-group-addon glyphicon"></span>
-            </div>
-            <input type="text" id="pid" hidden>
+            <p id="file" class="lead"></p>
+          </div>
+          <div class="input-group input-group-sm">
+            <input type="text" class="form-control input-sm" id="name">
+            <span id="name-ok" class="input-group-addon glyphicon"></span>
+          </div>
+          <div class="input-group input-group-sm">
+            <input type="text" class="form-control input-sm" id="date">
+            <span id="date-ok" class="input-group-addon glyphicon"></span>
           </div>
         </div>
         <div class="panel-body">
@@ -153,6 +146,7 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
+            <li><a onclick="refresh();">Start</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
@@ -166,24 +160,15 @@
             <div id="drop-area">
               <form class="my-form">
                 <input type="file" id="fileElem" multiple accept="image/*" onchange="handleFiles(this.files)">
-                <label class="button" for="fileElem">Upload note images</label>
+                <label class="btn btn-primary" for="fileElem">Upload note images</label>
               </form>
             </div>
           </div>
         </div>
-        <div class="row">
-          <div id="refresh" class="col-offset-1 col-sm-8 col-md-6">
-            <p>
-            <span role="button" 
-            class="glyphicon glyphicon-refresh badge-pill"
-            data-toggle="tooltip" title="Click to start again" 
-            onclick="refresh()"></span>
-            </p>
-          </div>
-        </div>
+              
         <div class="row">
           <div id="upload" class="col-offset-1 col-sm-8 col-md-6">
-            <p>Staging area:
+            <p class="lead">Staging area:
             <span role="button" 
             class="glyphicon glyphicon-upload badge-pill"
             data-toggle="tooltip" title="Click to upload sessions" 
@@ -193,7 +178,7 @@
         </div>
         <div class="row">
           <div id="gallery" class="col-offset-1 col-sm-8 col-md-6">        
-            <p>Files:</p>
+            <p class="lead">Files:</p>
           </div>
         </div>
       </div>
@@ -233,7 +218,7 @@
         row = (item) => item.name;
 
         $('#drop-area').hide()
-        $('#upload,#refresh,#gallery').hide()
+        $('#upload,#gallery').hide()
 
         $.getJSON('/patient', function(data){
           
@@ -390,7 +375,7 @@
       function handleFiles(files) {
 
         $('.gallery-item').remove()
-        $('#gallery,#refresh,#upload').show()
+        $('#gallery,#upload').show()
 
 
         files = ([...files])
@@ -512,14 +497,12 @@
               if (res.pid){
                 tmp.data('pid', res.pid);
                 tmp.data('name', res.name);
-                tmp.find('#pid').first().val(res.pid);
                 tmp.find('#name-ok').first()
                   .removeClass('glyphicon-remove')
                   .addClass('glyphicon-ok')
                 tmp.find('#name').first().val(res.name)
               }
               else{
-                tmp.find('#pid').first().val(undefined)
                 tmp.find('#name-ok').first()
                   .removeClass('glyphicon-ok')
                   .addClass('glyphicon-remove')
@@ -547,7 +530,6 @@
             })
 
             if (data.pid){
-              tmp.find('#pid').first().val(data.pid)
               name_el.val(data.name)
               tmp.find('#name-ok').first().addClass('glyphicon-ok')
             } else {
@@ -578,7 +560,7 @@
 
       $( document ).ready(function() {
 
-        $('#gallery,#refresh,#upload').hide()
+        $('#gallery,#upload').hide()
 
         if (navigator.userAgent.indexOf('Mobi')>-1){
           alert('Functionality not available on mobile devices');
