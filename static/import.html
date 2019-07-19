@@ -362,13 +362,13 @@
       function compareData(a,b){
         a_name = a.name.toLowerCase();
         b_name = b.name.toLowerCase();
-        if (a_name == b_name){
-          if (a.date == b.date){
+        if (a.date == b.date){
+          if (a_name == b.b_name){
             return 0
           }
-          return (a.date < b.date? -1 : 1);
+          return (a_name > b_name? -1 : 1);
         }
-        return (a_name > b_name? -1 : 1)
+        return (a.date < b.date? -1 : 1)
       }
 
       function handleFiles(files) {
