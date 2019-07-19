@@ -341,10 +341,7 @@ class SessionsHandler(webapp2.RequestHandler):
         query = models.Session.query(ancestor=models.UserKey.get(uid))
 
         order = self.request.get('order', 'lifo')
-        if order == 'lifo':
-            query = query.order(-models.Session.date_object)
-        else:
-            query = query.order(models.Session.date_object)
+        query = query.order(-models.Session.date_object)
 
         pid = self.request.get('pid')
 
