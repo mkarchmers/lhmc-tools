@@ -593,6 +593,11 @@ class NewHandler(webapp2.RequestHandler):
         patient = key.get()
 
         new_session = sessions.new_session(uid, patient, latest, date)
+        if new_session is None:
+            self.response.write(json.dumps({
+                'status':'error',
+                'message':'Unknown error creating new session'}))
+            return
 
         if img and img != "":
             k = models.NoteImage.create({'name':new_session.name,'date':new_session.date}, img)
@@ -600,13 +605,15 @@ class NewHandler(webapp2.RequestHandler):
             new_session.notes = '<img class="img-responsive" src="/img?img_id=%s"></img>' % k
         else:
             new_session.notes = notes
+            new_session.notes_img_id = None
 
-
-        if new_session is None:
-            self.response.write(json.dumps({
-                'status':'error',
-                'message':'Unknown error creating new session'}))
-            return
+        # if last was evaluation, change to ergular session and get new mod_code
+        if new_session.modality == 'Evaluation':
+            new_session.modality = 'Individual-45min'
+            if new_session.insurance != 'None' and new_session.insurance != 'SelfPay':
+                new_session.mod_code = models.Insurance.get_code(new_session.insurance, new_session.modality)
+            else:
+                new_session.mod_code = 'None'
 
         new_session.put()
 

@@ -108,11 +108,11 @@
             <p id="file" class="lead"></p>
           </div>
           <div class="input-group input-group-sm">
-            <input type="text" class="form-control input-sm" id="name">
+            <input type="text" class="form-control input-sm" id="name" placeholder="Name">
             <span id="name-ok" class="input-group-addon glyphicon"></span>
           </div>
           <div class="input-group input-group-sm">
-            <input type="text" class="form-control input-sm" id="date">
+            <input type="text" class="form-control input-sm" id="date" placeholder="Date">
             <span id="date-ok" class="input-group-addon glyphicon"></span>
           </div>
         </div>
@@ -209,10 +209,7 @@
         return new Promise((resolve) => setTimeout(resolve, time));
       }
 
-
       function load_patients(){
-
-        row = (item) => item.name;
 
         $('#drop-area').hide()
         $('#upload,#gallery').hide()
