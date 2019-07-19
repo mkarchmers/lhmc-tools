@@ -816,7 +816,7 @@
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.min.js' type='text/javascript'></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/fullcalendar.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.1.1/d3.min.js"></script>
 
@@ -1047,7 +1047,7 @@
           mom_schedule.set('hour',0);
           mom_schedule.set('minute',0);
           mom_schedule.set('second',0);
-          var d = moment(date).diff(mom_schedule,'day');
+          var d = moment(date, "MM/DD/YYYY").diff(mom_schedule,'day');
           return d % item.freq == 0;
         }
       }
@@ -1840,7 +1840,7 @@
 
             $('#seshdate').attr('placeholder', 'last on '+latest_data.date)
 
-            latest = moment(latest_data.date);
+            latest = moment(latest_data.date, "MM/DD/YYYY");
 
             // restrict datepicker
             $('#seshdate').datepicker({
@@ -2020,7 +2020,8 @@
                 if (freq == "Monthly") {
                   weeks = 4
                 }
-                nxt = moment($('input[name="date"]').val()).add(weeks,'week').format('MM/DD/YYYY');
+                let d = $('input[name="date"]').val();
+                nxt = moment(d, "MM/DD/YYYY").add(weeks,'week').format('MM/DD/YYYY');
                 $('input[name="PLN_NXT"]').val(nxt);
               }
               // PLN_FREQ
