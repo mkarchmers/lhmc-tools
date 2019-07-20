@@ -82,10 +82,10 @@
         margin: 5px;
       }
 
-      #name-ok.glyphicon-ok, #date-ok.glyphicon-ok{
+      .name-ok.glyphicon-ok, .date-ok.glyphicon-ok{
         color: green;
       }
-      #name-ok.glyphicon-remove, #date-ok.glyphicon-remove{
+      .name-ok.glyphicon-remove, .date-ok.glyphicon-remove{
         color: red;
       }
 
@@ -108,12 +108,12 @@
             <p id="file" class="lead"></p>
           </div>
           <div class="input-group input-group-sm">
-            <input type="text" class="form-control input-sm" id="name" placeholder="Name">
-            <span id="name-ok" class="input-group-addon glyphicon"></span>
+            <input type="text" class="form-control input-sm" name="name" placeholder="Name">
+            <span class="name-ok input-group-addon glyphicon"></span>
           </div>
           <div class="input-group input-group-sm">
-            <input type="text" class="form-control input-sm" id="date" placeholder="Date">
-            <span id="date-ok" class="input-group-addon glyphicon"></span>
+            <input type="text" class="form-control input-sm" name="date" placeholder="Date">
+            <span class="date-ok input-group-addon glyphicon"></span>
           </div>
         </div>
         <div class="panel-body">
@@ -175,7 +175,7 @@
         </div>
         <div class="row">
           <div id="gallery" class="col-offset-1 col-sm-8 col-md-6">        
-            <p class="lead">Files:</p>
+            <p class="lead">Issues:</p>
           </div>
         </div>
       </div>
@@ -319,7 +319,7 @@
 
       function unstageSession(el){
         tmp = $(el).parents('.upload-item');
-        previewFile(tmp.data());
+        previewFile(tmp.data(), true);
         tmp.remove();
       }
 
@@ -327,19 +327,21 @@
         $(el).parents('.gallery-item').remove()
       }
 
-      function validateData(item){
+      function validateData(item, silent){
         if (!item.pid | !isValidDate(item.date)){
-          alert('Name or date incorrect');
+          if (!silent){
+            alert('Name or date incorrect');
+          }
           return false
         }
         return true;
       }
 
-      function stageSession(el){
+      function stageSession(el, silent){
         var parent = $(el).parents('.gallery-item');
         var item = parent.data();
 
-        if (!validateData(item)){
+        if (!validateData(item, silent)){
           return;
         }
 
@@ -376,7 +378,7 @@
 
         files = ([...files])
         files.map(parseFilename)
-          .forEach(previewFile)
+          .forEach(function(x){previewFile(x,false)})
 
         $('#drop-area').hide()
       }
@@ -464,7 +466,7 @@
         return {date: date}
       }
 
-      function loader(data){
+      function loader(data, manual){
 
           return function() {
 
@@ -482,44 +484,45 @@
             })
 
             tmp.find('.upload-session').click(function(){
-              stageSession(this);
+              stageSession(this, false);
             })
 
             tmp.find('#file').first().html(data.file.name)
 
-            name_el = tmp.find('#name').first()
+            name_el = tmp.find('input[name="name"]').first()
             name_el.change(function(){
               res = validate_name(this)
               if (res.pid){
                 tmp.data('pid', res.pid);
                 tmp.data('name', res.name);
-                tmp.find('#name-ok').first()
+                tmp.find('.name-ok').first()
                   .removeClass('glyphicon-remove')
                   .addClass('glyphicon-ok')
-                tmp.find('#name').first().val(res.name)
+                tmp.find('input[name="name"]').first().val(res.name)
               }
               else{
-                tmp.find('#name-ok').first()
+                tmp.find('.name-ok').first()
                   .removeClass('glyphicon-ok')
                   .addClass('glyphicon-remove')
               }
             })
 
-            date_el = tmp.find('#date').first()
+            date_el = tmp.find('input[name="date"]').first()
                     date_el.datepicker({
                         autoclose: true,
                         todayHighlight: true,
+                        orientation: 'bottom',
                     });
 
             date_el.change(function(){
               res = validate_date(this)
               if (res.date){
                 tmp.data('date',res.date)
-                tmp.find('#date-ok').first()
+                tmp.find('.date-ok').first()
                   .removeClass('glyphicon-remove')
                   .addClass('glyphicon-ok')
               } else {
-                tmp.find('#date-ok').first()
+                tmp.find('.date-ok').first()
                   .removeClass('glyphicon-ok')
                   .addClass('glyphicon-remove')
               }
@@ -527,29 +530,33 @@
 
             if (data.pid){
               name_el.val(data.name)
-              tmp.find('#name-ok').first().addClass('glyphicon-ok')
+              tmp.find('.name-ok').first().addClass('glyphicon-ok')
             } else {
-              tmp.find('#name-ok').first().addClass('glyphicon-remove')
+              tmp.find('.name-ok').first().addClass('glyphicon-remove')
             }
 
             if (data.date){
-              tmp.find('#date').first().val(data.date.toLocaleDateString('en-US'))
-              tmp.find('#date-ok').first().addClass('glyphicon-ok')
+              tmp.find('input[name="date"]').first().val(data.date.toLocaleDateString('en-US'))
+              tmp.find('.date-ok').first().addClass('glyphicon-ok')
             }
             else {
-              tmp.find('#date-ok').first().addClass('glyphicon-remove')
+              tmp.find('.date-ok').first().addClass('glyphicon-remove')
             }
 
             tmp.data(data)
             tmp.appendTo('#gallery')
+
+            if (!manual){
+              stageSession( tmp.find('.upload-session').first(), true);
+            }
           }
       }
 
-      function previewFile(data) {
-        //console.log(data.file.name)
+      function previewFile(data, manual) {
+
         let reader = new FileReader()
 
-        reader.onloadend = loader(data)
+        reader.onloadend = loader(data, manual)
       
         reader.readAsDataURL(data.file)
       }
