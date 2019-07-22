@@ -473,7 +473,13 @@
             var tmp  = $( $('#img-tmpl').html() );
 
             let img = document.createElement('img')
-            img.src = this.result
+            if (data.src){
+              img.src = data.src
+            } else {
+              img.src = this.result
+              data['src'] = img.src
+            }
+
             img.className += "img-rounded img-thumbnail img-responsive"
             img.addEventListener('mouseover',function(){$(this).css("width", "95%")})
             img.addEventListener('mouseout',function(){$(this).css("width", "10%")})
@@ -553,6 +559,11 @@
       }
 
       function previewFile(data, manual) {
+
+        if (data.src){
+          loader(data,manual)()
+          return
+        }
 
         let reader = new FileReader()
 
