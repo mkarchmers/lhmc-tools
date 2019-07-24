@@ -645,7 +645,7 @@ class CodesHandler(webapp2.RequestHandler):
 
         self.response.headers['Content-Type'] = 'application/json'
 
-        f = open('static/icd10cm_codes_2019.txt', 'r')
+        f = open('static/icd10cm_codes.txt', 'r')
         l = f.readlines()
         parsed = [[CodesHandler.fmt(x[0:7].strip()), x[8:].strip()] for x in l]
 
