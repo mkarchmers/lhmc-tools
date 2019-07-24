@@ -107,9 +107,12 @@
                       data-toggle="tooltip" title="Click to load"></span>
             <p id="file" class="lead"></p>
           </div>
-          <div class="input-group input-group-sm">
-            <input type="text" class="form-control input-sm" name="name" placeholder="Name">
+          <div class="dropdown input-group input-group-sm">
+            <input type="text" class="form-control input-sm dropdown-toggle" name="name" 
+                    placeholder="Name" data-toggle="dropdown">
             <span class="name-ok input-group-addon glyphicon"></span>
+            <ul class="dropdown-menu pre-scrollable">
+            </ul>
           </div>
           <div class="input-group input-group-sm">
             <input type="text" class="form-control input-sm" name="date" placeholder="Date">
@@ -207,6 +210,20 @@
 
       function sleep (time) {
         return new Promise((resolve) => setTimeout(resolve, time));
+      }
+
+      function set(el){
+        var tmp = $(el);
+        var inp = tmp.parents('.dropdown').find('input').first();
+        inp.val( tmp.text() );
+        inp.change();
+      }
+
+      function toggle_dropdown(){
+          var value = $(this).val().toLowerCase();
+          $(this).parent().find(".dropdown-menu li").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+          });
       }
 
       function load_patients(){
@@ -496,6 +513,14 @@
             tmp.find('#file').first().html(data.file.name)
 
             name_el = tmp.find('input[name="name"]').first()
+            name_el.on("keyup", toggle_dropdown);
+            Object.keys(patient_dir).forEach(function(x){
+              var li = $('<li><a onclick="set(this);"></a></li');
+              li.find('a').text(x)
+              tmp.find('.dropdown-menu').append(li)
+            })
+
+
             name_el.change(function(){
               res = validate_name(this)
               if (res.pid){
