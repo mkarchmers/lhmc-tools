@@ -645,9 +645,12 @@ class CodesHandler(webapp2.RequestHandler):
 
         self.response.headers['Content-Type'] = 'application/json'
 
+        ##
+        # data from https://www.cms.gov/Medicare/Coding/ICD10/2018-ICD-10-CM-and-GEMs.html
+        ##
         f = open('static/icd10cm_codes.txt', 'r')
-        l = f.readlines()
-        parsed = [[CodesHandler.fmt(x[0:7].strip()), x[8:].strip()] for x in l]
+        parsed = [[CodesHandler.fmt(x[0:7].strip()), x[8:].strip()] for x in f.readlines()]
+        f.close()
 
         self.response.write(json.dumps({'codes': parsed}))
 
