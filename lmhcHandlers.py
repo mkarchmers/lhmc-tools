@@ -631,3 +631,24 @@ class ImageHandler(webapp2.RequestHandler):
         img = key.get()
         self.response.headers['Content-Type'] = 'image/png'
         self.response.out.write(img.blob)
+
+
+class CodesHandler(webapp2.RequestHandler):
+
+    @classmethod
+    def fmt(cls,c):
+        if len(c)==3:
+            return c
+        return c[:3]+"."+c[3:]
+
+    def get(self):
+
+        self.response.headers['Content-Type'] = 'application/json'
+
+        f = open('static/icd10cm_codes_2019.txt', 'r')
+        l = f.readlines()
+        parsed = [[CodesHandler.fmt(x[0:7].strip()), x[8:].strip()] for x in l]
+
+        self.response.write(json.dumps({'codes': parsed}))
+
+
