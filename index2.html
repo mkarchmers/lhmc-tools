@@ -1929,10 +1929,8 @@
           $(el).change(function(){
             code = $(el).val().toUpperCase()
             d = Codes.codes[$(el).val().toUpperCase()]
-            if (d) {
-              $(el).val(code);
-              $((idx==1? "#diag_2":"#diag")).val(d);
-            }
+            $(el).val(code);
+            $((idx==1? "#diag_2":"#diag")).val(d);
           })
         })
 
