@@ -327,6 +327,7 @@
                           <div class="input-group">
                             Primary diagnosis: <input type="text" id="diag" name="diag" >
                             Primary diagnosis code: <input type="text" id="diag_code" name="diag_code" >
+                            <a href="/static/icd10.html" target="_blank" class="glyphicon glyphicon-search badge-pill"></a>
                           </div>
                         </li>
                         <li class="list-group-item">
@@ -821,9 +822,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/fullcalendar.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.1.1/d3.min.js"></script>
 
-    <!--<script src="js/form.js"></script>-->
+    <script src="js/codes.js"></script>
 
     <script>
+
+      Codes.load();
 
       var new_patient_flag = true;
       var new_session_flag = true;
@@ -1921,6 +1924,17 @@
             e.stopPropagation();
           })
         }
+
+        ['#diag_code','#diag_2_code'].forEach(function(el,idx){
+          $(el).change(function(){
+            code = $(el).val().toUpperCase()
+            d = Codes.codes[$(el).val().toUpperCase()]
+            if (d) {
+              $(el).val(code);
+              $((idx==1? "#diag_2":"#diag")).val(d);
+            }
+          })
+        })
 
         // confirms closing of SI modal
         $('#session-info-close').on('click', function(event){

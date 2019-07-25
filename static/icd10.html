@@ -106,9 +106,10 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.min.js' type='text/javascript'></script>
 
-    <script>
+    <script src="/js/codes.js"></script>
 
-    var codes = {};
+
+    <script>
 
     function set(el){
       var tmp = $(el);
@@ -117,20 +118,8 @@
       inp.change();
     }
 
-    function load_codes(){
-
-      console.log('codes')
-
-      return $.getJSON('/codes',
-      //https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code&terms=F3&maxList=500',  
-        function(data){
-
-          data['codes'].forEach(function(x){codes[x[0]]=x[1]})
-      })
-    }
-
     function create_input_code(){
-      create_code_tmpl('#codes', '#code-tmpl', codes)
+      create_code_tmpl('#codes', '#code-tmpl', Codes.codes)
     }
 
     function get_pair(L, j, val){
@@ -189,9 +178,7 @@
 
     $(document).ready(function(){
 
-      load_codes()
-        .done(create_input_code);
-
+      Codes.load().done(create_input_code)
     });
 
 
