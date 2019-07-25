@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>MyTherapyNotes</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">  
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker.css" />    
+
+    <link rel="stylesheet" href="../js/lmhc.css"/>
+    <style type="text/css">
+
+      html, body {
+        margin: 10px;
+        padding: 0;
+      }
+
+      .container-main {
+        margin-top:20px;
+      }
+
+      .tool {
+        margin-top:50px;
+      }
+
+      .dropdown {
+        margin-top:10px;
+      }
+
+    </style>
+
+  </head>
+
+  <body>
+
+    <template id="code-tmpl">
+      <div class="container innput-group innput-group-sm">
+        <div class="dropdown">
+          Diagnosis: 
+          <input type="text" class="input-sm dropdown-toggle" name="diag" data-toggle="dropdown">
+          <ul id="diag" class="dropdown-menu pre-scrollable">
+          </ul>
+        </div>
+        <div class="dropdown">
+          Code: 
+          <input type="text" class="input-sm dropdown-toggle" name="diag_code" data-toggle="dropdown">
+          <ul id="diag-code" class="dropdown-menu pre-scrollable">
+          </ul>
+        </div>
+      </div>
+    </template>
+
+
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="/">MyTherapyNotes</a>
+        </div>
+      </div>
+    </nav>
+
+    
+    <div class="container" id="container-main">
+      <div class="row">
+        <div class="col-offset-1 col-sm-8 col-md-6">
+          <div class="tool panel panel-default">
+            <div class="panel-heading">
+              <p class="lead primary">
+                ICD-10 tool
+              </p>
+            </div>      
+            <div class="panel-body">
+              <div id="codes"><!-- class="col-offset-1 col-sm-8 col-md-6">-->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>        
+    </div>
+
+
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.min.js"
+      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+      crossorigin="anonymous"></script>
+    <script
+      src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+      integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+      crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.min.js' type='text/javascript'></script>
+
+    <script>
+
+    var codes = {};
+
+    function set(el){
+      var tmp = $(el);
+      var inp = tmp.parents('.dropdown').find('input').first();
+      inp.val( tmp.text() );
+      inp.change();
+    }
+
+    function load_codes(){
+
+      console.log('codes')
+
+      return $.getJSON('/codes',
+      //https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code&terms=F3&maxList=500',  
+        function(data){
+
+          data['codes'].forEach(function(x){codes[x[0]]=x[1]})
+      })
+    }
+
+    function create_input_code(){
+      create_code_tmpl('#codes', '#code-tmpl', codes)
+    }
+
+    function get_pair(L, j, val){
+      for(let i = 0; i < L.length; i++){
+        item = L[i]
+        if (item[j]==val){
+          return item[1-j]
+        }
+      }
+      return
+    }
+
+    function toggle_dropdown(){
+        var value = $(this).val().toLowerCase();
+        $(this).parent().find(".dropdown-menu li").filter(function() {
+          $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });      
+    }
+
+    function change_input(list, j, other_el){
+
+      return function() {
+        var value = $(this).val().toLowerCase();
+        var p = list.filter(function(x){return x[j].toLowerCase().indexOf(value) > -1})
+        if (p.length == 1){
+          var item = p[0];
+          $(this).val(item[j]);
+          other = get_pair(list,j,item[j])
+          $(this).parents('.container').first().find(`input[name="${other_el}"]`).first().val(other)
+        }
+      }
+    }
+
+    function create_code_tmpl(el, tmpl, codes){
+      var tmp = $( $(tmpl).html() );
+
+      var list = Object.entries(codes);
+
+      list.forEach(function(x){
+
+        var li = $(`<li><a onclick="set(this);">${x[0]}</a></li>`);
+        tmp.find('#diag-code').append(li)
+
+        var li = $(`<li><a onclick="set(this);">${x[1]}</a></li>`);
+        tmp.find('#diag').append(li)
+      })
+
+      tmp.find('input').on("keyup", toggle_dropdown);
+
+      tmp.find('input[name="diag"]').on("change", change_input(list,1,'diag_code'));
+
+      tmp.find('input[name="diag_code"]').on("change", change_input(list,0,'diag'));
+
+      $(el).append(tmp);
+    }
+
+    $(document).ready(function(){
+
+      load_codes()
+        .done(create_input_code);
+
+    });
+
+
+    </script>
+
+  </body>
+</html>
