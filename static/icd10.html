@@ -42,16 +42,17 @@
   <body>
 
     <template id="code-tmpl">
-      <div class="container innput-group innput-group-sm">
-        <div class="dropdown">
+      <div class="container">
+        <div class="dropdown input-group input-group-lg">
           Diagnosis: 
-          <input type="text" class="input-sm dropdown-toggle" name="diag" data-toggle="dropdown">
+          <input type="text" class="dropdown-toggle icd10-in" name="diag" data-toggle="dropdown">
+
           <ul id="diag" class="dropdown-menu pre-scrollable">
           </ul>
         </div>
-        <div class="dropdown">
+        <div class="dropdown input-group input-group-lg">
           Code: 
-          <input type="text" class="input-sm dropdown-toggle" name="diag_code" data-toggle="dropdown">
+          <input type="text" class="dropdown-toggle icd10-in" name="diag_code" data-toggle="dropdown">
           <ul id="diag-code" class="dropdown-menu pre-scrollable">
           </ul>
         </div>
@@ -66,7 +67,10 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li><a onclick="window.close();">Close</a></li>
+            <li><a class="glyphicon glyphicon-repeat" onclick="$('.icd10-in').val('');"></a></li>
+            <li><a class="glyphicon glyphicon-remove" onclick="window.close();"></a></li>
+          </span>
+
           </ul>
         </div><!--/.nav-collapse -->
 
