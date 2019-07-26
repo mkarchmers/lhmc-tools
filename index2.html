@@ -105,6 +105,9 @@
             </div>
             <br/>
             <table id="patientTable" class="table table-bordered table-striped">
+              <thead hidden>
+                <th></th>
+              </thead>
               <tbody></tbody>
             </table>
           </div>
@@ -1515,11 +1518,15 @@
 
         $.getJSON('/patient', function(data){
 
+          var sorted_list = data.patient_list.sort(function(a,b){
+            return (a.name.toLowerCase() > b.name.toLowerCase()? 1: -1)
+          })
+
           console.log('patient info loaded')
           var table = d3.select('#patientTable');
           var tbody = table.select('tbody');
           var selection = tbody.selectAll('tr')
-            .data(data.patient_list);
+            .data(sorted_list);
             
           selection.text(row)
 
@@ -1536,7 +1543,7 @@
           selection.exit().remove();
 
           tbody.selectAll('a')
-            .data(data.patient_list)
+            .data(sorted_list)
             .append('span')
             .classed('invisible', (d) => (d.status == "Inactive"))
             .classed('glyphicon',true)
@@ -1550,7 +1557,7 @@
               d3.event.stopPropagation();
             });
           tbody.selectAll('a')
-            .data(data.patient_list)
+            .data(sorted_list)
             .append('span')
             .classed('invisible', (d) => ((d.status == "Inactive") || (d.session_number == 0)))
             .classed('glyphicon',true)
@@ -1564,7 +1571,7 @@
               d3.event.stopPropagation();
             });
           tbody.selectAll('a')
-            .data(data.patient_list)
+            .data(sorted_list)
             .append('span')
             .classed('glyphicon',true)
             .classed('glyphicon-align-justify',true)
