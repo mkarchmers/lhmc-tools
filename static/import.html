@@ -405,7 +405,9 @@
         var li = tmp.find('li').first();
         var date = (item.date? item.date.toLocaleDateString('en-US') : undefined)
         title = `<small>${item.name}</small>`
-        li.find('a').first().html(title);
+        li.find('a').first()
+          .attr('title',item.file.name)
+          .html(title);
 
         create_stage_day(item.date).find('.stage-day-gallery').append(tmp)
 
