@@ -223,6 +223,11 @@
       var patient_list = [];
       var patient_dir = {}
 
+      function format_date(date){
+        return date.toLocaleDateString('en-US',
+          {'month':'2-digit','day':'2-digit','year':'numeric'})
+      }      
+
       function refresh(){
         window.location = '/static/import.html'
       }
@@ -309,7 +314,7 @@
         //console.log(item)
         var form_data = new FormData();
         form_data.append('pid',item.pid);
-        form_data.append('date', item.date.toLocaleDateString('en-US'));
+        form_data.append('date', format_date(item.date));
         form_data.append("img-file-todo", item.file);
 
         $.ajax({
@@ -410,7 +415,7 @@
         tmp.data(item)
 
         var li = tmp.find('li').first();
-        var date = (item.date? item.date.toLocaleDateString('en-US') : undefined)
+        var date = (item.date? format_date(item.date) : undefined)
         title = `<small>${item.name}</small>`
         li.find('a').first()
           .attr('title',item.file.name)
@@ -615,7 +620,7 @@
             }
 
             if (data.date){
-              tmp.find('input[name="date"]').first().val(data.date.toLocaleDateString('en-US'))
+              tmp.find('input[name="date"]').first().val(format_date(data.date))
               tmp.find('.date-ok').first().addClass('glyphicon-ok')
             }
             else {

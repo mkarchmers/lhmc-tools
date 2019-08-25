@@ -475,10 +475,6 @@ class DeleteHandler(webapp2.RequestHandler):
         p_key = ndb.Key(urlsafe=pid)
         patient = p_key.get()
 
-        notes_img_id = getattr(session, 'notes_img_id')
-        if notes_img_id is not None and notes_img_id != "":
-            n_key = ndb.Key(urlsafe=notes_img_id)
-            n_key.delete()  
 
         # is it OK to delete?
         if patient.session_number > session.session_number:
@@ -492,6 +488,10 @@ class DeleteHandler(webapp2.RequestHandler):
                 'message':'Attempting to delete a billed session. Nothing done.'}))
             return
 
+        notes_img_id = getattr(session, 'notes_img_id')
+        if notes_img_id is not None and notes_img_id != "":
+            n_key = ndb.Key(urlsafe=notes_img_id)
+            n_key.delete()  
         s_key.delete()
         ndb.transaction(patient.decrement)
 
