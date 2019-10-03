@@ -15,6 +15,8 @@ def new_session(uid, patient, session, date):
 
 	new_session.timestamp = datetime.datetime.now()
 
+	new_session.insurance = patient.insurance
+
 	new_session.is_billed = False
 	new_session.billing_time = None
 
